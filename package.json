@@ -1,0 +1,12 @@
+{
+  "name": "anotherstep-monorepo",
+  "private": true,
+  "description": "Monorepo for Another Step, Inc. and Storefront",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

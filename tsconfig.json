@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@anothersteporg/ui/*": ["packages/ui/src/*"]
+    }
+  }
+}

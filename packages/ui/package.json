@@ -1,0 +1,17 @@
+{
+    "name": "@anothersteporg/ui",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts",
+        "./components/*": "./src/components/*.astro",
+        "./styles/global.css": {
+            "style": "./src/styles/global.css",
+            "default": "./src/styles/global.css"
+        }
+    },
+    "peerDependencies": {
+        "astro": "^4.0.0 || ^5.0.0"
+    }
+}

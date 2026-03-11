@@ -1,0 +1,10 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@anothersteporg/ui/*": ["../../packages/ui/src/*"]
+    },
+    "types": ["vite/client"]
+  }
+}

@@ -1,0 +1,114 @@
+---
+/* PointerTrail.astro */
+---
+
+<!-- Mouse Cursor Trail Start -->
+<div class="pointer-trail cursor-outer"></div>
+<div class="pointer-trail cursor-inner"></div>
+<!-- Mouse Cursor Trail End -->
+
+<style>
+    .pointer-trail {
+        position: fixed;
+        top: 0;
+        left: 0;
+        border-radius: 50%;
+        transform: translateZ(0);
+        visibility: hidden;
+        pointer-events: none;
+        box-sizing: border-box;
+    }
+    .cursor-outer {
+        margin-left: -15px;
+        margin-top: -15px;
+        width: 30px;
+        height: 30px;
+        border: 1px solid blue;
+        background-color: blue;
+        z-index: 10000000;
+        opacity: 0.34;
+        transition: all 0.4s ease-out 0s;
+    }
+    .cursor-inner {
+        margin-left: -5px;
+        margin-top: -5px;
+        width: 10px;
+        height: 10px;
+        z-index: 10000001;
+        background-color: blue;
+        opacity: 1;
+        transition: all 0.24s ease-out 0s;
+    }
+    :global(.cursor-outer.cursor-hover) {
+        opacity: 0.14;
+    }
+    :global(.cursor-inner.cursor-hover) {
+        margin-left: -15px;
+        margin-top: -15px;
+        width: 30px;
+        height: 30px;
+        background-color: transparent;
+        border: 1px solid #686363;
+        opacity: 0.5; /* Adjusted so it's visible on hover */
+    }
+</style>
+
+<script>
+    function initCursor() {
+        const innerCursor = document.querySelector('.cursor-inner') as HTMLElement;
+        const outerCursor = document.querySelector('.cursor-outer') as HTMLElement;
+        
+        if (!innerCursor || !outerCursor) return;
+
+        let outerX = 0, outerY = 0;
+        let mouseX = 0, mouseY = 0;
+        const speed = 0.2; // Smoothness factor
+
+        // Visibility toggle
+        innerCursor.style.visibility = 'visible';
+        outerCursor.style.visibility = 'visible';
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Inner cursor follows mouse exactly
+            innerCursor.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
+        });
+
+        // Smooth lag for outer cursor
+        function animate() {
+            outerX += (mouseX - outerX) * speed;
+            outerY += (mouseY - outerY) * speed;
+            
+            outerCursor.style.transform = `translate(${outerX}px, ${outerY}px)`;
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Hover states
+        const handleEnter = (e: MouseEvent) => {
+            const target = e.target as HTMLElement;
+            if (target.closest('a, button, .cursor-pointer')) {
+                innerCursor.classList.add('cursor-hover');
+                outerCursor.classList.add('cursor-hover');
+            }
+        };
+
+        const handleLeave = (e: MouseEvent) => {
+            const target = e.target as HTMLElement;
+            if (target.closest('a, button, .cursor-pointer')) {
+                innerCursor.classList.remove('cursor-hover');
+                outerCursor.classList.remove('cursor-hover');
+            }
+        };
+
+        document.body.addEventListener('mouseover', handleEnter);
+        document.body.addEventListener('mouseout', handleLeave);
+    }
+
+    // Runs on initial load
+    initCursor();
+    // Re-runs if you use Astro View Transitions
+    document.addEventListener('astro:after-swap', initCursor);
+</script>

@@ -1,0 +1,31 @@
+---
+import Header from '@anothersteporg/ui/components/Header.astro';
+import PointerTrail from '@anothersteporg/ui/components/PointerTrail.astro';
+import Hero from '@anothersteporg/ui/components/Hero.astro';
+import '../styles/global.css'
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Astro</title>
+	</head>
+	<body>
+		<Header currentSite="main" />
+		<Hero 
+			title='Welcome to the Main Org Site'
+			subtitle='We are dedicated to helping individuals live their best lives through community habilitation, residences, and advocacy.'
+			buttonText='Donate Now'
+			buttonLink='/donation'
+			bgImage=''
+		/>
+		<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat distinctio in, odit, maxime vitae culpa quod quos necessitatibus omnis reprehenderit ex ipsam corrupti cumque eaque porro? Pariatur suscipit quia unde.</p>
+		<p>Voluptates rem veniam impedit eaque deleniti doloribus dicta odio a minima, veritatis obcaecati hic illo aspernatur. Saepe voluptatem ipsa officia. Quisquam, exercitationem! Fugiat optio aliquam ullam sint error cupiditate eligendi?</p>
+		<p>Facere expedita consequuntur, error animi, amet soluta voluptate omnis odio officia ullam reprehenderit sapiente aperiam similique est? Ipsa eaque minima quam magni accusantium. Nam laudantium totam expedita in impedit veritatis.</p>
+		<PointerTrail />
+	</body>
+</html>

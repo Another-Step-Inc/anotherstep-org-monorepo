@@ -1,0 +1,173 @@
+---
+// Temporary Mock Data representing your WordPress Menu structure
+const menuData = [
+  { title: 'Home', url: '/' },
+  { 
+    title: 'About Us', 
+    url: '/about-us', 
+    children: [
+      { title: 'Sector News', url: '/sector-news' },
+      { title: 'Gallery', url: '#gallery' },
+      { title: 'Contact Us', url: '/contact-us' }
+    ] 
+  },
+  { title: 'Advocacy', url: '/advocacy' },
+  { 
+    title: 'Services', 
+    url: '/services',
+    children: [
+      { title: 'Community Habilitation', url: '#community-habilitation' },
+      { title: 'Day Habilitation', url: '#day-habilitation' },
+      { title: 'Supported Employment', url: '#supported-employment' },
+      { title: 'Respite', url: '#respite' },
+      { title: 'Residences/Supervised Living', url: '#residences-and-supervised-living' }
+    ]
+  },
+  { 
+    title: 'Support Us', 
+    url: '#support-us',
+    children: [
+      { title: 'Donations', url: '/donation' },
+      { title: 'Crayola Flowers Fundraiser', url: '/crayola-flowers-fundraiser' }
+    ]
+  }
+];
+---
+<div class="bg-[#232020] text-white py-2 text-sm hidden md:block">
+  <div class="container mx-auto px-4 flex justify-between items-center">
+    <div class="flex items-center space-x-6">
+      <span class="flex items-center">
+        <i class="fa fa-envelope mr-2 text-[#F9EF21]"></i> info@anotherstep.org
+      </span>
+      <span class="flex items-center">
+        <i class="fa fa-location-dot mr-2 text-[#F9EF21]"></i> 706 Executive Blvd, Valley Cottage, NY
+      </span>
+    </div>
+    <div class="flex items-center space-x-4">
+      <a href="#" class="hover:text-[#F9EF21] transition-colors"><i class="fa-brands fa-facebook"></i></a>
+      <a href="#" class="hover:text-[#F9EF21] transition-colors"><i class="fa-brands fa-instagram"></i></a>
+      <a href="#" class="hover:text-[#F9EF21] transition-colors"><i class="fa-brands fa-linkedin"></i></a>
+    </div>
+  </div>
+</div>
+
+<header class="site-header sticky top-0 bg-white py-4 shadow-md z-50">
+  <div class="container mx-auto px-4 flex items-center justify-between">
+    
+    <div class="site-branding">
+      <p class="site-title font-bold text-xl text-[#232020]">
+        <a href="/" rel="home">Another Step, Inc.</a>
+      </p>
+    </div>
+
+    <nav class="main-navigation hidden md:block flex-grow">
+      <ul class="flex justify-center space-x-1 lg:space-x-2">
+        {menuData.map((item) => (
+          <li class="menu-item group relative">
+            <a 
+              href={item.url} 
+              class="text-[#232020] hover:text-[#F9EF21] font-medium transition-colors duration-300 flex items-center px-4 py-2"
+            >
+              {item.title}
+              {item.children && (
+                <span class="ml-2 text-[10px] transition-transform duration-300 group-hover:rotate-180">▼</span>
+              )}
+            </a>
+
+            {item.children && (
+              <ul class="sub-menu absolute hidden group-hover:block bg-white shadow-xl rounded-md mt-0 py-2 min-w-[200px] z-50 left-0 border border-gray-100">
+                {item.children.map((child) => (
+                  <li>
+                    <a 
+                      href={child.url} 
+                      class="text-[#232020] hover:text-[#F9EF21] hover:bg-gray-50 font-medium transition-colors duration-300 flex items-center px-4 py-2"
+                    >
+                      {child.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="hidden md:flex items-center space-x-4">
+      <div class="flex items-center text-[#232020] text-sm">
+         <span class="text-xl mr-2">📞</span>
+        <div>
+          <span class="block text-[10px] font-semibold uppercase opacity-75">Call Us Now</span>
+          <span class="block font-bold text-base whitespace-nowrap">(845)-268-8200</span>
+        </div>
+      </div>
+
+      <a 
+        href="/donation" 
+        class="bg-[#F9EF21] text-[#232020] px-8 py-3 rounded-full font-semibold hover:bg-yellow-400 transition-colors duration-300 shadow-sm"
+      >
+        Donate Now &rarr;
+      </a>
+    </div>
+
+    <button id="mobile-menu-toggle" class="md:hidden p-2 text-[#232020]">
+      <div class="space-y-1.5">
+        <span class="block w-6 h-0.5 bg-current"></span>
+        <span class="block w-6 h-0.5 bg-current"></span>
+        <span class="block w-6 h-0.5 bg-current"></span>
+      </div>
+    </button>
+  </div>
+
+  <div id="mobile-menu" class="hidden absolute top-full left-0 w-full bg-white shadow-2xl py-8 md:hidden border-t">
+    <ul class="flex flex-col items-center space-y-4">
+      {menuData.map((item) => (
+        <li class="w-full text-center">
+          <a href={item.url} class="text-lg font-bold text-[#232020]">{item.title}</a>
+          {item.children && (
+             <div class="flex flex-col space-y-2 mt-2 bg-gray-50 py-2">
+                {item.children.map(child => (
+                  <a href={child.url} class="text-sm text-gray-600">{child.title}</a>
+                ))}
+             </div>
+          )}
+        </li>
+      ))}
+    </ul>
+  </div>
+</header>
+
+<script>
+  const toggle = document.getElementById('mobile-menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+  toggle?.addEventListener('click', () => menu?.classList.toggle('hidden'));
+
+  function initStickyHeader() {
+    const stickyHeader = document.querySelector('.sticky-header');
+    const topBar = document.querySelector('.top-bar') as HTMLElement;
+    
+    if (!stickyHeader) return;
+
+    // Get dynamic height of top bar (usually ~40px)
+    const topBarHeight = topBar ? topBar.offsetHeight : 0;
+    let isScrolled = false;
+
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.scrollY;
+
+      if (currentScroll > topBarHeight && !isScrolled) {
+        stickyHeader.classList.add('scrolled');
+        isScrolled = true;
+      } else if (currentScroll <= topBarHeight && isScrolled) {
+        stickyHeader.classList.remove('scrolled');
+        isScrolled = false;
+      }
+    });
+  }
+
+  // Initialize on load
+  initStickyHeader();
+  
+  // Re-init if using Astro View Transitions
+  document.addEventListener('astro:after-swap', initStickyHeader);
+</script>

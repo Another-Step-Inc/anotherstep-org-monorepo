@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+@import "@anothersteporg/ui/styles/global.css";
+
+@source "/app/packages/ui/src/**/*.astro";
