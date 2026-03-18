@@ -24,6 +24,15 @@ const menuData = [
     ]
   },
   { 
+    title: 'Store', 
+    url: '/store', 
+    children: [
+      { title: 'All Products', url: '/store' },
+      { title: 'Apparel', url: '/store/category/apparel' },
+      { title: 'Donation Gifts', url: '/store/category/gifts' }
+    ]
+  },
+  { 
     title: 'Support Us', 
     url: '#support-us',
     children: [
@@ -32,6 +41,8 @@ const menuData = [
     ]
   }
 ];
+
+const { isStore = false } = Astro.props;
 ---
 <div class="bg-[#232020] text-white py-2 text-sm hidden md:block">
   <div class="container mx-auto px-4 flex justify-between items-center">
@@ -136,6 +147,50 @@ const menuData = [
     </ul>
   </div>
 </header>
+{isStore && (
+<div class="w-full bg-[#0E75BC] text-white shadow-lg border-t border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-14">
+        
+        <div class="flex items-center gap-8">
+          <a href="/products?cat=clothing" class="group flex items-center gap-2">
+            <span class="text-xs font-black uppercase tracking-[0.2em] group-hover:text-[#F9EF21] transition-colors">Clothing</span>
+          </a>
+          <a href="/products?cat=hats" class="group flex items-center gap-2">
+            <span class="text-xs font-black uppercase tracking-[0.2em] group-hover:text-[#F9EF21] transition-colors">Hats</span>
+          </a>
+          <div class="h-6 w-[1px] bg-white/20 hidden md:block"></div>
+          <a href="/impact" class="text-xs font-black uppercase tracking-[0.2em] text-[#F9EF21] hover:brightness-110">
+            Our Impact
+          </a>
+        </div>
+
+        <div class="flex items-center gap-6">
+          <form action="/search" class="hidden sm:block relative">
+            <input 
+              type="text" 
+              placeholder="Search Store..." 
+              class="bg-white/10 border border-white/20 rounded-full py-1 px-4 text-xs placeholder:text-white/50 focus:outline-none focus:bg-white focus:text-[#232020] transition-all w-48"
+            />
+          </form>
+          
+          <a href="/cart" class="flex items-center gap-2 group">
+            <div class="relative">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              <span class="absolute -top-1 -right-1 bg-[#EC1F28] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-md">
+                0
+              </span>
+            </div>
+            <span class="hidden md:inline text-[10px] font-black uppercase tracking-widest">Cart</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  )} 
 
 <script>
   const toggle = document.getElementById('mobile-menu-toggle');

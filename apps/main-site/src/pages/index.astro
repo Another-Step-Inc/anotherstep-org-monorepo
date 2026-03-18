@@ -1,31 +1,70 @@
 ---
-import Header from '@anothersteporg/ui/components/Header.astro';
-import PointerTrail from '@anothersteporg/ui/components/PointerTrail.astro';
+import MainLayout from '../layouts/MainLayout.astro';
 import Hero from '@anothersteporg/ui/components/Hero.astro';
+import AboutSection from 'src/components/AboutSection.astro';
+import ValuesSection from 'src/components/ValuesSection.astro';
+import EthicsSection from '../components/EthicsSection.astro';
+import PublicDisclousre from '../components/PublicDisclosure.astro';
+import PromoModal from '@anothersteporg/ui/components/PromoModal.astro';
 import '../styles/global.css'
----
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<Header currentSite="main" />
+const WP_URL = 'http://host.docker.internal:8050/graphql';
+
+const response = await fetch(WP_URL, {
+	method: 'POST',
+	headers: { 'Content-Type': 'application/json'},
+	body: JSON.stringify({
+		query: `
+		query GetLatestPromo {
+			promos(first: 1, where: { orderby: { field: DATE, order: DESC } }) {
+				nodes {
+						title
+						content
+						featuredImage {
+							node {
+							sourceUrl
+							}
+						}
+					promoFields {
+						buttontext
+						buttonlink
+					}
+				}
+			}
+		}
+		`,
+	})
+});
+
+const { data } = await response.json();
+const promos = data.promos.nodes[0]
+
+// Strip HTML tags from WP content for the modal description
+const cleanDescription = promos?.content?.replace(/<[^>]*>?/gm, '') || "";
+---
+<MainLayout title='Home'>
+	{promos && (
+		<PromoModal
+			id='wp-dynamic-promo'
+			title={promos?.title}
+			description={cleanDescription}
+			buttonText={promos?.promoFields?.buttontext}
+			buttonLink={promos?.promoFields?.buttonlink}
+			image={promos?.featuredImage?.node?.sourceUrl}
+			showDelay={3000}
+		/>			
+	)}
 		<Hero 
-			title='Welcome to the Main Org Site'
-			subtitle='We are dedicated to helping individuals live their best lives through community habilitation, residences, and advocacy.'
-			buttonText='Donate Now'
+			title='Partnering with People to Create the Lives They Choose'
+			subtitle='Another Step, Inc. is dedicated to supporting people with developmental disabilities 
+          in fulfilling their potential and exercising control over their lives within their 
+          own communities.'
+			buttonText='Support Our Mission'
 			buttonLink='/donation'
-			bgImage=''
+			bgImage='/images/front-page-hero.jpg'
 		/>
-		<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat distinctio in, odit, maxime vitae culpa quod quos necessitatibus omnis reprehenderit ex ipsam corrupti cumque eaque porro? Pariatur suscipit quia unde.</p>
-		<p>Voluptates rem veniam impedit eaque deleniti doloribus dicta odio a minima, veritatis obcaecati hic illo aspernatur. Saepe voluptatem ipsa officia. Quisquam, exercitationem! Fugiat optio aliquam ullam sint error cupiditate eligendi?</p>
-		<p>Facere expedita consequuntur, error animi, amet soluta voluptate omnis odio officia ullam reprehenderit sapiente aperiam similique est? Ipsa eaque minima quam magni accusantium. Nam laudantium totam expedita in impedit veritatis.</p>
-		<PointerTrail />
-	</body>
-</html>
+		<AboutSection />
+		<ValuesSection />
+		<EthicsSection />
+		<PublicDisclousre />
+</MainLayout>

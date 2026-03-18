@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
-.site-header {
+@layer base {
+    :root {
+        --color-yellow: #F9EF21;
+        --color-blue: #0E75BC;
+        --color-red: #EC1F28;
+        --color-dark: #232020;
+        --color-bg-light: #F5F5F5;
+        --color-neutral-gray: #A9A9A9;
+    }
 
+    body {
+        @apply bg-[#F5F5F5] text-[#232020] font-sans;
+    }
 }

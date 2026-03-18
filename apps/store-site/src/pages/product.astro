@@ -1,0 +1,88 @@
+---
+// apps/store-site/src/pages/products.astro
+import StoreLayout from '../layouts/StoreLayout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import Footer from 'src/components/Footer.astro';
+import '../styles/global.css'
+
+const products = {
+
+}
+---
+<StoreLayout title='Store - Product'>
+    <section class="max-w-7xl mx-auto px-4 py-12 grid lg:grid-cols-2 gap-16">
+    
+    <div class="space-y-4">
+        <div class="aspect-square bg-white rounded-[3rem] overflow-hidden border border-slate-100 shadow-sm">
+        <img src="/images/hat-mock.png" class="w-full h-full object-cover" alt="Product Image" />
+        </div>
+        <div class="grid grid-cols-4 gap-4">
+        <button class="aspect-square rounded-2xl border-2 border-[#0E75BC] overflow-hidden bg-white">
+            <img src="/thumb-1.jpg" class="object-cover" />
+        </button>
+        <button class="aspect-square rounded-2xl border border-slate-200 overflow-hidden bg-white opacity-60 hover:opacity-100">
+            <img src="/thumb-2.jpg" class="object-cover" />
+        </button>
+        </div>
+    </div>
+
+    <div class="flex flex-col justify-center">
+        <nav class="text-[10px] font-black uppercase tracking-widest text-[#808080] mb-4">
+        <a href="/products" class="hover:text-[#0E75BC]">Shop</a> / 
+        <a href="/products?cat=hats" class="hover:text-[#0E75BC]">Hats</a>
+        </nav>
+
+        <h1 class="text-4xl md:text-5xl font-black text-[#232020] mb-2 leading-tight">
+        Structured Logo Baseball Hat
+        </h1>
+        
+        <div class="flex items-center gap-4 mb-8">
+        <span class="text-3xl font-black text-[#232020]">$24.99</span>
+        <span class="bg-[#F9EF21] text-[#232020] text-[10px] font-black px-3 py-1 rounded-full uppercase">
+            In Stock
+        </span>
+        </div>
+
+        <p class="text-[#232020]/70 leading-relaxed mb-8">
+        A classic, structured fit with our premium embroidered logo. 100% of the proceeds from this purchase support community-based services in Rockland County.
+        </p>
+
+        <div class="space-y-6 mb-10">
+        <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-[#808080] mb-3">Color: Navy Blue</label>
+            <div class="flex gap-3">
+            <button class="w-10 h-10 rounded-full bg-[#0E75BC] ring-2 ring-offset-2 ring-[#0E75BC]"></button>
+            <button class="w-10 h-10 rounded-full bg-[#232020] border border-slate-200"></button>
+            <button class="w-10 h-10 rounded-full bg-white border border-slate-200"></button>
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-[#808080] mb-3">Select Size</label>
+            <div class="flex flex-wrap gap-2">
+            {['S', 'M', 'L', 'XL'].map((size) => (
+                <button class="px-6 py-3 border-2 border-slate-200 rounded-xl font-bold hover:border-[#0E75BC] hover:text-[#0E75BC] transition-all">
+                {size}
+                </button>
+            ))}
+            </div>
+        </div>
+        </div>
+
+        <button class="w-full bg-[#EC1F28] text-white py-6 rounded-[2rem] font-black text-xl uppercase tracking-widest hover:bg-[#232020] transition-all shadow-xl active:scale-[0.98]">
+        Add to Bag
+        </button>
+
+        <div class="mt-8 pt-8 border-t border-slate-100 flex items-center justify-between text-[#808080]">
+        <div class="flex items-center gap-2 text-[10px] font-bold uppercase">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+            Secure Checkout
+        </div>
+        <div class="flex items-center gap-2 text-[10px] font-bold uppercase">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+            Powered by Square
+        </div>
+        </div>
+    </div>
+    </section>
+</StoreLayout>

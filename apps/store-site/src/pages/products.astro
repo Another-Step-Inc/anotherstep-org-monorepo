@@ -1,0 +1,23 @@
+---
+// apps/store-site/src/pages/products.astro
+import StoreLayout from '../layouts/StoreLayout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import Footer from 'src/components/Footer.astro';
+import '../styles/global.css'
+
+const products = {
+
+}
+---
+<StoreLayout title='Store - Products'>
+    <nav class="flex gap-4 mb-12 overflow-x-auto pb-2">
+		<button class="bg-[#0E75BC] text-white px-6 py-2 rounded-full font-bold">All Items</button>
+	    <button class="bg-white text-[#0E75BC] border border-[#0E75BC] px-6 py-2 rounded-full font-bold hover:bg-[#0E75BC] hover:text-white transition">Apparel</button>
+		<button class="bg-white text-[#0E75BC] border border-[#0E75BC] px-6 py-2 rounded-full font-bold hover:bg-[#0E75BC] hover:text-white transition">Accessories</button>
+	</nav>
+	<div class="grid grid-cols-3 gap-4">
+		<ProductCard />
+		<ProductCard />
+		<ProductCard />
+	</div>
+</StoreLayout>

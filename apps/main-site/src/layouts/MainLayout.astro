@@ -1,0 +1,9 @@
+---
+// apps/main-site/src/layouts/MainLayout.astro
+import Header from '@anothersteporg/ui/components/Header.astro';
+import BaseLayout from '@anothersteporg/ui/layouts/BaseLayout.astro';
+const { title } = Astro.props;
+---
+<BaseLayout title={title} isStore={false}>
+    <slot />
+</BaseLayout>

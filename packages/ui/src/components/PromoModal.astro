@@ -1,0 +1,118 @@
+---
+interface Props {
+    id: string;
+    title: string;
+    description: string;
+    buttonText?: string;
+    buttonLink?: string;
+    image?: string;
+    showDelay?: number;
+}
+
+const {
+    id,
+    title,
+    description,
+    buttonText = "Learn More",
+    buttonLink = "#",
+    image,
+    showDelay = 1500
+} = Astro.props;
+---
+
+<dialog
+    id={id}
+    class="promo-modal fixed inset-0 z-[100] p-0 m-auto bg-transparent backdrop:bg-[#232020]/80 backdrop:backdrop-blur-sm open:flex items-center justify-center outline-none border-none"
+>
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-[90vw] overfloe-hidden flex flex-col md:flex-row relative">
+        <button
+            class="close-modal absolute top-4 right-4 z-20 bg-white/80 hover:bg-white p-2 rounded-ful shadow-md transition-colors"
+            aria-label="Close modal"
+        >
+            <i class="fa fa-xmark text-[#232020]"></i>
+        </button>
+        {image && (
+            <div class="md:w-1/2 h-48 md:h-auto overflow-hidden">
+                <img src={image} alt={title} class="w-full h-full object-cover" />
+            </div>
+        )}
+        <div class={`p-8 md:p-10 flex flex-col justify-center ${image ? 'md:w-1/2' : 'w-full'}`}>
+            <h2 class="text-3xl font-extrabold text-[#232020] mb-4 leading-right">
+                {title}
+            </h2>
+            <p class="text-gray-600 mb-8 leading-relaxed">
+                {description}
+            </p>
+            <div class="flex flex-col gap-3">
+                <a 
+                    href={buttonLink}
+                    class="bg-[#F9EF21] text-[#232020] px-6 py-3 rounded-full font-bold text-center hover:bg-yellow-400 transition-all shadow-md"
+                >
+                    {buttonText}
+                </a>
+                <button class="close-modal text-sm text-gray-500 hover:text-[#232020] transition-colors underline">
+                    Maybe Later
+                </button>
+            </div>
+        </div>
+    </div>
+</dialog>
+<script define:vars={{ id, showDelay }}>
+    function initModal() {
+        const modal = document.getElementById(id);
+        const closeButtons = modal?.querySelectorAll('.close-modal');
+
+        // Check session storage so we don't throw the modal on every refresh
+        const hasSeenModal = sessionStorage.getItem(`has_seen_${id}`);
+
+        if (modal && !hasSeenModal) {
+            setTimeout(() => {
+                modal.showModal();
+                // Prevent scrolling while modal is open
+                document.body.style.overflow = 'hidden';
+            }, showDelay);
+        }
+
+        closeButtons?.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                modal.close();
+                document.body.style.overflow = '';
+                sessionStorage.setItem(`has_seen_${id}`, 'true');
+            });
+        });
+
+        // Close on backdrop click
+        modal?.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.close();
+                document.body.style.overflow = '';
+                sessionStorage.setItem(`has_seen_${id}`, 'true');
+            }
+        });
+    }
+
+    initModal();
+    // Support View Transitions
+    document.addEventListener('astro:after-swap', initModal);
+</script>
+<style>
+    /* Animation for the modal entrance */
+    dialog[open] {
+        animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes zoom {
+        from { transform: scale(0.9); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
+    /* Fade in the backdrop */
+    dialog::backdrop {
+        animation: fade 0.4s ease-out;
+    }
+
+    @keyframes fade {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+</style>
