@@ -9,7 +9,9 @@ export default defineConfig({
     port: 4321,
   },
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss({
+      configFile: '../../packages/ui/tailwind.config.mjs',
+    })],
     server: {
       hmr: {
         protocol: 'ws',      // Explicitly use non-secure websocket

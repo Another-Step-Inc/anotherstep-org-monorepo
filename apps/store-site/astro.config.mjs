@@ -9,7 +9,9 @@ export default defineConfig({
     port: 4322,
   },
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss({
+      configFile: '../../packages/ui/tailwind.config.mjs',
+    })],
     server: {
       hmr: {
         host: 'localhost',
