@@ -1,16 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+@import "@fortawesome/fontawesome-free/css/all.min.css";
 @import "tailwindcss";
 
+:root {
+    /* Brand Colors */
+    --color-yellow: #F9EF21;
+    --color-blue: #0E75BC;
+    --color-red: #EC1F28;
+    --color-dark: #232020;
+    --color-bg-light: #F5F5F5;
+    --color-neutral-gray: #A9A9A9;
+
+    /* Typography */
+    --font-lexend: 'Lexend', sans-serif;
+}
+
+@theme {
+  --color-brand-yellow: var(--color-yellow);
+  --color-brand-blue: var(--color-blue);
+  --color-brand-red: var(--color-red);
+  --color-brand-dark: var(--color-dark);
+  --color-brand-bg: var(--color-bg-light);
+  --color-brand-gray: var(--color-neutral-gray);
+
+  --font-sans: var(--font-lexend);
+  --radius-brand: 2.5rem;
+}
+
 @layer base {
-    :root {
-        --color-yellow: #F9EF21;
-        --color-blue: #0E75BC;
-        --color-red: #EC1F28;
-        --color-dark: #232020;
-        --color-bg-light: #F5F5F5;
-        --color-neutral-gray: #A9A9A9;
+    html {
+        font-family: var(--font-lexend);
+        @apply antialiased;
     }
 
     body {
-        @apply bg-[#F5F5F5] text-[#232020] font-sans;
+        @apply bg-[#F5F5F5] text-[#232020];
     }
+
+  svg {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+  }
+    /* Some elements don't inherit font-family by default in all browsers */
+  button, input, optgroup, select, textarea {
+    font-family: inherit;
+  }
+
+  /* Force headings to use the font-weight you want */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-lexend), sans-serif;
+    font-weight: 900; /* Lexend Black for that boutique feel */
+  }
 }

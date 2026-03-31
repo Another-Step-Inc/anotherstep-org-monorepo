@@ -1,7 +1,9 @@
 ---
-// Temporary Mock Data representing your WordPress Menu structure
+import { Image } from 'astro:assets';
+import logoReg from '../assets/another_step_logo.png';
+
+// Temporary Mock Data representing WordPress Menu structure
 const menuData = [
-  { title: 'Home', url: '/' },
   { 
     title: 'About Us', 
     url: '/about-us', 
@@ -44,20 +46,19 @@ const menuData = [
 
 const { isStore = false } = Astro.props;
 ---
-<div class="bg-[#232020] text-white py-2 text-sm hidden md:block">
-  <div class="container mx-auto px-4 flex justify-between items-center">
-    <div class="flex items-center space-x-6">
-      <span class="flex items-center">
-        <i class="fa fa-envelope mr-2 text-[#F9EF21]"></i> info@anotherstep.org
-      </span>
-      <span class="flex items-center">
-        <i class="fa fa-location-dot mr-2 text-[#F9EF21]"></i> 706 Executive Blvd, Valley Cottage, NY
-      </span>
-    </div>
+<div class="bg-brand-blue text-white py-2 text-sm hidden md:block">
+  <div class="container mx-auto px-4 flex justify-end items-center py-2">
     <div class="flex items-center space-x-4">
-      <a href="#" class="hover:text-[#F9EF21] transition-colors"><i class="fa-brands fa-facebook"></i></a>
-      <a href="#" class="hover:text-[#F9EF21] transition-colors"><i class="fa-brands fa-instagram"></i></a>
-      <a href="#" class="hover:text-[#F9EF21] transition-colors"><i class="fa-brands fa-linkedin"></i></a>
+      
+      <span class="text-xs font-bold border-r pr-4 flex items-center gap-2">
+        <i class="fa fa-phone text-[10px]"></i>
+        (845)-268-8200
+      </span>
+
+      <span class="text-xs font-medium tracking-tight">
+        Available Mon-Fri, 9am - 5pm
+      </span>
+      
     </div>
   </div>
 </div>
@@ -66,8 +67,9 @@ const { isStore = false } = Astro.props;
   <div class="container mx-auto px-4 flex items-center justify-between">
     
     <div class="site-branding">
-      <p class="site-title font-bold text-xl text-[#232020]">
-        <a href="/" rel="home">Another Step, Inc.</a>
+      <Image src={logoReg} alt="Another Step Logo" class="h-16 w-auto" />
+      <p class="site-title font-bold text-md text-brand-blue">
+        <a href="/" rel="home">Another Step</a>
       </p>
     </div>
 
@@ -105,17 +107,9 @@ const { isStore = false } = Astro.props;
     </nav>
 
     <div class="hidden md:flex items-center space-x-4">
-      <div class="flex items-center text-[#232020] text-sm">
-         <span class="text-xl mr-2">📞</span>
-        <div>
-          <span class="block text-[10px] font-semibold uppercase opacity-75">Call Us Now</span>
-          <span class="block font-bold text-base whitespace-nowrap">(845)-268-8200</span>
-        </div>
-      </div>
-
       <a 
         href="/donation" 
-        class="bg-[#F9EF21] text-[#232020] px-8 py-3 rounded-full font-semibold hover:bg-yellow-400 transition-colors duration-300 shadow-sm"
+        class="bg-brand-blue text-white px-8 py-3 rounded-full font-semibold hover:bg-brand-blue-400 transition-colors duration-300 shadow-sm"
       >
         Donate Now &rarr;
       </a>

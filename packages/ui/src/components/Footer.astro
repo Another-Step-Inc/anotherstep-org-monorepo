@@ -1,0 +1,118 @@
+---
+// components/Footer.astro
+import { Image } from 'astro:assets';
+import logoReg from '../assets/another_step_logo.png';
+import accessibilityIcon from '../assets/accessibility-svgrepo-com.svg?raw'
+const date = new Date;
+const year = date.getFullYear();
+console.log(date);
+---
+<footer class="bg-[#F3F3F6] py-16">
+    <div id="top-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap justify-between gap-8">
+        <div id="info-col" class="w-full lg:w-[25%] flex flex-col items-center gap-6 lg:items-start">
+            <div id="info-heading" class="flex flex-row items-center justify-center gap-3">
+                <Image src={logoReg} alt="Another Step Logo" class="h-12 w-auto" />
+                <h2 class="text-[#004E8B] text-xl font-black">Another Step</h2>
+            </div>
+            <p id="info-description" class="text-[#4E535D] font-semibold">
+                Supporting independent living with clarity, care, and community for everyone.
+            </p>
+            <p id="info-copyright" class="text-[#717782]">
+                &copy; {year} Another Step. All rights reserved.
+            </p>
+        </div>
+        <div id="quick-links-col" class="w-full sm:w-[45%] lg:w-[15%] flex flex-col items-center lg:items-start">
+            <h3 id="quick-links-heading" class="text-[#004E8B] text-md font-black pb-5">Quick Links</h3>
+            <ul class="flex flex-col gap-4">
+                <li><a href="#">Career</a></li>
+                <li><a href="#">Contact HR</a></li>
+                <li><a href="#">Compliance Form</a></li>
+                <li><a href="#">Incident Reporting</a></li>
+                <li><a href="#">OPWDD Statement</a></li>
+            </ul>
+        </div>
+        <div id="services-col" class="w-full sm:w-[45%] lg:w-[20%] flex flex-col items-center lg:items-start">
+            <h3 id="services-heading" class="text-[#004E8B] text-md font-black pb-5">Our Services</h3>
+            <ul class="flex flex-col gap-4">
+                <li><a href="#">Com Hab</a></li>
+                <li><a href="#">Day Hab</a></li>
+                <li><a href="#">Supported Employment</a></li>
+                <li><a href="#">Respite</a></li>
+                <li><a href="#">Residential</a></li>
+            </ul>
+        </div>
+        <div id="contact-col" class="w-full lg:w-[25%] flex flex-col items-center lg:items-start">
+            <h3 id="contact-heading" class="text-[#004E8B] text-md font-black pb-5">Get In Touch</h3>
+            <div class="flex flex-col gap-10 w-full">
+                <div id="office-1" class="flex flex-col gap-3">
+                    <span class="font-black text-brand-dark text-[10px] uppercase tracking-widest ml-7 lg:ml-8">Rockland Office</span>
+                    
+                    <div class="flex items-start gap-3 lg:gap-4">
+                        <i class="fa-solid fa-location-dot text-brand-blue mt-1 w-4 text-center"></i>
+                        <address class="not-italic text-[#4E535D] text-sm font-semibold leading-snug">
+                            30 Ramland Rd.<br />
+                            Suite 202<br />
+                            Orangeburg, NY 10962
+                        </address>
+                    </div>
+
+                    <div class="flex items-center gap-3 lg:gap-4">
+                        <i class="fa-solid fa-phone text-brand-blue w-4 text-center"></i>
+                        <a href="tel:8452688200" class="text-brand-blue text-xs font-bold hover:underline underline-offset-4">
+                            (845) 268-8200
+                        </a>
+                    </div>
+
+                    <div class="flex items-center gap-3 lg:gap-4">
+                        <i class="fa-solid fa-envelope text-brand-blue w-4 text-center"></i>
+                        <a href="mailto:info@anotherstep.org" class="text-[#4E535D] text-xs font-medium hover:text-brand-blue transition-colors">
+                            info@anotherstep.org
+                        </a>
+                    </div>
+                </div>
+
+                <div id="office-2" class="flex flex-col gap-3">
+                    <span class="font-black text-brand-dark text-[10px] uppercase tracking-widest ml-7 lg:ml-8">Westchester Office</span>
+                    
+                    <div class="flex items-start gap-3 lg:gap-4">
+                        <i class="fa-solid fa-location-dot text-brand-blue mt-1 w-4 text-center"></i>
+                        <address class="not-italic text-[#4E535D] text-sm font-semibold leading-snug">
+                            175 Clearbrook Rd.<br />
+                            Suite 161<br />
+                            Elmsford, NY 10523
+                        </address>
+                    </div>
+
+                    <div class="flex items-center gap-3 lg:gap-4">
+                        <i class="fa-solid fa-phone text-brand-blue w-4 text-center"></i>
+                        <a href="tel:9149562288" class="text-brand-blue text-xs font-bold hover:underline underline-offset-4">
+                            (914) 946-2288
+                        </a>
+                    </div>
+
+                    <div class="flex items-center gap-3 lg:gap-4">
+                        <i class="fa-solid fa-envelope text-brand-blue w-4 text-center"></i>
+                        <a href="mailto:westchester@anotherstep.org" class="text-[#4E535D] text-xs font-medium hover:text-brand-blue transition-colors">
+                            westchester@anotherstep.org
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="bottom-section" class="flex flex-row justify-between items-center max-w-7xl mx-auto px-4 mt-12 border-t border-gray-200 pt-8 text-[#717782] tracking-normal">
+        <div id="legal-links" class="flex flex-row justify-between items-cneter gap-8">
+            <a class="underline underline-offset-5 decoration-2 font-bold font-sm" href="">Privacy Policy</a>
+            <a class="underline underline-offset-5 decoration-2 font-bold font-sm" href="">Terms of Service</a>
+            <a class="underline underline-offset-5 decoration-2 font-bold font-sm" href="">Accessibility Statement</a>
+        </div>
+        <div id="legal-btns" class="flex flex-row justify-between gap-4">
+            <button class="bg-[#E2E2E5] rounded-full h-10 w-10 text-[#004E8B] fill-current"><i class="fa-solid fa-share-nodes"></i></button>
+            <button class="flex items-center justify-center bg-[#E2E2E5] rounded-full h-10 w-10 text-[#004E8B] fill-current">
+                <div class="h-6 w-6">
+                    <Fragment set:html={accessibilityIcon} />
+                </div>
+            </button>
+        </div>
+    </div>
+</footer>
