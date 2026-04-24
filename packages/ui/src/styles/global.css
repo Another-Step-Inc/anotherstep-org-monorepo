@@ -10,6 +10,7 @@
     --color-dark: #232020;
     --color-bg-light: #F5F5F5;
     --color-neutral-gray: #A9A9A9;
+    --color-text-gray: #414751;
 
     /* Typography */
     --font-lexend: 'Lexend', sans-serif;
@@ -22,6 +23,7 @@
   --color-brand-dark: var(--color-dark);
   --color-brand-bg: var(--color-bg-light);
   --color-brand-gray: var(--color-neutral-gray);
+  --color-brand-text: var(--color-text-gray);
 
   --font-sans: var(--font-lexend);
   --radius-brand: 2.5rem;
