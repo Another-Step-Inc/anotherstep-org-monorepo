@@ -1,0 +1,12 @@
+---
+const { url, alt } = Astro.props;
+---
+
+<div class="my-8 flex justify-content">
+    <img 
+        src={url} 
+        alt={alt || "Company asset"}
+        class="rounded-lg shadow-md max-w-full h-auto border border-gray-200"
+        loading="lazy"
+    />
+</div>

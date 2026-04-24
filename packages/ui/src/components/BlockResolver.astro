@@ -1,0 +1,35 @@
+---
+// src/components/BlockResolver.astro
+import Hero from './Hero.astro';
+import TextBlock from './TextBlock.astro';
+import ImageGallery from './ImageGallery.astro';
+import TwoColumns from './TwoColumns.astro';
+
+const { blocks = [] } = Astro.props
+const allBlocks = blocks || [];
+
+if (!blocks || blocks.length === 0) return null;
+---
+
+{allBlocks.map((block: any) => {
+    if (!block) return null;
+
+    switch (block.name) {
+        case 'core/paragraph':
+        case 'core/heading':
+            return <TextBlock content={block.renderedHtml} />
+
+        case 'core/image':
+        case 'core/gallery':
+            // The attributesJson contains the URL and alt text from WP
+            const attrs = block.attributesJSON ? JSON.parse(block.attributesJSON) : {};
+            return <ImageGallery url={block.attributes?.url} alt={block.attributes?.alt} />;
+        
+        case 'anotherstep/homepage-about-section':
+            return <TwoColumns content={block.renderedHtml} />
+        
+        default:
+            // Fallback for blocks there are no components built yet
+            return <div class="wp-block-fallback"set:html={block.renderedHtml} />;
+    }
+})}
