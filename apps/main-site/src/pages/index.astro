@@ -1,5 +1,6 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
+import BlockResolver from '@anothersteporg/ui/components/BlockResolver.astro';
 import Hero from '@anothersteporg/ui/components/Hero.astro';
 import AboutSection from 'src/components/AboutSection.astro';
 import ValuesSection from 'src/components/ValuesSection.astro';
@@ -36,8 +37,60 @@ const response = await fetch(WP_URL, {
 	})
 });
 
+const homePageResponse = await fetch(WP_URL, {
+	method: 'POST',
+	headers: {'Content-Type': 'application/json'},
+	body: JSON.stringify({
+		query: `
+		query GetHomePage {
+			page(id: "home", idType: URI) {
+				homefields {
+				homepageHero {
+					heroTitle,
+					heroDescription,
+					heroImage {
+					node {
+						sourceUrl
+					}
+					},
+					heroButton1 {
+					buttonText1,
+					buttonLink1
+					},
+					heroButton2 {
+					buttonText2,
+					buttonLink2
+					}
+				}
+				homepageWhoWeAre {
+					aboutHeadline,
+					aboutContent
+				}
+				},
+				editorBlocks{
+					name,
+					renderedHtml,
+					... on CoreImage {
+						attributes {
+							url
+							alt
+							caption
+						}
+					}
+				}
+			}
+		}
+		`,
+	})
+})
+
 const { data } = await response.json();
-const promos = data.promos.nodes[0]
+const result = await homePageResponse.json();
+const homePageData = result.data;
+console.log(homePageData.page.editorBlocks[0].name)
+const promos = data.promos.nodes[0];
+
+console.log("Blocks found:", homePageData.page.editorBlocks.length);
 
 // Strip HTML tags from WP content for the modal description
 const cleanDescription = promos?.content?.replace(/<[^>]*>?/gm, '') || "";
@@ -63,6 +116,7 @@ const cleanDescription = promos?.content?.replace(/<[^>]*>?/gm, '') || "";
 			buttonLink='/donation'
 			bgImage='/images/front-page-hero.jpg'
 		/>
+		<BlockResolver blocks={homePageData?.page?.editorBlocks} />
 		<AboutSection />
 		<ValuesSection />
 		<EthicsSection />
