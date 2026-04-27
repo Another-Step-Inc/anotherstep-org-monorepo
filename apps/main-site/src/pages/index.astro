@@ -42,44 +42,36 @@ const homePageResponse = await fetch(WP_URL, {
 	headers: {'Content-Type': 'application/json'},
 	body: JSON.stringify({
 		query: `
-		query GetHomePage {
-			page(id: "home", idType: URI) {
-				homefields {
-				homepageHero {
+			query GetHomePage {
+				page(id: "home", idType: URI) {
+					homefields {
 					heroTitle,
 					heroDescription,
 					heroImage {
-					node {
+						node {
 						sourceUrl
+						}
 					}
-					},
-					heroButton1 {
 					buttonText1,
 					buttonLink1
-					},
-					heroButton2 {
 					buttonText2,
-					buttonLink2
-					}
-				}
-				homepageWhoWeAre {
+					buttonLink2,
 					aboutHeadline,
 					aboutContent
-				}
-				},
-				editorBlocks{
+					},
+					editorBlocks{
 					name,
 					renderedHtml,
 					... on CoreImage {
 						attributes {
-							url
-							alt
-							caption
+						url
+						alt
+						caption
 						}
+					}
 					}
 				}
 			}
-		}
 		`,
 	})
 })
@@ -91,6 +83,7 @@ console.log(homePageData.page.editorBlocks[0].name)
 const promos = data.promos.nodes[0];
 
 console.log("Blocks found:", homePageData.page.editorBlocks.length);
+console.log('DEBUG ACF:', homePageData.page);
 
 // Strip HTML tags from WP content for the modal description
 const cleanDescription = promos?.content?.replace(/<[^>]*>?/gm, '') || "";
@@ -107,7 +100,7 @@ const cleanDescription = promos?.content?.replace(/<[^>]*>?/gm, '') || "";
 			showDelay={3000}
 		/>			
 	)}
-		<Hero 
+		<!-- <Hero 
 			title='Partnering with People to Create the Lives They Choose'
 			subtitle='Another Step, Inc. is dedicated to supporting people with developmental disabilities 
           in fulfilling their potential and exercising control over their lives within their 
@@ -115,7 +108,7 @@ const cleanDescription = promos?.content?.replace(/<[^>]*>?/gm, '') || "";
 			buttonText='Support Our Mission'
 			buttonLink='/donation'
 			bgImage='/images/front-page-hero.jpg'
-		/>
+		/> -->
 		<BlockResolver blocks={homePageData?.page?.editorBlocks} />
 		<AboutSection />
 		<ValuesSection />
