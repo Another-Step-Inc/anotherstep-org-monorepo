@@ -1,0 +1,16 @@
+services:
+  dev:
+    image: node:20-alpine
+    user: "root"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - pnpm-store:/root/.local/share/pnpm/store
+    working_dir: /app
+    tty: true
+    stdin_open: true
+    environment:
+      - COREPACK_DEFAULT_TO_LATEST=0
+    command: sh -c "corepack enable && sh"
+volumes:
+  pnpm-store:
