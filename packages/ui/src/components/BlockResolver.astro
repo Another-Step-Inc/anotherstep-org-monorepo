@@ -4,6 +4,7 @@ import Hero from './Hero.astro';
 import TextBlock from './TextBlock.astro';
 import ImageGallery from './ImageGallery.astro';
 import TwoColumns from './TwoColumns.astro';
+import ThreeColumns from './ThreeColumns.astro';
 
 const { blocks = [] } = Astro.props
 const allBlocks = blocks || [];
@@ -30,6 +31,9 @@ if (!blocks || blocks.length === 0) return null;
 
         case 'anotherstep/homepage-about-section':
             return <TwoColumns content={block.renderedHtml} />
+
+        case 'anotherstep/homepage-values-section':
+            return <ThreeColumns content={block.renderedHtml} />
         
         default:
             // Fallback for blocks there are no components built yet

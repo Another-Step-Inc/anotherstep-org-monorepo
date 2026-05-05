@@ -3,10 +3,16 @@
 const { content } = Astro.props;
 ---
 
-<section class="px-4 py-8 md:px-8">
+<section class="prose prose-lg px-4 py-8 md:px-8">
   <div class="max-w-7xl mx-auto overflow-hidden rounded-3xl bg-gradient-to-br from-[#003366] to-[#004a94] shadow-xl">
     <div class="flex flex-col md:flex-row items-center">
       <Fragment set:html={content}  />
     </div>
   </div>
 </section>
+
+<style is:global>
+    /* This ensures WordPress classes like .has-text-align-center work */
+    .prose .has-text-align-center { text-align: center; }
+    .prose .has-text-align-right { text-align: right; }
+</style>
