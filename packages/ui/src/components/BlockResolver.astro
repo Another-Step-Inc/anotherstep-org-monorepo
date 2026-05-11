@@ -5,14 +5,29 @@ import TextBlock from './TextBlock.astro';
 import ImageGallery from './ImageGallery.astro';
 import TwoColumns from './TwoColumns.astro';
 import ThreeColumns from './ThreeColumns.astro';
+import OneColumnCard from './OneColumnCard.astro';
 
 const { blocks = [] } = Astro.props
-const allBlocks = blocks || [];
+// 1. Get a combined string of all "Container" block outputs
+const parentOutputs = blocks
+    .filter((b: any) => b.name.includes('anotherstep/'))
+    .map((b: any) => b.renderedHtml)
+    .join('');
 
-if (!blocks || blocks.length === 0) return null;
+// 2. Filter the blocks
+const uniqueBlocks = blocks.filter((block: any) => {
+    // If it's a core paragraph/heading, check if it's already inside a parent's HTML
+    if (block.name === 'core/paragraph' || block.name === 'core/heading') {
+        // If the paragraph's HTML exists inside the combined parent HTML, skip it
+        if (parentOutputs.includes(block.renderedHtml)) {
+            return false;
+        }
+    }
+    return true;
+});
 ---
 
-{allBlocks.map((block: any) => {
+{uniqueBlocks.map((block: any) => {
     if (!block) return null;
 
     switch (block.name) {
@@ -34,6 +49,9 @@ if (!blocks || blocks.length === 0) return null;
 
         case 'anotherstep/homepage-values-section':
             return <ThreeColumns content={block.renderedHtml} />
+        
+        case 'anotherstep/homepage-ethics-section':
+            return <OneColumnCard content={block.renderedHtml} />
         
         default:
             // Fallback for blocks there are no components built yet
