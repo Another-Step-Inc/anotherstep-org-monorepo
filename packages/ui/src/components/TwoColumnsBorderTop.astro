@@ -1,0 +1,12 @@
+---
+const { content } = Astro.props;
+---
+<section class="py-12 px-4 md:px-8 border-t border-slate-100">
+  <Fragment set:html={content} />
+</section>
+
+<style is:global>
+    /* This ensures WordPress classes like .has-text-align-center work */
+    .prose .has-text-align-center { text-align: center; }
+    .prose .has-text-align-right { text-align: right; }
+</style>

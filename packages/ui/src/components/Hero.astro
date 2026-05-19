@@ -5,7 +5,7 @@ const { content } = Astro.props;
 
 <section class="prose prose-lg px-4 py-8 md:px-8">
   <div class="max-w-7xl mx-auto overflow-hidden rounded-3xl bg-gradient-to-br from-[#003366] to-[#004a94] shadow-xl">
-    <div class="flex flex-col md:flex-row items-center">
+    <div class="flex flex-col md:flex-row items-center min-h-[500px]">
       <Fragment set:html={content}  />
     </div>
   </div>

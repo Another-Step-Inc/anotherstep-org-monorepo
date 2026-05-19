@@ -4,6 +4,7 @@ import Hero from './Hero.astro';
 import TextBlock from './TextBlock.astro';
 import ImageGallery from './ImageGallery.astro';
 import TwoColumns from './TwoColumns.astro';
+import TwoColumnsBorderTop from './TwoColumnsBorderTop.astro';
 import ThreeColumns from './ThreeColumns.astro';
 import OneColumnCard from './OneColumnCard.astro';
 
@@ -53,6 +54,9 @@ const uniqueBlocks = blocks.filter((block: any) => {
         case 'anotherstep/homepage-ethics-section':
             return <OneColumnCard content={block.renderedHtml} />
         
+        case 'anotherstep/homepage-legal-section':
+            return <TwoColumnsBorderTop content={block.renderedHtml} />
+
         default:
             // Fallback for blocks there are no components built yet
             return <div class="wp-block-fallback"set:html={block.renderedHtml} />;
