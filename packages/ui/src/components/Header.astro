@@ -2,48 +2,116 @@
 import { Image } from 'astro:assets';
 import logoReg from '../assets/another_step_logo.png';
 
-// Temporary Mock Data representing WordPress Menu structure
-const menuData = [
-  { 
-    title: 'About Us', 
-    url: '/about-us', 
-    children: [
-      { title: 'Sector News', url: '/sector-news' },
-      { title: 'Gallery', url: '#gallery' },
-    ] 
-  },
-  { title: 'Advocacy', url: '/advocacy' },
-  { 
-    title: 'Services', 
-    url: '/services',
-    children: [
-      { title: 'Community Habilitation', url: '#community-habilitation' },
-      { title: 'Day Habilitation', url: '#day-habilitation' },
-      { title: 'Supported Employment', url: '#supported-employment' },
-      { title: 'Respite', url: '#respite' },
-      { title: 'Residences/Supervised Living', url: '#residences-and-supervised-living' }
-    ]
-  },
-  { 
-    title: 'Store', 
-    url: '/store', 
-    children: [
-      { title: 'All Products', url: '/store' },
-      { title: 'Apparel', url: '/store/category/apparel' },
-      { title: 'Donation Gifts', url: '/store/category/gifts' }
-    ]
-  },
-  { 
-    title: 'Support Us', 
-    url: '#support-us',
-    children: [
-      { title: 'Donations', url: '/donation' },
-      { title: 'Crayola Flowers Fundraiser', url: '/crayola-flowers-fundraiser' }
-    ]
-  },
-  { title: 'Contact Us', url: '/contact' },
-];
+interface MenuItem {
+  title: string;
+  url: string;
+  children?: MenuItem[];
+}
 
+const WP_URL = import.meta.env.WP_GRAPHQL_URL || 'http://host.docker.internal:8050/graphql';
+
+async function fetchMenuData(): Promise<MenuItem[]> {
+  try {
+    const response = await fetch(WP_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: `
+          query GetMenu {
+            menu(id: "main-navigation", idType: SLUG) {
+              id
+              name
+              menuItems(first: 100) {
+                nodes {
+                  id
+                  label
+                  path
+                  parentId
+                  childItems {
+                    nodes {
+                      id
+                      label
+                      path
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!result.data?.menu?.menuItems?.nodes) {
+      console.warn('Menu data not found in WordPress response');
+      return getFallbackMenu();
+    }
+
+    const items = result.data.menu.menuItems.nodes;
+
+    // Filter only top-level items (no parentId)
+    return items
+      .filter((item: any) => !item.parentId)
+      .map((item: any) => ({
+        title: item.label,
+        url: item.path,
+        children: item.childItems?.nodes?.map((child: any) => ({
+          title: child.label,
+          url: child.path,
+        })) || [],
+      }));
+  } catch (error) {
+    console.error('Failed to fetch menu from WordPress:', error);
+    return getFallbackMenu();
+  }
+}
+
+function getFallbackMenu(): MenuItem[] {
+  return [
+    {
+      title: 'About Us',
+      url: '/about-us',
+      children: [
+        { title: 'Sector News', url: '/sector-news' },
+        { title: 'Gallery', url: '#gallery' },
+      ]
+    },
+    { title: 'Advocacy', url: '/advocacy' },
+    {
+      title: 'Services',
+      url: '/services',
+      children: [
+        { title: 'Community Habilitation', url: '#community-habilitation' },
+        { title: 'Day Habilitation', url: '#day-habilitation' },
+        { title: 'Supported Employment', url: '#supported-employment' },
+        { title: 'Respite', url: '#respite' },
+        { title: 'Residences/Supervised Living', url: '#residences-and-supervised-living' }
+      ]
+    },
+    {
+      title: 'Store',
+      url: '/store',
+      children: [
+        { title: 'All Products', url: '/store' },
+        { title: 'Apparel', url: '/store/category/apparel' },
+        { title: 'Donation Gifts', url: '/store/category/gifts' }
+      ]
+    },
+    {
+      title: 'Support Us',
+      url: '#support-us',
+      children: [
+        { title: 'Donations', url: '/donation' },
+        { title: 'Crayola Flowers Fundraiser', url: '/crayola-flowers-fundraiser' }
+      ]
+    },
+    { title: 'Contact Us', url: '/contact' },
+  ];
+}
+
+const menuData = await fetchMenuData();
 const { isStore = false } = Astro.props;
 ---
 <div class="bg-brand-blue text-white py-2 text-sm hidden md:block">
@@ -82,12 +150,12 @@ const { isStore = false } = Astro.props;
               class="text-[#232020] hover:text-[#F9EF21] font-medium transition-colors duration-300 flex items-center px-4 py-2"
             >
               {item.title}
-              {item.children && (
+              {item.children && item.children.length > 0 && (
                 <span class="ml-2 text-[10px] transition-transform duration-300 group-hover:rotate-180">▼</span>
               )}
             </a>
 
-            {item.children && (
+            {item.children && item.children.length > 0 && (
               <ul class="sub-menu absolute hidden group-hover:block bg-white shadow-xl rounded-md mt-0 py-2 min-w-[200px] z-50 left-0 border border-gray-100">
                 {item.children.map((child) => (
                   <li>
@@ -129,7 +197,7 @@ const { isStore = false } = Astro.props;
       {menuData.map((item) => (
         <li class="w-full text-center">
           <a href={item.url} class="text-lg font-bold text-[#232020]">{item.title}</a>
-          {item.children && (
+          {item.children && item.children.length > 0 && (
              <div class="flex flex-col space-y-2 mt-2 bg-gray-50 py-2">
                 {item.children.map(child => (
                   <a href={child.url} class="text-sm text-gray-600">{child.title}</a>

@@ -3,6 +3,59 @@
 import { Image } from 'astro:assets';
 import logoReg from '../assets/another_step_logo.png';
 import accessibilityIcon from '../assets/accessibility-svgrepo-com.svg?raw'
+
+interface MenuItem {
+  label: string;
+  path: string;
+}
+
+const WP_URL = import.meta.env.WP_GRAPHQL_URL || 'http://host.docker.internal:8050/graphql';
+
+async function fetchMenuItems(menuSlug: string): Promise<MenuItem[]> {
+  try {
+    const response = await fetch(WP_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: `
+          query GetMenu {
+            menu(id: "${menuSlug}", idType: SLUG) {
+              id
+              menuItems(first: 100) {
+                nodes {
+                  id
+                  label
+                  path
+                  parentId
+                }
+              }
+            }
+          }
+        `,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!result.data?.menu?.menuItems?.nodes) {
+      console.warn(`Menu data not found for ${menuSlug}`);
+      return [];
+    }
+
+    return result.data.menu.menuItems.nodes
+      .filter((item: any) => !item.parentId)
+      .map((item: any) => ({
+        label: item.label,
+        path: item.path,
+      }));
+  } catch (error) {
+    console.error(`Failed to fetch ${menuSlug} menu from WordPress:`, error);
+    return [];
+  }
+}
+
+const quickLinks = await fetchMenuItems('quick-links');
+const ourServices = await fetchMenuItems('our-services');
 const date = new Date;
 const year = date.getFullYear();
 console.log(date);
@@ -24,21 +77,37 @@ console.log(date);
         <div id="quick-links-col" class="w-full sm:w-[45%] lg:w-[15%] flex flex-col items-center lg:items-start">
             <h3 id="quick-links-heading" class="text-[#004E8B] text-md font-black pb-5">Quick Links</h3>
             <ul class="flex flex-col gap-4">
-                <li><a href="#">Career</a></li>
-                <li><a href="#">Contact HR</a></li>
-                <li><a href="#">Compliance Form</a></li>
-                <li><a href="#">Incident Reporting</a></li>
-                <li><a href="#">OPWDD Statement</a></li>
+                {quickLinks.length > 0 ? (
+                  quickLinks.map((item) => (
+                    <li><a href={item.path}>{item.label}</a></li>
+                  ))
+                ) : (
+                  <>
+                    <li><a href="#">Career</a></li>
+                    <li><a href="#">Contact HR</a></li>
+                    <li><a href="#">Compliance Form</a></li>
+                    <li><a href="#">Incident Reporting</a></li>
+                    <li><a href="#">OPWDD Statement</a></li>
+                  </>
+                )}
             </ul>
         </div>
         <div id="services-col" class="w-full sm:w-[45%] lg:w-[20%] flex flex-col items-center lg:items-start">
             <h3 id="services-heading" class="text-[#004E8B] text-md font-black pb-5">Our Services</h3>
             <ul class="flex flex-col gap-4">
-                <li><a href="#">Com Hab</a></li>
-                <li><a href="#">Day Hab</a></li>
-                <li><a href="#">Supported Employment</a></li>
-                <li><a href="#">Respite</a></li>
-                <li><a href="#">Residential</a></li>
+                {ourServices.length > 0 ? (
+                  ourServices.map((item) => (
+                    <li><a href={item.path}>{item.label}</a></li>
+                  ))
+                ) : (
+                  <>
+                    <li><a href="#">Com Hab</a></li>
+                    <li><a href="#">Day Hab</a></li>
+                    <li><a href="#">Supported Employment</a></li>
+                    <li><a href="#">Respite</a></li>
+                    <li><a href="#">Residential</a></li>
+                  </>
+                )}
             </ul>
         </div>
         <div id="contact-col" class="w-full lg:w-[25%] flex flex-col items-center lg:items-start">
