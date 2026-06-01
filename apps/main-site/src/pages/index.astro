@@ -1,5 +1,6 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
+import HomeLayout from 'src/layouts/HomeLayout.astro';
 import BlockResolver from '@anothersteporg/ui/components/BlockResolver.astro';
 import Hero from '@anothersteporg/ui/components/Hero.astro';
 import AboutSection from 'src/components/AboutSection.astro';
@@ -87,7 +88,7 @@ console.log("Blocks found:", homePageData.page.editorBlocks.length);
 // Strip HTML tags from WP content for the modal description
 const cleanDescription = promos?.content?.replace(/<[^>]*>?/gm, '') || "";
 ---
-<MainLayout title='Home'>
+<HomeLayout title='Home'>
 	{promos && (
 		<PromoModal
 			id='wp-dynamic-promo'
@@ -109,4 +110,4 @@ const cleanDescription = promos?.content?.replace(/<[^>]*>?/gm, '') || "";
 			bgImage='/images/front-page-hero.jpg'
 		/> -->
 		<BlockResolver blocks={homePageData?.page?.editorBlocks} />
-</MainLayout>
+</HomeLayout>

@@ -1,11 +1,11 @@
 ---
-// apps/main-site/src/layouts/MainLayout.astro
+// apps/main-site/src/layouts/HomeLayout.astro
 import Header from '@anothersteporg/ui/components/Header.astro';
 import BaseLayout from '@anothersteporg/ui/layouts/BaseLayout.astro';
 const { title } = Astro.props;
 ---
 <BaseLayout title={title} isStore={false}>
-    <main>
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <slot />        
     </main>
 </BaseLayout>
