@@ -4,6 +4,7 @@
 
 :root {
     /* Brand Colors */
+    --color-background: #f9f9fc;
     --color-yellow: #F9EF21;
     --color-dark-yellow: #BCAE00;
     --color-yellow-fixed: #464100;
@@ -11,14 +12,12 @@
     --color-blue-fixed-dim: #a2c9ff;
     --color-blue-fixed: #d3e4ff;
     --color-blue-container: #0066b3;
-    --color-on-blue-container: #d2e3ff;
     --color-red: #EC1F28;
     --color-dark-red: #410002;
     --color-dark: #232020;
     --color-bg-light: #F5F5F5;
     --color-neutral-gray: #A9A9A9;
     --color-text-gray: #414751;    
-    --color-on-surface: #1a1c1e;
     --color-surface: #f9f9fc;
     --color-inverse-surface: #2f3133;
     --color-inverse-on-surface: #f0f0f3;    
@@ -33,12 +32,17 @@
     --color-surface-container-lowest: #ffffff;
     --color-outline: #717782;
     --color-outline-variant: #c1c7d3;
+    --color-on-background: #1a1c1e;
+    --color-on-surface: #1a1c1e;
+    --color-on-brand-color: #ffffff;
+    --color-on-blue-container: #d2e3ff;
 
     /* Typography */
     --font-lexend: 'Lexend', sans-serif;
 }
 
 @theme {
+  --color-background: var(--color-background);
   --color-brand-yellow: var(--color-yellow);
   --color-brand-dark-yellow: var(--color-dark-yellow);
   --color-brand-yellow-fixed: var(--color-yellow-fixed);
@@ -46,7 +50,6 @@
   --color-brand-blue-fixed: var(--color-blue-fixed-dim);
   --color-brand-blue-fixed-dim: var(--color-blue-fixed-dim);
   --color-brand-blue-container: var(--color-blue-container);
-  --color-on-blue-container: var(--color-on-blue-container);
   --color-brand-red: var(--color-red);
   --color-brand-dark-red-fixed: var(--color-dark-red);
   --color-brand-dark: var(--color-dark);
@@ -61,6 +64,11 @@
   --color-surface-container-lowest: var(--color-surface-container-lowest);
   --color-outline: var(--color-outline);
   --color-outline-variant: var(--color-outline-variant);
+  --color-on-background: var(--color-on-background);
+  --color-on-brand-blue: var(--color-on-brand-color);
+  --color-on-brand-yellow: var(--color-on-brand-color);
+  --color-on-brand-red: var(--color-on-brand-color);
+  --color-on-blue-container: var(--color-on-blue-container);
 
   --font-sans: var(--font-lexend);
   --radius-brand: 2.5rem;
