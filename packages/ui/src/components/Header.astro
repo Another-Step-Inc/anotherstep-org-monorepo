@@ -8,7 +8,32 @@ interface MenuItem {
   children?: MenuItem[];
 }
 
+const MAIN_SITE_URL = import.meta.env.PUBLIC_MAIN_SITE_URL || 'http://localhost:4321';
+const STORE_SITE_URL = import.meta.env.PUBLIC_STORE_SITE_URL || 'http://localhost:4322';
 const WP_URL = import.meta.env.WP_GRAPHQL_URL || 'http://host.docker.internal:8050/graphql';
+
+function formatUrl(path: string, currentIsStore: boolean): string {
+  const trimmedPath = path ? path.trim() : '';
+
+  if (!trimmedPath || trimmedPath === '#') return '#';
+  if (trimmedPath.startsWith('http://') || trimmedPath.startsWith('https://') || trimmedPath.startsWith('#')) return trimmedPath;
+
+  let cleanPath = trimmedPath.startsWith('/') ? trimmedPath : `/${trimmedPath}`;
+
+  const isStoreLink = cleanPath.startsWith('/store') || cleanPath.startsWith('/products') || cleanPath.startsWith('/cart');
+
+  if (isStoreLink) {
+    if (cleanPath === '/store') {
+      cleanPath = '/'
+    } else if(cleanPath.startsWith('/store/')) {
+      cleanPath = cleanPath.replace('/store/', '/');
+    }
+
+    return currentIsStore ? cleanPath : `${STORE_SITE_URL}${cleanPath}`;
+  } else {
+    return currentIsStore ? `${MAIN_SITE_URL}${cleanPath}` : cleanPath;
+  }
+}
 
 async function fetchMenuData(): Promise<MenuItem[]> {
   try {
@@ -113,6 +138,7 @@ function getFallbackMenu(): MenuItem[] {
 
 const menuData = await fetchMenuData();
 const { isStore = false } = Astro.props;
+const brandingUrl = isStore ? MAIN_SITE_URL : '/';
 ---
 <div class="bg-brand-blue text-white py-2 text-sm hidden md:block">
   <div class="container mx-auto px-4 flex justify-end items-center py-2">
@@ -137,7 +163,7 @@ const { isStore = false } = Astro.props;
     <div class="site-branding flex flex-row items-center">
       <Image src={logoReg} alt="Another Step Logo" class="h-16 w-auto" />
       <p class="site-title font-bold text-md text-brand-blue">
-        <a href="/" rel="home">Another Step</a>
+        <a href={brandingUrl} rel="home">Another Step</a>
       </p>
     </div>
 
@@ -146,7 +172,8 @@ const { isStore = false } = Astro.props;
         {menuData.map((item) => (
           <li class="menu-item group relative">
             <a 
-              href={item.url} 
+              href={formatUrl(item.url, isStore)} 
+              onclick={item.url === '#' ? 'event.preventDefault()' : ''}
               class="text-[#232020] hover:text-[#F9EF21] font-medium transition-colors duration-300 flex items-center px-4 py-2"
             >
               {item.title}
@@ -160,7 +187,7 @@ const { isStore = false } = Astro.props;
                 {item.children.map((child) => (
                   <li>
                     <a 
-                      href={child.url} 
+                      href={formatUrl(child.url, isStore)} 
                       class="text-[#232020] hover:text-[#F9EF21] hover:bg-gray-50 font-medium transition-colors duration-300 flex items-center px-4 py-2"
                     >
                       {child.title}
@@ -179,7 +206,7 @@ const { isStore = false } = Astro.props;
         href="/donation" 
         class="bg-brand-blue text-white px-8 py-3 rounded-full font-semibold hover:bg-brand-blue-400 transition-colors duration-300 shadow-sm"
       >
-        Donate Now &rarr;
+        Donate Now
       </a>
     </div>
 
@@ -196,11 +223,11 @@ const { isStore = false } = Astro.props;
     <ul class="flex flex-col items-center space-y-4">
       {menuData.map((item) => (
         <li class="w-full text-center">
-          <a href={item.url} class="text-lg font-bold text-[#232020]">{item.title}</a>
+          <a href={formatUrl(item.url, isStore)} class="text-lg font-bold text-[#232020]">{item.title}</a>
           {item.children && item.children.length > 0 && (
              <div class="flex flex-col space-y-2 mt-2 bg-gray-50 py-2">
                 {item.children.map(child => (
-                  <a href={child.url} class="text-sm text-gray-600">{child.title}</a>
+                  <a href={formatUrl(child.url, isStore)} class="text-sm text-gray-600">{child.title}</a>
                 ))}
              </div>
           )}
@@ -255,6 +282,7 @@ const { isStore = false } = Astro.props;
   )} 
 
 <script>
+  const parentLinks = document.querySelectorAll('.mobile-parent-link');
   const toggle = document.getElementById('mobile-menu-toggle');
   const menu = document.getElementById('mobile-menu');
   toggle?.addEventListener('click', () => menu?.classList.toggle('hidden'));
@@ -281,6 +309,26 @@ const { isStore = false } = Astro.props;
       }
     });
   }
+
+  parentLinks.forEach(link => {
+  link.addEventListener('click', (e) => {
+    const hasChildren = link.getAttribute('data-has-children') === 'true';
+    const href = link.getAttribute('href');
+
+    // If it's a structural '#' link, stop it from navigating or jumping the page
+    if (href === '#') {
+      e.preventDefault();
+    }
+
+    // Toggle the sibling submenu dropdown if children exist
+    if (hasChildren) {
+      const submenu = link.nextElementSibling;
+      if (submenu && submenu.classList.contains('mobile-submenu')) {
+        submenu.classList.toggle('hidden');
+      }
+    }
+  });
+});
 
   // Initialize on load
   initStickyHeader();
