@@ -1,0 +1,178 @@
+---
+// src/pages/news/[slug].astro
+import MainLayout from "src/layouts/MainLayout.astro";
+
+import "src/styles/global.css";
+
+export async function getStaticPaths() {
+    const WP_API_URL = "http://host.docker.internal:8050/wp-json/wp/v2";
+
+    try {
+        const response = await fetch(`${WP_API_URL}/posts?_embed`);
+        if (!response.ok) throw new Error("Network response was not ok");
+        const posts = await response.json();
+
+        return posts.map((post) => ({
+            params: { slug: post.slug },
+            props: { post },
+        }));
+    } catch (error) {
+        console.error("Error fetching paths in getStaticPaths:", error);
+        // Return a minimal fallback route so the build server doesn't crash completely
+        return [{ params: { slug: "welcome" }, props: { post: null } }];
+    }
+}
+
+const { post } = Astro.props;
+
+if (!post) {
+  return Astro.redirect('/404');
+}
+
+// Format the date strings cleanly
+const formattedDate = new Date(post.date).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const category = post._embedded?.['wp:term']?.[0]?.[0];
+const categorySlug = category?.slug || 'default';
+const categoryName = category?.name || 'News';
+
+const categoryStyles = {
+    'policy-and-advocacy': 'bg-brand-blue-fixed text-on-brand-blue-fixed-variant',
+    'agency-updates': 'bg-brand-red-fixed text-on-brand-red-fixed-variant text-label-md',
+    'community-stories': 'bg-brand-yellow-fixed text-on-brand-yellow-fixed-variant',
+    'resource-and-tools': 'bg-brand-green-fixed text-on-brand-green-fixed-variant',
+    'the-without-walls-perspective': 'bg-brand-purple-fixed text-on-brand-purple-fixed-variant',
+    'welcome': 'bg-brand-orange-fixed text-on-brand-orange-fixed-variant',
+    'default': 'bg-brand-sky-blue-fixed text-on-brand-sky-blue-fixed-variant',
+}
+
+const badgeClass = categoryStyles[categorySlug] || categoryStyles['default'];
+---
+<MainLayout title="Sector News">
+    <div class="max-w-6xl mx-auto px-4 pt-8 pb-16">
+        
+    <!-- Breadcrumbs Trail -->
+    <nav aria-label="Breadcrumb" class="mb-6 block">
+      <ol class="flex items-center space-x-2 text-sm text-slate-500 list-none p-0 m-0">
+        <li>
+          <a href="/" class="hover:text-blue-600 transition-colors">Home</a>
+        </li>
+        <li class="flex items-center space-x-2">
+          <span class="text-slate-400">/</span>
+          <a href="/news" class="hover:text-blue-600 transition-colors">Sector News</a>
+        </li>
+        <li class="flex items-center space-x-2" aria-current="page">
+          <span class="text-slate-400">/</span>
+          <span class="text-slate-400 font-medium truncate max-w-[200px]" set:html={post.title.rendered} />
+        </li>
+      </ol>
+    </nav>
+
+    <!-- Back Action Button -->
+    <a 
+      href="/news" 
+      class="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors group mb-8"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Back to News Feed
+    </a>
+
+    <!-- THE CSS GRID ENGINE -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      
+      <!-- Article & Sign-up Form (8 Columns wide) -->
+      <main class="lg:col-span-8 block">
+          
+          <article class="block">
+            <span class={`inline-block px-3 py-1 text-label-md font-bold rounded-full w-fit mb-4 uppercase tracking-wider ${badgeClass}`}>
+                {categoryName}
+            </span>
+            
+            <h1 class="text-3xl md:text-4xl font-extrabold mb-3 leading-tight text-slate-900" set:html={post.title.rendered} />
+            
+            <p class="text-xs md:text-sm text-slate-500 mb-6">
+                Published on {formattedDate} • By {post._embedded?.author?.[0]?.name || 'Staff'}
+            </p>
+
+            <hr class="mb-8 border-slate-200" />
+            
+            <div class="entry-content text-slate-800 break-words mb-12" set:html={post.content.rendered} />
+          </article>
+      </main>
+
+      <!-- Sidebar Panel Layout (4 Columns wide) -->
+      <aside class="lg:col-span-4 space-y-10 border-t lg:border-t-0 lg:border-l lg:pl-8 border-slate-200 pt-8 lg:pt-0 block">
+          
+          <div class="space-y-4">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Recent Updates</h3>
+            <ul class="space-y-3 list-none p-0 m-0 text-sm">
+                <li>
+                  <a href="#" class="font-medium text-slate-800 hover:text-blue-600 line-clamp-2">Example Recent Post Title Will Go Here</a>
+                </li>
+            </ul>
+          </div>
+
+          <div class="space-y-4">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Quick Resources</h3>
+            <ul class="space-y-2 list-none p-0 m-0 text-sm">
+                <li><a href="/compliance" class="text-blue-600 hover:underline">Compliance Form</a></li>
+                <li><a href="/incident-reporting" class="text-blue-600 hover:underline">Incident Reporting</a></li>
+                <li><a href="/careers" class="text-blue-600 hover:underline">Career Opportunities</a></li>
+            </ul>
+          </div>
+
+      </aside>
+
+    </div> <!-- End Grid Engine -->
+
+    <hr class="my-8 border-slate-200" />
+
+    <!-- Bottom Action Box -->
+    <div class="space-y-6">
+        <h3 class="text-lg font-bold text-slate-900">Enjoyed this update?</h3>
+        <div class="flex flex-wrap gap-4 items-center justify-between bg-slate-100 p-6 rounded-lg">
+            <div>
+                <p class="font-medium text-slate-800">Stay informed with Another Step</p>
+                <p class="text-sm text-slate-600">Get the latest sector updates delivered directly to your inbox.</p>
+            </div>
+            <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded transition-colors">
+                Join Our Email List
+            </a>
+        </div>
+    </div>
+  </div>
+</MainLayout>
+<style is:global>
+    /* Target elements specifically within your WordPress entry container */
+    .entry-content p {
+        margin-bottom: 1.5rem; /* Adds clean spacing below each paragraph */
+        line-height: 1.75;
+    }
+
+    .entry-content h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-top: 2rem;
+        margin-bottom: 0.75rem; /* Spacing beneath subheadings */
+        color: #0f172a; /* slate-900 */
+        line-height: 1.3;
+    }
+
+    /* Unordered List Layout Adjustments */
+    .entry-content ul {
+        list-style-type: disc; /* Restores standard bullet formatting */
+        padding-left: 1.5rem;   /* indents the list item trail */
+        margin-bottom: 1.5rem;  /* bottom padding below the entire list block */
+    }
+
+    .entry-content li {
+        margin-bottom: 0.5rem;  /* Spacing between list items */
+        line-height: 1.6;
+    }
+</style>
