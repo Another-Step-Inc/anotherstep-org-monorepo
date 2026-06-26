@@ -1,0 +1,272 @@
+---
+import MainLayout from "src/layouts/MainLayout.astro";
+
+import "src/styles/global.css";
+---
+
+<MainLayout title="Gallery">
+  <!-- Hero Section -->
+  <section class="max-w-[1440px] mx-auto px-12 pt-20 pb-12">
+    <div class="max-w-3xl">
+      <h1
+        class="text-[3.5rem] leading-tight font-black text-brand-blue mb-6 font-display"
+      >
+        Community in Action
+      </h1>
+      <p
+        class="text-body-lg text-on-surface leading-relaxed mb-8 border-l-4 border-brand-yellow-fixed pl-6"
+      >
+        At Another Step, we believe that true inclusion happens in the heart of
+        our neighborhoods. Our participants are active contributors to the
+        community, building relationships, developing skills, and discovering
+        their passions through authentic, everyday experiences.
+      </p>
+    </div>
+  </section>
+  <!-- Video Section -->
+  <section class="max-w-[1440px] mx-auto px-12 pb-24">
+    <div
+      class="relative w-full aspect-video rounded-3xl overflow-hidden group cursor-pointer shadow-2xl"
+    >
+      <img
+        alt="Video cover showing a community gathering"
+        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2aIMYJDvagr8omF20l9fjUvTlDeEyIeoddij8MN0w5siQkFNbe8aix64d3T4EUKCkyLSYvZzfTku6dXYzroQGgMEQpLkhoEI1rD_Z7DVpVnuVzYXh-enfQNJSiJPmiMcQBseqSuNtgsfjz_WfwaH9jZSoc36hrBhTI4xRyQKBmtgzJ8nn21EXH1Qq0leC8CnIff1-ZwBFbayD-yuzvEq5hu5RC0NSM2PbsUehxOgV8o94NBEhLv5d5VJf_En4mhDmuU_BsYGcydg"
+      />
+      <div
+        class="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors flex flex-col items-center justify-center"
+      >
+        <div
+          class="bg-white/20 backdrop-blur-md rounded-full p-6 group-hover:bg-white/30 transition-all transform group-hover:scale-110 mb-6"
+        >
+          <span
+            class="material-symbols-outlined text-white text-6xl"
+            style="font-variation-settings: 'FILL' 1">play_arrow</span
+          >
+        </div>
+        <h2
+          class="text-white text-3xl font-black font-display tracking-tight text-center px-4"
+        >
+          Another Step in Motion
+        </h2>
+        <p class="text-white/90 font-medium mt-2">
+          See how our community thrives together
+        </p>
+      </div>
+    </div>
+  </section>
+  <!-- Expanded Photo Grid -->
+  <section class="max-w-[1440px] mx-auto px-12 pb-24">
+    <h3 class="text-2xl font-bold text-brand-blue mb-8 flex items-center gap-3">
+      <span class="material-symbols-outlined">auto_awesome_motion</span>
+      Stories of Independence
+    </h3>
+    <div class="masonry-grid">
+      <!-- Image 1: Tall -->
+      <div
+        class="masonry-item-tall group relative overflow-hidden rounded-2xl bg-surface-container-low transition-all duration-500 hover:shadow-xl"
+      >
+        <img
+          alt="Participants learning at the local library"
+          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBP61bbRWU079CQp6a47osUzwN839JiR3DrNkwuVlaB0_CWD14H_OSxW4fh3Jssudgagw8n0C83gFciboNrU7FhIH7XNtiKhc2ubBOwNaTspwsya4RvoI_LAyXplaE_2bx3dT8l32p6E89G4G-XowHC_ksp-htXNPIC-e05PNwaOkTiMPll5ZJFsWNrOYqSiKBBPe_5BXjIDjtViIKrzG8OxxrQLqvOaWPn_SdtC5rZ2imhTyfBwcS7ZiG_YL1FJIp5I_wbVE2ObNY"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-brand-blue/90 via-brand-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8"
+        >
+          <span class="text-white font-bold text-lg leading-snug"
+            >Lifelong Learning: Library Workshop</span
+          >
+        </div>
+      </div>
+      <!-- Image 2 -->
+      <div
+        class="group relative overflow-hidden rounded-2xl bg-surface-container-low transition-all duration-500 hover:shadow-xl"
+      >
+        <img
+          alt="Volunteering at the community garden"
+          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuABdfZY0JzZMuue8DSckzTXJ7UnOAzsc1GipZYnpdWmXl9GvhWewv157_R6ycpBvluthBX5TBaxzszdzQILUyl_kaC3Xmcv-DKn2atlLS8IyPQkMGQpZVS3YxxSv5-Mxb4_9iw283wpIBiZh8s6oYxCn3oCG_YbmcytU69vFq7lZuChSqmpbCRbhbeiHXNTOP4FQhOQWQ2HF7omp9_zXG2TrNQx8Lox7vg1E5l_e54wZG2fUULKO_hMhE4cQoJbGeaLSjkZkxvDhdg"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-brand-blue/90 via-brand-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6"
+        >
+          <span class="text-white font-bold text-lg">Cultivating Community</span
+          >
+        </div>
+      </div>
+      <!-- Image 3 -->
+      <div
+        class="group relative overflow-hidden rounded-2xl bg-surface-container-low transition-all duration-500 hover:shadow-xl"
+      >
+        <img
+          alt="Friends at a coffee shop"
+          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7jR4j51UcVKF0OLKJqR_rGFUysdJDZhYyT142XabpE4JpJ-PmCpFkE7gWpDJ4j-NT7n1KC_1XU8AtZuTOzEu-X4jR3JJAqZztXNVnHUgvDbVGDMquB3f-jmWQcO1xSNihDJPP2Q9B2pDN-OEHYRb5atiAF2WgXQOHFXn-YGBFjVoNgigSI0qNMELOheQ5cS-ZfUyn8hSMzZSMQX74_wX1Jg3Zu7EXNFXHDtUwRAfp2pgEhOS76zlyEwVfknZW9W2WlqMvXUpnr5E"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-brand-blue/90 via-brand-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6"
+        >
+          <span class="text-white font-bold text-lg">Social Connections</span>
+        </div>
+      </div>
+      <!-- Image 4: Wide -->
+      <div
+        class="masonry-item-wide group relative overflow-hidden rounded-2xl bg-surface-container-low transition-all duration-500 hover:shadow-xl"
+      >
+        <img
+          alt="Cooking class experience"
+          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJmrRmFi4ktT6UNYTemkvrOZnNkJ9FPtFFASuwEqkljKQzCS808Ed4RYSOO8FuGDp9Jg0mQyDZh_tyhfojW7AsXc484Wp7Jw-OGWtFwUOIggLRzH_Ug45TfawaACtqCQ54rFilI3OaM8ZtsBxqbXpb8gqPUfaDDi4DSxJVbqVyJT0dPyzjeBlz2cKJPEBvaggVrwoQu3VceY9odkLj_Ee4i0-XUi6ewDdZAsT9bjZ4OGo61X8jYML_rAY8UVeovFZ_pbSTmTvne9A"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-brand-blue/90 via-brand-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8"
+        >
+          <div class="text-white">
+            <span
+              class="text-label-md uppercase tracking-wider font-bold mb-1 block opacity-80"
+              >Skill Building</span
+            >
+            <span class="text-xl font-bold">The Art of Independent Living</span>
+          </div>
+        </div>
+      </div>
+      <!-- Image 5 -->
+      <div
+        class="group relative overflow-hidden rounded-2xl bg-surface-container-low transition-all duration-500 hover:shadow-xl"
+      >
+        <img
+          alt="Outing in a local park"
+          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKhHUhCkyIK0KIFVTQUEdPQYPP-H3nZFsr7Zai2u_p5-Vc2of6LezIy5a9IRJpHBzZEJInRihDcxnLmdNofXhZg4u3iIQ2wb-kcrjRtp7xIFQAk3hAoMmN5sPZ7gdD6DXdokSmO_bfd12ykJ3U6m7vHeYqTQBto7K2zzdLwNR69I14sPj7AA6x13tFZfj1LVobfgSRlzc2T4eW1UV9EYMl4DHo3Xg80XLDGgm6Ch8jcsmjiXuzxub-f96woE5JCRj4wG1ogN1qEjQ"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-brand-blue/90 via-brand-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6"
+        >
+          <span class="text-white font-bold text-lg"
+            >Active Living in Parks</span
+          >
+        </div>
+      </div>
+      <!-- Image 6: Tall -->
+      <div
+        class="masonry-item-tall group relative overflow-hidden rounded-2xl bg-surface-container-low transition-all duration-500 hover:shadow-xl"
+      >
+        <img
+          alt="Skill development at college"
+          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcAXKB5rI2Pq5snnBVpSU-1zPHT8_Z-H54VaN67PnDGM7g_Vzt7MPvK492KHoJcBAQMhtMTJ5WSgVDAwSls6On6_ViC3DsToFeli9G5YuHmoqzjnkAh4tvjEtgmgXUH1RBosvqhJG4WqAQkrW0nv-0gStNEqlEu-IVd05Xvv56qaf7M-oD3uzx2-A27uKr8YleuyCP6LIq3_ulN8gfsilWk4r3AEbv_EqHAOG6SS9Jft7MLJbvpyiBJXYOn-tLsU5tdfqllILOvE4"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-brand-blue/90 via-brand-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8"
+        >
+          <span class="text-white font-bold text-lg"
+            >Professional Growth &amp; Career Prep</span
+          >
+        </div>
+      </div>
+      <!-- Image 7 -->
+      <div
+        class="group relative overflow-hidden rounded-2xl bg-surface-container-low transition-all duration-500 hover:shadow-xl"
+      >
+        <img
+          alt="Art therapy session"
+          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCurpufoF6-wQ9E4XXgadHGt-07QlTUQLzudgx8GbDtEEVzrhWbH1hQPpEO1nSoRYRDGXSEIHgoOkPK2fRGqBQFFNL4MLqjFJ1wGrUgZGr1kgE69bZivl5Az5i9oYLXPWIWO5iP2rykP2eIF6KYKKxVHrZ-D4LTyQpxKnexpsr8w3eEsDZFssJQk-XNrWaAvf6z-2PpgjfuUp8Rzrk2Pbl6MarWmkjTAZjB5ZfxCVeF6hc2EY8_y1geBWbUiXZnkwEPxZjxDLrbyrk"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-brand-blue/90 via-brand-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6"
+        >
+          <span class="text-white font-bold text-lg">Creative Expression</span>
+        </div>
+      </div>
+      <!-- Image 8 -->
+      <div
+        class="group relative overflow-hidden rounded-2xl bg-surface-container-low transition-all duration-500 hover:shadow-xl"
+      >
+        <img
+          alt="Music group workshop"
+          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0ZnfkqRfjacMdoAcx08c0xjkbPU_tLiKFtkBxPIqoGXf3bVCi8-WeQhZfVvDK-M13GkXnGjzPFkWNVyJnIfG-T8WwCWRuKNSD0QVB_q99P3Pa3Fwo9we5k7dC3y4r4JVTLc-QNdpsfrx4JXopwVbWihvM2RuId1eZNvBD5OXn20lWBybxF2ywDJXR2tj8eeDn-TlzX6jlJMNPnog7hQgfVdGDj8_s5KV468coFyr9pwna0t9hZ3deuHjkBMfWJwSVHOJB6InnAsM"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-brand-blue/90 via-brand-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6"
+        >
+          <span class="text-white font-bold text-lg">Rhythm of Inclusion</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Impact Section -->
+  <section class="bg-brand-blue text-on-brand-blue py-24 relative overflow-hidden">
+    <!-- Decorative circle -->
+    <div
+      class="absolute -top-24 -right-24 w-96 h-96 bg-brand-blue-container rounded-full opacity-20"
+    >
+    </div>
+    <div
+      class="max-w-[1440px] mx-auto px-12 relative z-10 grid md:grid-cols-2 gap-16 items-center"
+    >
+      <div>
+        <h2 class="text-headline-lg font-black mb-6">Every Step Counts</h2>
+        <p class="text-body-lg opacity-90 leading-relaxed mb-8">
+          The moments captured here are more than just photos; they are the
+          milestones of independence. By integrating daily experiences with
+          professional coaching and community support, we provide the foundation
+          for a fulfilling life where everyone belongs.
+        </p>
+        <div class="flex gap-4">
+          <button
+            class="bg-brand-red text-on-brand-red rounded-full px-8 py-3 font-bold active:scale-95 transition-transform hover:shadow-lg"
+          >
+            Join Our Mission
+          </button>
+          <button
+            class="bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full px-8 py-3 font-bold hover:bg-white/20 transition-colors"
+          >
+            Read Impact Stories
+          </button>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div
+          class="bg-surface-container-lowest/10 backdrop-blur p-8 rounded-2xl border border-white/10 text-center"
+        >
+          <div class="text-display-lg font-black text-brand-yellow mb-2">
+            500+
+          </div>
+          <div class="text-label-md uppercase tracking-widest font-bold">
+            Monthly Outings
+          </div>
+        </div>
+        <div
+          class="bg-surface-container-lowest/10 backdrop-blur p-8 rounded-2xl border border-white/10 text-center translate-y-8"
+        >
+          <div class="text-display-lg font-black text-brand-red-fixed mb-2">
+            95%
+          </div>
+          <div class="text-label-md uppercase tracking-widest font-bold">
+            Goal Completion
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</MainLayout>
+<style>
+    .masonry-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        grid-auto-rows: 250px;
+        gap: 1.5rem;
+    }
+    .masonry-item-tall { grid-row: span 2; }
+    .masonry-item-wide { grid-column: span 2; }
+    @media (max-width: 768px) {
+        .masonry-item-wide { grid-column: span 1; }
+    }
+    .glass-nav {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+    }
+</style>
