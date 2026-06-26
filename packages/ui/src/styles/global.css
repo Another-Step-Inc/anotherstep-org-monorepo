@@ -4,23 +4,38 @@
 
 :root {
     /* Brand Colors */
-    --color-background: #f9f9fc;
-    --color-yellow: #F9EF21;
-    --color-dark-yellow: #BCAE00;
-    --color-yellow-fixed: #464100;
     --color-blue: #0E75BC;
-    --color-blue-fixed-dim: #a2c9ff;
-    --color-blue-fixed: #d3e4ff;
-    --color-blue-container: #0066b3;
+    --color-yellow: #F9EF21;
     --color-red: #EC1F28;
+
+    /* Alt Brand Colors */
+    --color-blue-fixed: #d3e4ff;
+    --color-blue-fixed-dim: #a2c9ff;
+    --color-blue-container: #0066b3;
+    --color-darker-yellow: #BCAE00;
+    --color-darkest-yellow: #464100;
+    --color-red-fixed-dim: #ffb4ab;
+    --color-red-fixed: #ffdad6;    
+    --color-darker-red: #BB0014;
     --color-dark-red: #410002;
-    --color-dark: #232020;
+
+    /* News Category Colors */
+    --color-green: #E6F4EA;
+    --color-purple: #F3E8FF;
+    --color-sky-blue: #E0F2FE;
+    --color-teal: #E2F9F7;
+    --color-orange: #FFEFE6;
+
+    /* Neutral Gray Colors */
     --color-bg-light: #F5F5F5;
+    --color-background: #f9f9fc;
     --color-neutral-gray: #A9A9A9;
-    --color-text-gray: #414751;    
+    --color-text-gray: #414751;
+    --color-dark: #232020;
+    
+    /* Surface Colors */
     --color-surface: #f9f9fc;
     --color-inverse-surface: #2f3133;
-    --color-inverse-on-surface: #f0f0f3;    
     --color-surface-tint: #0060a9;
     --color-surface-dim: #dadadc;
     --color-surface-bright: #f9f9fc;
@@ -30,12 +45,27 @@
     --color-surface-container-high: #e8e8ea;
     --color-surface-container-low: #f3f3f6;
     --color-surface-container-lowest: #ffffff;
+
+    /* Outline Colors */
     --color-outline: #717782;
     --color-outline-variant: #c1c7d3;
+
+    /* Text On Colors */
+    --color-text-on-brand-blue-fixed: #001C38;
+    --color-text-on-brand-yellow: #1F1C00;
+    --color-text-on-brand-red-fixed: #410002;
     --color-on-background: #1a1c1e;
     --color-on-surface: #1a1c1e;
+    --color-inverse-on-surface: #f0f0f3;
     --color-on-brand-color: #ffffff;
     --color-on-blue-container: #d2e3ff;
+
+    /* News Category Text On Colors */
+    --color-text-on-green: #137333;
+    --color-text-on-purple: #6B21A8;
+    --color-text-on-sky-blue: #0369A1;
+    --color-text-on-teal: #005B5C;
+    --color-text-on-orange: #A33B00;
 
     /* Typography */
     --font-lexend: 'Lexend', sans-serif;
@@ -44,15 +74,32 @@
 @theme {
   --color-background: var(--color-background);
   --color-brand-yellow: var(--color-yellow);
-  --color-brand-dark-yellow: var(--color-dark-yellow);
-  --color-brand-yellow-fixed: var(--color-yellow-fixed);
+  --color-brand-dark-yellow: var(--color-darker-yellow);
+  --color-brand-yellow-fixed: var(--color-darkest-yellow);
+  --color-on-brand-yellow: var(--color-text-on-brand-yellow);
+  --color-on-brand-dark-yellow: var(--color-darkest-yellow);
   --color-brand-blue: var(--color-blue);
   --color-brand-blue-fixed: var(--color-blue-fixed-dim);
   --color-brand-blue-fixed-dim: var(--color-blue-fixed-dim);
   --color-brand-blue-container: var(--color-blue-container);
+  --color-on-brand-blue-fixed: var(--color-text-on-brand-blue-fixed);
   --color-brand-red: var(--color-red);
+  --color-brand-red-fixed: var(--color-red-fixed);
+  --color-brand-red-fixed-dim: var(--color-red-fixed-dim);
+  --color-on-brand-red-fixed: var(--color-text-on-brand-red-fixed);
+  --color-brand-dark-red: var(--color-darker-red);
   --color-brand-dark-red-fixed: var(--color-dark-red);
   --color-brand-dark: var(--color-dark);
+  --color-brand-green-fixed: var(--color-green);
+  --color-on-brand-green-fixed-variant: var(--color-text-on-green);
+  --color-brand-purple-fixed: var(--color-purple);
+  --color-on-brand-purple-fixed-variant: var(--color-text-on-purple);
+  --color-brand-sky-blue-fixed: var(--color-sky-blue);
+  --color-on-brand-sky-blue-fixed-variant: var(--color-text-on-sky-blue);
+  --color-brand-teal-fixed: var(--color-teal);
+  --color-on-brand-teal-fixed-variant: var(--color-text-on-teal);
+  --color-brand-orange-fixed: var(--color-orange);
+  --color-on-brand-orange-fixed-variant: var(--color-text-on-orange);
   --color-brand-bg: var(--color-bg-light);
   --color-brand-gray: var(--color-neutral-gray);
   --color-brand-text: var(--color-text-gray);
@@ -66,12 +113,15 @@
   --color-outline-variant: var(--color-outline-variant);
   --color-on-background: var(--color-on-background);
   --color-on-brand-blue: var(--color-on-brand-color);
-  --color-on-brand-yellow: var(--color-on-brand-color);
   --color-on-brand-red: var(--color-on-brand-color);
   --color-on-blue-container: var(--color-on-blue-container);
 
   --font-sans: var(--font-lexend);
   --radius-brand: 2.5rem;
+  --headline: var(--font-lexend);
+  --display: var(--font-lexend);
+  --body: var(--font-lexend);
+  --label: var(--font-lexend);
 }
 
 @layer base {
