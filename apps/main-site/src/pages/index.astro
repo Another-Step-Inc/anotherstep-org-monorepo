@@ -1,5 +1,5 @@
 ---
-import MainLayout from '../layouts/MainLayout.astro';
+import MainLayout from "src/layouts/MainLayout.astro";
 import HomeLayout from 'src/layouts/HomeLayout.astro';
 import BlockResolver from '@anothersteporg/ui/components/BlockResolver.astro';
 import Hero from '@anothersteporg/ui/components/Hero.astro';
@@ -8,7 +8,8 @@ import ValuesSection from 'src/components/ValuesSection.astro';
 import EthicsSection from '../components/EthicsSection.astro';
 import PublicDisclousre from '../components/PublicDisclosure.astro';
 import PromoModal from '@anothersteporg/ui/components/PromoModal.astro';
-import '../styles/global.css'
+
+import "src/styles/global.css";
 
 const WP_URL = 'http://host.docker.internal:8050/graphql';
 
