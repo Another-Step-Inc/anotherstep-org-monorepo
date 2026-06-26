@@ -1,0 +1,327 @@
+---
+import MainLayout from "src/layouts/MainLayout.astro";
+
+import "src/styles/global.css";
+---
+
+<MainLayout title="Advocacy">
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden bg-surface py-24 md:py-32">
+    <div class="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-7">
+          <span
+            class="text-brand-blue font-bold tracking-widest uppercase text-sm block mb-4"
+            >Our Mission</span
+          >
+          <h1
+            class="text-[3.5rem] leading-[1.1] font-display font-black text-on-surface mb-8"
+          >
+            Advocacy
+          </h1>
+          <p
+            class="text-[1.375rem] leading-relaxed text-on-surface-variant max-w-2xl"
+          >
+            Advocacy is about having your voice heard and your rights respected.
+            At Another Step, we empower individuals and families to speak up and
+            create change.
+          </p>
+          <div class="mt-12 flex flex-wrap gap-4">
+            <a
+              class="bg-brand-blue text-on-brand-blue rounded-full px-10 py-4 font-bold text-lg inline-flex items-center gap-2 transition-all hover:bg-brand-blue-container active:scale-95 shadow-lg"
+              href="#self-advocacy"
+            >
+              Start Here
+              <span class="material-symbols-outlined">arrow_downward</span>
+            </a>
+            <button
+              class="bg-surface-container-highest text-on-surface rounded-full px-10 py-4 font-bold text-lg inline-flex items-center gap-2 transition-all hover:bg-surface-container-high active:scale-95"
+            >
+              Learn More
+            </button>
+          </div>
+        </div>
+        <div class="lg:col-span-5 relative">
+          <div
+            class="rounded-xl overflow-hidden aspect-square organic-shadow transform rotate-3 scale-105 border-[8px] border-surface-container-lowest"
+          >
+            <img
+              class="w-full h-full object-cover"
+              data-alt="A diverse group of individuals with intellectual and developmental disabilities sitting in a circle during a bright, sunny afternoon workshop. The environment is a clean, modern studio with Lexend typography posters on the walls. The lighting is soft and optimistic, emphasizing human connection and empowerment. Warm wood tones and primary color accents reflect the Another Step brand aesthetic."
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7HlQohgLXovhw_9mU9HOeVT3i4aRS8gNBoGKQBpJvX40VgCABpLo0C6wE08hBzsNBvLSqYzj2UUMrN1vlsyEusQDTzRkXEq9eprxFcCsknHdicSZ5v__3yjseRXHqylZ27-k4SHdGeKPy5T6w05SgHRq5VoTajWO64b6tVyZ42lrIeP8tj0SQ8sFI16KyoqiM8vKTYQFY_zA4WHumXfcNblVqWZwHu2ot2DuEmm0wf2tG1-akVHrEibvf4PLdTE8Zm9KbYnZ0oaE"
+            />
+          </div>
+          <div
+            class="absolute -bottom-6 -left-6 bg-brand-dark-yellow text-on-brand-yellow p-8 rounded-xl organic-shadow max-w-[240px]"
+          >
+            <p class="font-bold text-lg italic">
+              "Every voice matters in the journey to independence."
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Decorative Element -->
+    <div
+      class="absolute top-0 right-0 w-1/3 h-full bg-brand-blue-container/5 -skew-x-12 transform translate-x-1/2"
+    >
+    </div>
+  </section>
+  <!-- Advocacy Pillars (Bento Style) -->
+<!--   <section class="py-24 bg-surface-container-low">
+    <div class="max-w-7xl mx-auto px-6 md:px-12">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"> -->
+        <!-- Self-Advocacy Card -->
+<!--         <div
+          class="lg:col-span-2 bg-surface-container-lowest rounded-xl organic-shadow overflow-hidden flex flex-col md:flex-row group transition-all duration-300 hover:-translate-y-2"
+          id="self-advocacy"
+        >
+          <div class="w-full md:w-2/5 h-64 md:h-auto overflow-hidden">
+            <img
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              data-alt="A close-up portrait of a confident young woman with a disability standing in a bright editorial-style studio. She is dressed in modern professional attire, looking directly at the camera with a peaceful, determined expression. The background is a soft blue gradient consistent with the primary color palette. High-end photography lighting highlights her features, evoking dignity and self-determination."
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTEoMIev_QKaQqOHPNLZ4iC1sshIq8jUGQJCpjiyEHaJMXqbzJfhT2sQhInCt0QQtGdVVr5ZSyO-n5uxTMC-tCwJc15nb449sqJqiexaRzC2ntkNIkGTegyHHKzlC1d--4w1o_ID5SKi_kDPbMs8omQ6JNiSHYQrmzsV6YHlUshxUm6nck0Byu5N4wOxOCKJ8pSvUZRjOBDPQAprJIDpkos7Y1mCbvB39-8KIDoNKtkhva7LlkpZPKVRc_d9FTTJxr15n4fBHcUxQ"
+            />
+          </div>
+          <div class="p-10 flex flex-col justify-center">
+            <div class="flex items-center gap-4 mb-6">
+              <div
+                class="w-12 h-12 rounded-full bg-brand-blue/10 flex items-center justify-center text-brand-blue"
+              >
+                <span
+                  class="material-symbols-outlined"
+                  style="font-variation-settings: 'FILL' 1;">person_pin</span
+                >
+              </div>
+              <h2 class="text-headline-lg font-bold text-on-surface">
+                Self-Advocacy
+              </h2>
+            </div>
+            <p
+              class="text-body-lg text-on-surface-variant mb-8 leading-relaxed"
+            >
+              Speaking for yourself is the ultimate step toward independence. We
+              provide tools for individuals to know their rights, articulate
+              their needs, and make the choices that shape their own futures.
+            </p>
+            <ul class="space-y-4 mb-8">
+              <li class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-brand-blue mt-1"
+                  >check_circle</span
+                >
+                <span class="text-on-surface font-medium"
+                  >Rights awareness training</span
+                >
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-brand-blue mt-1"
+                  >check_circle</span
+                >
+                <span class="text-on-surface font-medium"
+                  >Personal choice workshops</span
+                >
+              </li>
+            </ul>
+            <button
+              class="text-brand-blue font-bold flex items-center gap-2 group/btn"
+            >
+              Download Self-Advocacy Toolkit
+              <span
+                class="material-symbols-outlined group-hover/btn:translate-x-1 transition-transform"
+                >arrow_forward</span
+              >
+            </button>
+          </div>
+        </div> -->
+        <!-- Family Advocacy Card -->
+<!--         <div
+          class="bg-brand-blue text-on-brand-blue rounded-xl organic-shadow p-10 flex flex-col transition-all duration-300 hover:-translate-y-2"
+        >
+          <div
+            class="w-16 h-16 rounded-full bg-on-brand-blue/20 flex items-center justify-center mb-8"
+          >
+            <span
+              class="material-symbols-outlined text-3xl"
+              style="font-variation-settings: 'FILL' 1;">groups</span
+            >
+          </div>
+          <h2 class="text-headline-lg font-bold mb-6">Family Advocacy</h2>
+          <p class="text-body-lg opacity-90 mb-8 leading-relaxed">
+            Support systems are the backbone of success. We help families
+            navigate complex systems together, leveraging community strength to
+            ensure their loved ones receive the respect and opportunities they
+            deserve.
+          </p>
+          <div class="mt-auto">
+            <button
+              class="w-full bg-on-brand-blue text-brand-blue rounded-full py-4 font-bold shadow-md hover:bg-brand-blue-fixed-dim transition-colors"
+              >Join Parent Group</button
+            >
+          </div>
+        </div> -->
+        <!-- Legislative Advocacy Card -->
+        <!-- <div
+          class="lg:col-span-3 bg-surface-container-highest rounded-xl p-12 overflow-hidden relative transition-all duration-300 hover:shadow-xl"
+        >
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 relative z-10">
+            <div>
+              <div class="flex items-center gap-4 mb-6">
+                <div
+                  class="w-12 h-12 rounded-full bg-brand-red/10 flex items-center justify-center text-brand-red"
+                >
+                  <span
+                    class="material-symbols-outlined"
+                    style="font-variation-settings: 'FILL' 1;">gavel</span
+                  >
+                </div>
+                <h2 class="text-headline-lg font-bold text-on-surface">
+                  Legislative Advocacy
+                </h2>
+              </div>
+              <p
+                class="text-body-lg text-on-surface-variant mb-10 leading-relaxed"
+              >
+                Change happens at the systemic level. We stay informed on laws
+                affecting the IDD community and facilitate direct communication
+                with representatives to drive meaningful policy changes that
+                protect the rights of all.
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="bg-surface p-6 rounded-lg organic-shadow">
+                  <h3 class="font-bold text-brand-blue mb-2">Policy Updates</h3>
+                  <p class="text-sm text-on-surface-variant">
+                    Stay informed about upcoming state and federal bills.
+                  </p>
+                </div>
+                <div class="bg-surface p-6 rounded-lg organic-shadow">
+                  <h3 class="font-bold text-brand-blue mb-2">Speak to Reps</h3>
+                  <p class="text-sm text-on-surface-variant">
+                    Guided tools to contact your local representatives
+                    effectively.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col justify-center space-y-6">
+              <div
+                class="bg-brand-red-fixed text-brand-dark-red-fixed p-8 rounded-xl organic-shadow"
+              >
+                <h4 class="text-xl font-bold mb-4">Urgent Call to Action</h4>
+                <p class="mb-6 opacity-90">
+                  Bill AB-402 is up for a vote next Tuesday. This affects direct
+                  care funding in our county.
+                </p>
+                <button
+                  class="bg-brand-red text-on-brand-red rounded-full px-8 py-3 font-bold hover:bg-on-brand-red-fixed-variant transition-colors"
+                  >Take Action Now</button
+                >
+              </div>
+            </div>
+          </div>
+          <div class="absolute bottom-0 right-0 opacity-5 pointer-events-none">
+            <span
+              class="material-symbols-outlined text-[300px]"
+              style="font-variation-settings: 'FILL' 1;">account_balance</span
+            >
+          </div>
+        </div>-->
+<!--       </div>
+    </div> 
+  </section> -->
+  <!-- Upcoming Events Section -->
+  <section class="py-24 bg-surface">
+    <div class="max-w-7xl mx-auto px-6 md:px-12">
+      <div class="flex flex-col lg:flex-row gap-12 items-start">
+        <div class="lg:w-1/3">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="material-symbols-outlined text-brand-blue text-3xl"
+              >calendar_month</span
+            >
+            <h2
+              class="text-[2.5rem] font-display font-black text-on-surface tracking-tight"
+            >
+              Upcoming Events
+            </h2>
+          </div>
+          <div
+            class="bg-brand-blue-container/5 p-8 rounded-xl border border-brand-blue/10"
+          >
+            <h3 class="text-xl font-bold text-brand-blue mb-4">
+              New York City / Westchester News &amp; Events
+            </h3>
+            <p class="text-on-surface-variant mb-6 leading-relaxed">
+              To become a sponsor or get involved in the NYC-Westchester Region,
+              please email SANYS at <a
+                class="text-brand-blue font-bold hover:underline"
+                href="mailto:nyc@sanys.org">nyc@sanys.org</a
+              > or call <span class="font-bold">(646) 896-1938</span>.
+            </p>
+            <div class="flex items-center gap-2 text-brand-red font-bold">
+              <span class="material-symbols-outlined"
+                >notification_important</span
+              >
+              <span>Save the Date!</span>
+            </div>
+          </div>
+        </div>
+        <div class="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div
+            class="bg-surface-container-low p-8 rounded-xl organic-shadow md:col-span-2"
+          >
+            <h3
+              class="text-xl font-bold text-on-surface mb-4 flex items-center gap-2"
+            >
+              <span class="material-symbols-outlined text-brand-blue"
+                >event_repeat</span
+              >
+              Monthly Regional Meetings
+            </h3>
+            <p class="text-body-lg text-on-surface-variant mb-4">
+              Meetings are now happening in-person and over Zoom! Mark your
+              calendars for the <strong
+                >first Tuesday of every month from 12-2pm</strong
+              >.
+            </p>
+          </div>
+          <div
+            class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/20"
+          >
+            <h4 class="font-bold text-brand-blue mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined">location_on</span>
+              Join In Person
+            </h4>
+            <p class="text-sm text-on-surface-variant leading-relaxed">
+              Go to the SANYS office at <strong>25 Beaver St., NYC 10004</strong
+              >. Please let SANYS know in advance if you plan to go in person,
+              and make sure to bring a <strong>photo ID</strong> or else you won’t
+              be allowed into the building.
+            </p>
+          </div>
+          <div
+            class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/20 flex flex-col"
+          >
+            <h4 class="font-bold text-brand-blue mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined">videocam</span>
+              Join Digitally
+            </h4>
+            <div class="space-y-4">
+              <a
+                class="bg-brand-blue text-on-brand-blue rounded-full px-6 py-3 font-bold text-center block hover:bg-brand-blue-container transition-colors"
+                href="https://zoom.us/j/92281612488"
+                target="_blank"
+              >
+                Launch Zoom Meeting
+              </a>
+              <div class="text-xs text-on-surface-variant">
+                <p class="font-bold mb-1">By Phone:</p>
+                <p>Dial (929) 205-6099</p>
+                <p>Meeting ID: 922 8161 2488</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</MainLayout>
+<style is:global></style>
