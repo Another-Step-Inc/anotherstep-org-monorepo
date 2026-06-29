@@ -114,6 +114,7 @@
   --color-on-background: var(--color-on-background);
   --color-on-brand-blue: var(--color-on-brand-color);
   --color-on-brand-red: var(--color-on-brand-color);
+  --color-on-brand-yellow: var(--color-on-brand-color);
   --color-on-blue-container: var(--color-on-blue-container);
 
   --font-sans: var(--font-lexend);
