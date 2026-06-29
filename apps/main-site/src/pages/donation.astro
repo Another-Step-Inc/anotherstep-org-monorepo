@@ -1,0 +1,54 @@
+---
+import MainLayout from "src/layouts/MainLayout.astro";
+
+import "src/styles/global.css";
+---
+
+<MainLayout title="Donations">
+  <!-- Hero Section -->
+  <section class="max-w-7xl mx-auto px-8 mb-24">
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+      <div class="space-y-8">
+        <h1
+          class="text-[3.5rem] leading-tight font-display font-bold text-brand-blue tracking-tight"
+        >
+          Support Independence and Community Growth
+        </h1>
+        <p
+          class="text-body-lg text-on-surface-variant max-w-xl leading-relaxed"
+        >
+          Creative, consumer-driven approaches provide the best quality of life
+          for all people with intellectual and developmental disabilities in
+          Rockland, Westchester, and Orange Counties. Support the Another Step
+          mission to partner with people with developmental disabilities to
+          create the lives they choose. Thank you!
+        </p>
+        <div class="flex flex-wrap gap-4 pt-4">
+          <div
+            class="flex items-center gap-3 bg-surface-container-high px-6 py-4 rounded-xl"
+          >
+            <span
+              class="material-symbols-outlined text-brand-dark-yellow text-3xl"
+              style="font-variation-settings: 'FILL' 1;">verified</span
+            >
+            <span
+              class="text-label-md font-bold text-on-surface uppercase tracking-wider"
+              >Tax-Deductible 501(c)(3)</span
+            >
+          </div>
+        </div>
+      </div>
+      <div class="relative group">
+        <div
+          class="absolute -inset-4 bg-brand-dark-yellow/10 rounded-[2rem] -rotate-2 group-hover:rotate-0 transition-transform duration-500"
+        >
+        </div>
+        <img
+          class="relative rounded-[1.5rem] shadow-2xl w-full h-[500px] object-cover"
+          data-alt="A heartwarming, high-quality photograph of a diverse group of people engaged in a community workshop. A supportive mentor is seen smiling while assisting a young adult with a vocational task in a bright, modern light-filled studio. The scene is full of vibrant primary colors, echoing the Another Step brand palette of blue, red, and yellow, with soft natural lighting and a warm, inclusive atmosphere."
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqt0EC68r0XpyWJn-1_l8NOyKDC88tsR25gazciRzlBswteAx7ExXN8cqe9rGSTq3qazUZo5LPFtGUHsEqkUP-S7gZMvHBwgUpjoLu7qEsV-A4cXOMtpvABJxo9nXPNR59LH7oijBS4kEXdPCH2fT_TVbykZHegkd4NrwxTM-qe-fAFSCflWcpVhxR4_S_XIUM-BkPVARVq4fXKvLMcUgpLxDuLQ2x8kISVJK0UgUjX-CXjBQTTOM6N01CaMKe1LjjCjV85gNSyU4"
+        />
+      </div>
+    </div>
+  </section>
+</MainLayout>
