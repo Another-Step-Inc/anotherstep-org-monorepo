@@ -42,9 +42,30 @@ const uniqueBlocks = blocks.filter((block: any) => {
             const attrs = block.attributesJSON ? JSON.parse(block.attributesJSON) : {};
             return <ImageGallery url={block.attributes?.url} alt={block.attributes?.alt} />;
         
-        case 'anotherstep/page-hero-section':
-            return <Hero content={block.renderedHtml} />
-
+        case 'anotherstep/page-hero-section': {
+            // Parse block attributes out of JSON string
+            const attrs = block.attributes || {};
+            return (
+                <Hero 
+                    content={block.renderedHtml}
+                    layoutType={attrs.layoutType}
+                    imageDecoration={attrs.imageDecoration}
+                    hasBadge={attrs.hasBadge}
+                    badgeText={attrs.badgeText}
+                    quoteText={attrs.quoteText}
+                    statsNumber={attrs.statsNumber}
+                    statsText={attrs.statsText}
+                    extraDivText={attrs.extraDivText}
+                    title={attrs.heroTitle}
+                    paragraph={attrs.heroDescription}
+                    imageSrc={attrs.heroImageUrl}
+                    btn1Text={attrs.btn1Text}
+                    btn1Url={attrs.btn1Url}
+                    btn2Text={attrs.btn2Text}
+                    btn2Url={attrs.btn2Url}
+                />
+            );
+        }
         case 'anotherstep/homepage-about-section':
             return <TwoColumns content={block.renderedHtml} />
 

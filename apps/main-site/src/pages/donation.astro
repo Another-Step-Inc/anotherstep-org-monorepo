@@ -6,13 +6,13 @@ import "src/styles/global.css";
 
 <MainLayout title="Donations">
   <!-- Hero Section -->
-  <section class="max-w-7xl mx-auto px-8 mb-24">
+  <section class="max-w-7xl mx-auto px-8 py-12 mb-24">
     <div class="grid lg:grid-cols-2 gap-16 items-center">
       <div class="space-y-8">
         <h1
           class="text-[3.5rem] leading-tight font-display font-bold text-brand-blue tracking-tight"
         >
-          Support Independence and Community Growth
+          Support Our Community
         </h1>
         <p
           class="text-body-lg text-on-surface-variant max-w-xl leading-relaxed"
@@ -45,10 +45,203 @@ import "src/styles/global.css";
         </div>
         <img
           class="relative rounded-[1.5rem] shadow-2xl w-full h-[500px] object-cover"
-          data-alt="A heartwarming, high-quality photograph of a diverse group of people engaged in a community workshop. A supportive mentor is seen smiling while assisting a young adult with a vocational task in a bright, modern light-filled studio. The scene is full of vibrant primary colors, echoing the Another Step brand palette of blue, red, and yellow, with soft natural lighting and a warm, inclusive atmosphere."
+          data-alt="A heartwarming, high-quality photograph of a diverse group of people engaged in a community workshop. A supportive mentor is seen smiling while assisting a young adult with a vocational task in a bright, modern light-filled studio. The scene is full of vibrant brand-blue colors, echoing the Another Step brand palette of blue, red, and yellow, with soft natural lighting and a warm, inclusive atmosphere."
           src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqt0EC68r0XpyWJn-1_l8NOyKDC88tsR25gazciRzlBswteAx7ExXN8cqe9rGSTq3qazUZo5LPFtGUHsEqkUP-S7gZMvHBwgUpjoLu7qEsV-A4cXOMtpvABJxo9nXPNR59LH7oijBS4kEXdPCH2fT_TVbykZHegkd4NrwxTM-qe-fAFSCflWcpVhxR4_S_XIUM-BkPVARVq4fXKvLMcUgpLxDuLQ2x8kISVJK0UgUjX-CXjBQTTOM6N01CaMKe1LjjCjV85gNSyU4"
         />
       </div>
     </div>
+  </section>
+  <!-- Donation Bento Grid -->
+  <section
+    class="max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 mb-24"
+  >
+    <!-- Donation Form Container -->
+    <div
+      class="lg:col-span-8 bg-surface-container-lowest p-8 md:p-12 rounded-[2rem] shadow-sm relative overflow-hidden border border-outline-variant/20"
+    >
+      <div
+        class="absolute top-0 right-0 w-64 h-64 bg-brand-blue/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"
+      >
+      </div>
+      <div class="relative z-10 space-y-10">
+        <div class="text-center py-12 space-y-6">
+          <div class="space-y-2">
+            <h2 class="text-headline-lg font-bold text-on-surface">
+              Secure Donation Form
+            </h2>
+            <p class="text-on-surface-variant">
+              Your contribution directly supports independence and community
+              growth.
+            </p>
+          </div>
+          <div class="flex justify-center mb-8">
+            <div class="inline-flex p-1 bg-surface-container-high rounded-full">
+              <button
+                class="px-8 py-2 rounded-full font-bold transition-all bg-surface-container-lowest text-brand-blue shadow-sm"
+                id="toggle-general"
+                onclick="this.parentElement.querySelectorAll('button').forEach(b => { b.classList.remove('bg-surface-container-lowest', 'text-brand-blue', 'shadow-sm'); b.classList.add('text-on-surface-variant'); }); this.classList.add('bg-surface-container-lowest', 'text-brand-blue', 'shadow-sm'); this.classList.remove('text-on-surface-variant'); document.getElementById('form-type-label').textContent = 'General Donation Form';"
+              >
+                General Donation
+              </button>
+              <button
+                class="px-8 py-2 rounded-full font-bold transition-all text-on-surface-variant"
+                id="toggle-tribute"
+                onclick="this.parentElement.querySelectorAll('button').forEach(b => { b.classList.remove('bg-surface-container-lowest', 'text-brand-blue', 'shadow-sm'); b.classList.add('text-on-surface-variant'); }); this.classList.add('bg-surface-container-lowest', 'text-brand-blue', 'shadow-sm'); this.classList.remove('text-on-surface-variant'); document.getElementById('form-type-label').textContent = 'Tribute Donation Form';"
+              >
+                Tribute Donation
+              </button>
+            </div>
+          </div><div
+            class="w-full min-h-[600px] bg-surface-container-low rounded-2xl border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center p-8"
+          >
+            <span
+              class="material-symbols-outlined text-6xl text-brand-blue/40 mb-4"
+              >iframe</span
+            >
+            <p
+              class="text-title-lg font-bold text-on-surface-variant"
+              id="form-type-label"
+            >
+              General Donation Form
+            </p>
+            <p
+              class="text-sm text-on-surface-variant/60 mt-2 text-center max-w-md"
+            >
+              The specific DonorPerfect secure payment interface will load here
+              based on your selection above.
+            </p>
+          </div><div class="mt-6 px-4">
+            <p
+              class="text-sm text-on-surface-variant/80 leading-relaxed text-center italic"
+            >
+              <span class="font-bold">TAX DISCLOSURE:</span> Federal tax law requires
+              us to inform you that no goods or services were provided to you in return
+              for your gift and that, therefore, the full amount of your gift is fully
+              deductible for Federal income tax purposes, subject to any limitations
+              that might otherwise apply.
+            </p>
+          </div>
+          <div
+            class="flex items-center justify-center gap-4 pt-6 border-t border-outline-variant/30"
+          >
+            <span class="material-symbols-outlined text-brand-blue">lock</span>
+            <span
+              class="text-label-md font-bold text-on-surface-variant uppercase tracking-wider"
+              >Secure 256-bit SSL Encryption</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Transparency Column -->
+    <div class="lg:col-span-4 space-y-8">
+      <!-- Trust Card -->
+      <div
+        class="bg-brand-blue-container text-on-brand-blue p-8 rounded-[2rem] relative overflow-hidden"
+      >
+        <span
+          class="material-symbols-outlined absolute -right-8 -bottom-8 text-[12rem] opacity-10"
+          >gavel</span
+        >
+        <h3 class="text-title-lg font-bold mb-4">Terms &amp; Conditions</h3>
+        <p class="text-body-lg opacity-90 leading-relaxed">
+          By submitting your payment, you authorize us to charge the account
+          above for the amount specified in the Transaction Amount field. Should
+          you choose to donate a regular recurring automatic donation your
+          account information for recurring pledges/monthly giving is encrypted
+          and stored securely via SafeSave™ for automatic processing of your
+          future payments. Notify us at any time if you wish to discontinue your
+          pledge.
+        </p>
+      </div>
+      <!-- Impact Badge -->
+      <div
+        class="bg-brand-blue-container text-on-brand-blue p-8 rounded-[2rem] relative overflow-hidden"
+      >
+        <span
+          class="material-symbols-outlined absolute -right-8 -bottom-8 text-[12rem] opacity-10"
+          >shield</span
+        >
+        <h3 class="text-title-lg font-bold mb-4">Secure &amp; Private</h3>
+        <p class="text-body-lg opacity-90 leading-relaxed">
+          Privacy Policy: We take precautions to protect your information. We
+          collect credit card or bank account information, names, addresses, and
+          other data related to your transaction when you make a payment through
+          our site. We use this information to process your payment.
+        </p>
+      </div>
+    </div>
+  </section>
+  <!-- Ways to Give (Bento Cards) -->
+  <section class="max-w-7xl mx-auto px-8 mb-24">
+    <h2 class="text-headline-lg font-bold text-on-surface mb-12 text-center">
+      Other Meaningful Ways to Give
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Corporate Matching -->
+      <div
+        class="group bg-surface-container-low hover:bg-surface-container-lowest transition-colors p-8 rounded-[2rem] border border-transparent hover:border-brand-blue/20 hover:shadow-xl duration-300"
+      >
+        <span
+          class="material-symbols-outlined text-4xl text-brand-blue mb-6"
+          style="font-variation-settings: 'FILL' 0;">business</span
+        >
+        <h4 class="text-title-lg font-bold mb-4">Corporate Matching</h4>
+        <p class="text-on-surface-variant leading-relaxed mb-6">
+          Double your impact! Many employers match charitable contributions made
+          by their employees.
+        </p>
+        <a
+          class="text-brand-blue font-bold inline-flex items-center gap-2 group-hover:gap-4 transition-all"
+          href="#"
+          >Check Eligibility <span class="material-symbols-outlined"
+            >arrow_forward</span
+          ></a
+        >
+      </div>
+      <!-- Planned Giving -->
+      <div
+        class="group bg-surface-container-low hover:bg-surface-container-lowest transition-colors p-8 rounded-[2rem] border border-transparent hover:border-brand-blue/20 hover:shadow-xl duration-300"
+      >
+        <span
+          class="material-symbols-outlined text-4xl text-brand-dark-yellow mb-6"
+          style="font-variation-settings: 'FILL' 0;">history_edu</span
+        >
+        <h4 class="text-title-lg font-bold mb-4">Planned Giving</h4>
+        <p class="text-on-surface-variant leading-relaxed mb-6">
+          Leave a lasting legacy by including Another Step in your will or
+          estate plans to support future generations.
+        </p>
+        <a
+          class="text-brand-blue font-bold inline-flex items-center gap-2 group-hover:gap-4 transition-all"
+          href="#"
+          >Legacy Guide <span class="material-symbols-outlined"
+            >arrow_forward</span
+          ></a
+        >
+      </div>
+      <!-- In-Kind Donations -->
+      <div
+        class="group bg-surface-container-low hover:bg-surface-container-lowest transition-colors p-8 rounded-[2rem] border border-transparent hover:border-brand-blue/20 hover:shadow-xl duration-300"
+      >
+        <span
+          class="material-symbols-outlined text-4xl text-brand-dark-red mb-6"
+          style="font-variation-settings: 'FILL' 0;">inventory_2</span
+        >
+        <h4 class="text-title-lg font-bold mb-4">In-Kind Gifts</h4>
+        <p class="text-on-surface-variant leading-relaxed mb-6">
+          Donate supplies, equipment, or professional services directly to our
+          local programs and centers.
+        </p>
+        <a
+          class="text-brand-blue font-bold inline-flex items-center gap-2 group-hover:gap-4 transition-all"
+          href="#"
+          >Our Wishlist <span class="material-symbols-outlined"
+            >arrow_forward</span
+          ></a
+        >
+      </div>
+    </div>
+    <!-- Secondary Giving Options Bar -->
   </section>
 </MainLayout>

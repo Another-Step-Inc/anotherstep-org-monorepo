@@ -64,6 +64,27 @@ const homePageResponse = await fetch(WP_URL, {
 					editorBlocks{
 					name,
 					renderedHtml,
+					... on AnotherstepPageHeroSection {
+						attributes {
+						layoutType
+						heroTitle
+						heroDescription
+						heroImageUrl
+						heroImageId
+						imageDecoration
+						badgeText
+						hasBadge
+						quoteText
+						statsText
+						statsNumber
+						ctaStyle
+						extraDivText
+						btn1Text
+						btn1Url
+						btn2Text
+						btn2Url
+						}
+					}
 					... on CoreImage {
 						attributes {
 						url
