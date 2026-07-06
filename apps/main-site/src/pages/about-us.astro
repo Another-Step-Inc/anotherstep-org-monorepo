@@ -3,60 +3,23 @@ import MainLayout from "src/layouts/MainLayout.astro";
 import BlockResolver from "@anothersteporg/ui/components/BlockResolver.astro";
 
 import "src/styles/global.css";
+import { wpFetch, EDITOR_BLOCKS_FRAGMENT } from '@anothersteporg/ui/lib/wp.js';
 
-const WP_URL = "http://host.docker.internal:8050/graphql";
-const aboutUsPageResponse = await fetch(WP_URL, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    query: `
-        query GetAboutUsPage {
-        page(id: "about-us", idType: URI) {
-            editorBlocks{
-            name,
-            renderedHtml,
-            ... on AnotherstepPageHeroSection {
-                attributes {
-                layoutType
-                heroTitle
-                heroDescription
-                heroImageUrl
-                heroImageId
-                imageDecoration
-                badgeText
-                hasBadge
-                quoteText
-                statsText
-                statsNumber
-                ctaStyle
-                extraDivText
-                btn1Text
-                btn1Url
-                btn2Text
-                btn2Url
-                }
-            }
-            ... on CoreImage {
-                attributes {
-                url
-                alt
-                caption
-                }
-            }
-            }
-        }
-        }
-		`,
-  }),
-});
+const data = await wpFetch(`
+  query GetPageByUri {
+    page(id: "about-us", idType: URI) {
+      title
+      ${EDITOR_BLOCKS_FRAGMENT}
+    }
+  }
+`)
 
-const result = await aboutUsPageResponse.json();
-const aboutUsPageData = result.data;
+const blocks = data?.page?.editorBlocks || [];
 ---
 
-<MainLayout title="About Us">
-  <BlockResolver blocks={aboutUsPageData?.page?.editorBlocks} />
-  <section
+<MainLayout title={data?.page?.title}>
+  <BlockResolver blocks={blocks} />
+<!--   <section
     class="max-w-7xl mx-auto px-8 py-20 lg:py-32 flex flex-col lg:flex-row gap-16 items-center"
   >
     <div class="flex flex-row">
@@ -91,7 +54,7 @@ const aboutUsPageData = result.data;
         </div>
       </div>
     </div>
-  </section>
+  </section> -->
   <section class="bg-brand-bg py-24">
     <div class="max-w-7xl mx-auto px-8">
       <div class="flex flex-col md:flex-row gap-12 items-start">

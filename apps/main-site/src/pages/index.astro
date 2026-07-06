@@ -10,115 +10,48 @@ import PublicDisclousre from '../components/PublicDisclosure.astro';
 import PromoModal from '@anothersteporg/ui/components/PromoModal.astro';
 
 import "src/styles/global.css";
+import { wpFetch, EDITOR_BLOCKS_FRAGMENT } from '@anothersteporg/ui/lib/wp.js';
 
-const WP_URL = 'http://host.docker.internal:8050/graphql';
+// Query both root nodes simultaneously
+const data = await wpFetch(`
+  query GetHomeAndPromo {
+    page(id: "home", idType: URI) {
+      title
+      ${EDITOR_BLOCKS_FRAGMENT}
+    }
+    promos(first: 1, where: { orderby: { field: DATE, order: DESC } }) {
+      nodes {
+        title
+        content
+        featuredImage {
+          node {
+            sourceUrl
+          }
+        }
+        promoFields {
+          buttontext
+          buttonlink
+        }
+      }
+    }
+  }
+`);
 
-const response = await fetch(WP_URL, {
-	method: 'POST',
-	headers: { 'Content-Type': 'application/json'},
-	body: JSON.stringify({
-		query: `
-		query GetLatestPromo {
-			promos(first: 1, where: { orderby: { field: DATE, order: DESC } }) {
-				nodes {
-						title
-						content
-						featuredImage {
-							node {
-							sourceUrl
-							}
-						}
-					promoFields {
-						buttontext
-						buttonlink
-					}
-				}
-			}
-		}
-		`,
-	})
-});
-
-const homePageResponse = await fetch(WP_URL, {
-	method: 'POST',
-	headers: {'Content-Type': 'application/json'},
-	body: JSON.stringify({
-		query: `
-			query GetHomePage {
-				page(id: "home", idType: URI) {
-					homefields {
-					heroTitle,
-					heroDescription,
-					heroImage {
-						node {
-						sourceUrl
-						}
-					}
-					buttonText1,
-					buttonLink1
-					buttonText2,
-					buttonLink2,
-					aboutHeadline,
-					aboutContent
-					},
-					editorBlocks{
-					name,
-					renderedHtml,
-					... on AnotherstepPageHeroSection {
-						attributes {
-						layoutType
-						heroTitle
-						heroDescription
-						heroImageUrl
-						heroImageId
-						imageDecoration
-						badgeText
-						hasBadge
-						quoteText
-						statsText
-						statsNumber
-						ctaStyle
-						extraDivText
-						btn1Text
-						btn1Url
-						btn2Text
-						btn2Url
-						}
-					}
-					... on CoreImage {
-						attributes {
-						url
-						alt
-						caption
-						}
-					}
-					}
-				}
-			}
-		`,
-	})
-})
-
-const { data } = await response.json();
-const result = await homePageResponse.json();
-const homePageData = result.data;
-console.log(homePageData.page.editorBlocks[0].name)
-const promos = data.promos.nodes[0];
-
-console.log("Blocks found:", homePageData.page.editorBlocks.length);
+const blocks = data?.page?.editorBlocks || [];
+const latestPromo = data?.promos?.nodes?.[0] || null;
 
 // Strip HTML tags from WP content for the modal description
-const cleanDescription = promos?.content?.replace(/<[^>]*>?/gm, '') || "";
+const cleanDescription = latestPromo?.content?.replace(/<[^>]*>?/gm, '') || "";
 ---
-<HomeLayout title='Home'>
-	{promos && (
+<HomeLayout title={data?.page?.title}>
+	{latestPromo && (
 		<PromoModal
 			id='wp-dynamic-promo'
-			title={promos?.title}
+			title={latestPromo?.title}
 			description={cleanDescription}
-			buttonText={promos?.promoFields?.buttontext}
-			buttonLink={promos?.promoFields?.buttonlink}
-			image={promos?.featuredImage?.node?.sourceUrl}
+			buttonText={latestPromo?.promoFields?.buttontext}
+			buttonLink={latestPromo?.promoFields?.buttonlink}
+			image={latestPromo?.featuredImage?.node?.sourceUrl}
 			showDelay={3000}
 		/>			
 	)}
@@ -131,5 +64,5 @@ const cleanDescription = promos?.content?.replace(/<[^>]*>?/gm, '') || "";
 			buttonLink='/donation'
 			bgImage='/images/front-page-hero.jpg'
 		/> -->
-		<BlockResolver blocks={homePageData?.page?.editorBlocks} />
+		<BlockResolver blocks={blocks} />
 </HomeLayout>

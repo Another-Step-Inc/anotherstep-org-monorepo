@@ -5,6 +5,7 @@
     "type": "module",
     "exports": {
         ".": "./src/index.ts",
+        "./lib/*": "./src/lib/*.js",
         "./layouts/*": "./src/layouts/*.astro",
         "./components/*": "./src/components/*.astro",
         "./styles/global.css": {

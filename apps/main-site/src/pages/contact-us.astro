@@ -1,12 +1,25 @@
 ---
 import MainLayout from "src/layouts/MainLayout.astro";
+import BlockResolver from "@anothersteporg/ui/components/BlockResolver.astro";
 
 import "src/styles/global.css";
+import { wpFetch, EDITOR_BLOCKS_FRAGMENT } from '@anothersteporg/ui/lib/wp.js';
+
+const data = await wpFetch(`
+  query GetPageByUri {
+    page(id: "contact-us", idType: URI) {
+      title
+      ${EDITOR_BLOCKS_FRAGMENT}
+    }
+  }
+`)
+
+const blocks = data?.page?.editorBlocks || [];
 ---
 
-<MainLayout title="Contact Us">
-  <div class="max-w-7xl mx-auto px-8 py-16">
-    <section class="mb-20">
+<MainLayout title={data?.page?.title}>
+    <BlockResolver blocks={blocks} />
+<!--     <section class="mb-20">
       <div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
         <div class="md:col-span-7">
           <h1 class="text-[42pt] text-brand-blue">
@@ -35,7 +48,7 @@ import "src/styles/global.css";
           </div>
         </div>
       </div>
-    </section>
+    </section> -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       <div class="md:col-span-1 space-y-6">
         <!-- Phone Card -->
@@ -191,5 +204,4 @@ import "src/styles/global.css";
             </a>
         </div>
     </section>
-  </div>
 </MainLayout>
