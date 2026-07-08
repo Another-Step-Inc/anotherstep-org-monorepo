@@ -9,8 +9,16 @@ const {
   badgeStyle, 
   quoteText, 
   statsNumber, 
-  statsText, 
+  statsText,
+  statsBgColor,
+  statsTextColor,
+  isImageLarge,
+  isStatsRotated,
+  hasExtraTextDiv, 
   extraDivText,
+  extraDivIcon,
+  extraDivIconColor,
+  extraDivBgColor,
   title,
   paragraph,
   imageSrc,
@@ -21,12 +29,18 @@ const {
 } = Astro.props;
 
 const badgeStyles = {
-  'pill-yellow': 'inline-block bg-brand-yellow rounded-full px-4 py-1 mb-6 tracking-wide',
-  'text-blue': 'block text-brand-blue mb-4 tracking-widest',
-  'pill-blue': 'bg-brand-blue'
+  'pill-yellow': 'inline-block bg-brand-dark-yellow text-on-brand-dark-yellow px-4 py-1 rounded-full text-label-md font-bold mb-6 tracking-wide uppercase',
+  'text-blue': 'block text-brand-blue mb-4 tracking-widest uppercase',
+  'pill-blue': 'inline-block px-4 py-1 rounded-full bg-brand-blue-fixed text-on-brand-blue-fixed text-label-md font-bold mb-6'
 }
 
 const activeBadgeClass = badgeStyles[badgeStyle];
+
+const isExternalLink = (url: string) => {
+  if (!url) return false;
+  // Matches URLS staring with http:// or https://
+  return /^https?:\/\//i.test(url);
+};
 ---
 
 <section class={`relative overflow-hidden ${layoutType === 'background' ? 'min-h-[85vh] flex items-center py-12' : 'py-24 md:py-32'}`}>
@@ -34,7 +48,7 @@ const activeBadgeClass = badgeStyles[badgeStyle];
   {imageDecoration === 'quote-bubble' && quoteText && (
     <div class="absolute top-0 right-0 w-1/3 h-full bg-brand-blue-container/5 -skew-x-12 transform translate-x-1/2"></div>
   )}
-  <div class="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+
     {/* If Background layout style, render the following */}
     {layoutType === 'background' && (
       <div class="absolute inset-0 z-0">
@@ -48,11 +62,12 @@ const activeBadgeClass = badgeStyles[badgeStyle];
         >
         </div>
       </div>
-    )}
+    )}  
+  <div class="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
     <div class={`${layoutType === 'background' ? 'relative z-10 md:grid-cols-2' : 'lg:grid-cols-12'} max-w-7xl mx-auto px-8 grid grid-cols-1 gap-12 items-center`}>
       <div class={layoutType === 'background' ? 'max-w-xl' : 'lg:col-span-7 space-y-8'}>
           {hasBadge && badgeText && (
-            <span class={`${activeBadgeClass} text-sm font-bold uppercase`}>
+            <span class={`${activeBadgeClass} text-sm font-bold`}>
               {badgeText}
             </span>
           )}
@@ -66,26 +81,55 @@ const activeBadgeClass = badgeStyles[badgeStyle];
           )}
 
           {(btn1Text || btn2Text) && (
-            <div class="flex flex-col sm:flex-row gap-4 pt-2">
+            <div class="flex flex-wrap gap-4 pt-2">
+              
               {btn1Text && (
-                <a href={btn1Url || '#'} class="inline-flex items-center justify-center bg-brand-blue text-white px-10 py-4 rounded-full font-bold shadow-lg" set:html={btn1Text} />
+                <a 
+                  href={btn1Url || '#'} 
+                  target={isExternalLink(btn1Url) ? '_blank' : undefined}
+                  rel={isExternalLink(btn1Url) ? 'noopener noreferrer' : undefined}
+                  class="bg-brand-blue text-on-brand-blue px-10 py-5 rounded-full font-bold text-lg flex items-center justify-center gap-3 hover:bg-brand-blue-container transition-all active:scale-95 shadow-lg shadow-brand-blue/20"
+                >
+                  <span set:html={btn1Text} />
+                  {isExternalLink(btn1Url) ? (
+                    <span class="material-symbols-outlined text-xl">open_in_new</span>
+                  ) : null}
+                </a>
               )}
+
               {btn2Text && (
-                <a href={btn2Url || '#'} class="inline-flex items-center justify-center bg-surface-container-lowest text-brand-blue px-10 py-4 rounded-full font-bold hover:bg-surface-container-high transition-all duration-200 min-h-[56px]" set:html={btn2Text} />
+                <a 
+                  href={btn2Url || '#'} 
+                  target={isExternalLink(btn2Url) ? '_blank' : undefined}
+                  rel={isExternalLink(btn2Url) ? 'noopener noreferrer' : undefined}
+                  class={`px-10 py-5 rounded-full font-bold text-lg flex items-center justify-center transition-all border-2 active:scale-95
+                    ${layoutType === 'background' 
+                      ? 'text-brand-blue border-brand-blue/30 hover:bg-brand-blue/10' 
+                      : 'text-brand-blue border-brand-blue/20 hover:bg-brand-blue-container/10'
+                    }`}
+                >
+                  <span set:html={btn2Text} />
+                  {isExternalLink(btn2Url) ? (
+                    <span class="material-symbols-outlined text-xl">open_in_new</span>
+                  ) : null}
+                </a>
               )}
+              
             </div>
           )}
 
-          {/* Layout Accent Information Item Block */}
-          {imageDecoration === 'extra-text-div' && extraDivText && (
+          {hasExtraTextDiv && extraDivText && (
             <div class="flex flex-wrap gap-4 pt-4">
-              <div class="flex items-center gap-3 bg-surface-container-high px-6 py-4 rounded-xl">
-                <span class="material-symbols-outlined text-brand-dark-yellow text-3xl" style="font-variation-settings: 'FILL' 1;">
-                  verified
+              <div class={`bg-${extraDivBgColor} text-on-surface px-6 py-4 rounded-xl flex items-center gap-3`}>
+                <span 
+                  class={`material-symbols-outlined text-3xl text-${extraDivIconColor}`} 
+                  style="font-variation-settings: 'FILL' 1;"
+                >
+                  {extraDivIcon}
                 </span>
-                <span class="text-label-md font-bold text-on-surface uppercase tracking-wider">
+                <p class={`text-body-lg tracking-wider ${extraDivText.length < 25 ? 'font-bold uppercase' : 'font-medium'}`}>
                   {extraDivText}
-                </span>
+                </p>
               </div>
             </div>
           )}
@@ -93,16 +137,18 @@ const activeBadgeClass = badgeStyles[badgeStyle];
 
     {/* Split Layout Only */}
     {layoutType !== 'background' && imageSrc && (
-      <div class="lg:col-span-5 relative">
+      <div class="lg:col-span-5 relative group">
         {/* Underlay structural backgrounds */}
+        {imageDecoration === 'hover-frame' && <div class="absolute -inset-4 bg-brand-blue/10 rounded-[2rem] -rotate-2 group-hover:rotate-0 transition-transform duration-500 z-0"></div>}
         {imageDecoration === 'yellow-box' && <div class="absolute -bottom-6 -left-6 w-32 h-32 bg-brand-yellow rounded-xl -z-10"></div>}
         {imageDecoration === 'extra-text-div' && <div class="absolute -inset-4 bg-brand-yellow/10 rounded-[2rem] -rotate-2 group-hover:rotate-0 transition-transform duration-500"></div>}
 
         {/* Dynamic Canvas Image Layout Frame */}
-        <div class={`relative overflow-hidden shadow-2xl aspect-square 
-          ${['bubble-text', 'yellow-box', 'extra-text-div'].includes(imageDecoration) ? 'w-95 h-95 rounded-[3rem] transform rotate-3' : ''}
-          ${['quote-bubble'].includes(imageDecoration) ? 'rounded-xl organic-shadow transform rotate-3 scale-105 border-[8px] border-surface-container-lowest': ''}
-          ${['gradient-overlay', 'organic-blur', 'none'].includes(imageDecoration) ? 'w-95 h-95 rounded-[3rem]' : ''}`}
+        <div class={`relative overflow-hidden shadow-2xl aspect-square transition-all duration-300 rounded-xl
+          ${isImageLarge ? 'w-120 h-120' : 'w-95 h-95'}
+          ${['bubble-text', 'yellow-box', 'extra-text-div'].includes(imageDecoration) ? 'transform rotate-3' : ''}
+          ${['quote-bubble'].includes(imageDecoration) ? 'organic-shadow transform rotate-3 scale-105 border-[8px] border-surface-container-lowest': ''}
+          ${['hover-frame', 'gradient-overlay', 'organic-blur', 'none'].includes(imageDecoration) ? '' : ''}`}
         >
           <img src={imageSrc} class="w-full h-full object-cover" alt={title} />
 
@@ -110,11 +156,22 @@ const activeBadgeClass = badgeStyles[badgeStyle];
           {imageDecoration === 'gradient-overlay' && <div class="absolute inset-0 bg-gradient-to-t from-brand-blue/40 to-transparent pointer-events-none"></div>}
         </div>
 
-        {/* Absolute floating detail widgets over image edges */}
+        {/* 🌟 FIXED STATS BOX: Utilizing dynamic color mappings, sizing states, and rotation properties */}
         {imageDecoration === 'bubble-text' && statsNumber && (
-          <div class="absolute -bottom-3 left-1 w-2/5 h-auto bg-white p-6 rounded-2xl shadow-xl flex flex-col justify-center z-20">
-            <span class="text-brand-red font-black text-2xl block leading-none mb-1">{statsNumber}</span>
-            <p class="text-xs font-semibold text-gray-500 leading-tight">{statsText}</p>
+          <div 
+            class={`absolute -bottom-6 p-8 rounded-2xl shadow-xl max-w-[240px] z-20 
+              ${isImageLarge ? '-left-10' : '-left-6 '}
+              ${isStatsRotated ? '-rotate-3' : 'rotate-0'} 
+              bg-${statsBgColor}`}
+          >
+            <span class={`text-${statsTextColor} text-3xl font-black block mb-2`}>{statsNumber}</span>
+            
+            {/* 🌟 Dynamic conditional text color based on statsBgColor */}
+            <p class={`text-sm font-medium opacity-90 leading-tight 
+              ${statsBgColor === 'white' ? 'text-on-surface-variant' : 'text-white'}`}
+            >
+              {statsText}
+            </p>
           </div>
         )}
 

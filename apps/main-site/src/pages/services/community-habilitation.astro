@@ -1,12 +1,26 @@
 ---
 import MainLayout from "src/layouts/MainLayout.astro";
+import BlockResolver from "@anothersteporg/ui/components/BlockResolver.astro";
 
 import "src/styles/global.css";
+import { wpFetch, EDITOR_BLOCKS_FRAGMENT } from "@anothersteporg/ui/lib/wp";
+
+const data = await wpFetch(`
+  query GetPageByUri {
+    page(id: "community-habilitation", idType: URI) {
+      title
+      ${EDITOR_BLOCKS_FRAGMENT}
+    }
+  }
+`)
+
+const blocks = data?.page?.editorBlocks || [];
 ---
 
-<MainLayout title="Services">
+<MainLayout title={data?.page?.title}>
+  <BlockResolver blocks={blocks} />
   <!-- Hero Section / Title -->
-  <section class="relative pt-20 pb-32 overflow-hidden">
+<!--   <section class="relative pt-20 pb-32 overflow-hidden">
     <div class="max-w-7xl mx-auto px-8 relative z-10">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         <div class="lg:col-span-7">
@@ -39,7 +53,7 @@ import "src/styles/global.css";
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2r82GJ7VHlZX74QRGi3AdpX3sJLiHWMOdnKnAJXJG0Ej3G7O75rRm8PsGhIl06fV9F6zwMtAY1m-qbJh59GIHqD5lZwpiek0SKy8NLJiGZGOn7XblDrvqnVbX81lXJEM7bPYldF1zg8XHuwxKIMMagfbRLXCsESCj-sOtSSuEZivn5wsHF_LRK77rSabPMWmkcdDqNSNM3tucZJ4wlr41fDIfdrmBHluAane6bczWyRuP5IB2GUNoE4SmCX4TWVPXmsO1O82uAmU"
             />
           </div>
-          <!-- Decorative element -->
+          Decorative element
           <div
             class="absolute -bottom-6 -left-6 w-32 h-32 bg-brand-yellow rounded-xl -z-10"
           >
@@ -47,7 +61,7 @@ import "src/styles/global.css";
         </div>
       </div>
     </div>
-  </section>
+  </section> -->
   <!-- Training Section: Bento Style -->
   <section class="py-24 bg-surface-container-low">
     <div class="max-w-screen-2xl mx-auto px-8">

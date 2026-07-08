@@ -19,8 +19,16 @@ export const EDITOR_BLOCKS_FRAGMENT = `
                 quoteText
                 statsText
                 statsNumber
+                statsBgColor
+                statsTextColor
+                isImageLarge
+                isStatsRotated
                 ctaStyle
+                hasExtraTextDiv
                 extraDivText
+                extraDivIcon
+                extraDivIconColor
+                extraDivBgColor
                 btn1Text
                 btn1Url
                 btn2Text

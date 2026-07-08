@@ -1,13 +1,27 @@
 ---
 import MainLayout from "src/layouts/MainLayout.astro";
+import BlockResolver from "@anothersteporg/ui/components/BlockResolver.astro";
 
 import "src/styles/global.css";
+import { wpFetch, EDITOR_BLOCKS_FRAGMENT } from "@anothersteporg/ui/lib/wp";
+
+const data = await wpFetch(`
+  query GetPageByUri {
+    page(id: "services", idType: URI) {
+      title
+      ${EDITOR_BLOCKS_FRAGMENT}
+    }
+  }
+`)
+
+const blocks = data?.page?.editorBlocks || [];
 ---
 
-<MainLayout title="Services">
+<MainLayout title={data?.page?.title}>
+  <BlockResolver blocks={blocks} />
   <div class="max-w-7xl mx-auto px-8 py-16 md:py-24">
     <!-- Hero Section -->
-    <section class="mb-24 grid md:grid-cols-12 gap-12 items-center">
+<!--     <section class="mb-24 grid md:grid-cols-12 gap-12 items-center">
       <div class="md:col-span-7">
         <h1
           class="text-[3.5rem] leading-[1.1] font-black text-brand-blue tracking-tight mb-8"
@@ -53,7 +67,7 @@ import "src/styles/global.css";
           >
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- Services Grid -->
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-32">
