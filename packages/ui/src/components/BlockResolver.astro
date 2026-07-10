@@ -7,6 +7,7 @@ import TwoColumns from './TwoColumns.astro';
 import TwoColumnsBorderTop from './TwoColumnsBorderTop.astro';
 import ThreeColumns from './ThreeColumns.astro';
 import OneColumnCard from './OneColumnCard.astro';
+import SplitFeature from './SplitFeature.astro';
 
 const { blocks = [] } = Astro.props
 // 1. Get a combined string of all "Container" block outputs
@@ -39,7 +40,7 @@ const uniqueBlocks = blocks.filter((block: any) => {
         case 'core/image':
         case 'core/gallery':
             // The attributesJson contains the URL and alt text from WP
-            const attrs = block.attributesJSON ? JSON.parse(block.attributesJSON) : {};
+            const imageAttrs = block.attributesJSON ? JSON.parse(block.attributesJSON) : {};
             return <ImageGallery url={block.attributes?.url} alt={block.attributes?.alt} />;
         
         case 'anotherstep/page-hero-section': {
@@ -87,6 +88,27 @@ const uniqueBlocks = blocks.filter((block: any) => {
         case 'anotherstep/homepage-legal-section':
             return <TwoColumnsBorderTop content={block.renderedHtml} />
 
+        case 'anotherstep/split-feature-section':
+            // Parse block attributes out of JSON string
+            const attrs = block.attributes || {};
+            return (
+                <SplitFeature 
+                    imageAlignment={attrs.imageAlignment}
+                    backgroundColor={attrs.backgroundColor}
+                    eyebrowText={attrs.eyebrowText}
+                    underlineAccent={attrs.underlineAccent}
+                    mediaUrl={attrs.mediaUrl}
+                    mediaAlt={attrs.mediaAlt}
+                    secondaryMediaUrl={attrs.secondaryMediaUrl}
+                    metricNumber={attrs.metricNumber}
+                    metricLabel={attrs.metricLabel}
+                    iconName={attrs.iconName}
+                    iconTitle={attrs.iconTitle}
+                    innerHTML={block.renderedHtml}
+                    splitTitle={attrs.splitTitle}
+                    splitDescription={attrs.splitDescription}
+                />
+            );
         default:
             // Fallback for blocks there are no components built yet
             return <div class="wp-block-fallback"set:html={block.renderedHtml} />;
