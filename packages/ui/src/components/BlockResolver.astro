@@ -1,13 +1,13 @@
 ---
 // src/components/BlockResolver.astro
-import Hero from './Hero.astro';
-import TextBlock from './TextBlock.astro';
-import ImageGallery from './ImageGallery.astro';
-import TwoColumns from './TwoColumns.astro';
-import TwoColumnsBorderTop from './TwoColumnsBorderTop.astro';
-import ThreeColumns from './ThreeColumns.astro';
-import OneColumnCard from './OneColumnCard.astro';
-import SplitFeature from './SplitFeature.astro';
+import Hero from './blocks/Hero.astro';
+import TextBlock from './blocks/TextBlock.astro';
+import ImageGallery from './blocks/ImageGallery.astro';
+import TwoColumns from './blocks/TwoColumns.astro';
+import TwoColumnsBorderTop from './blocks/TwoColumnsBorderTop.astro';
+import ThreeColumns from './blocks/ThreeColumns.astro';
+import OneColumnCard from './blocks/OneColumnCard.astro';
+import SplitFeature from './blocks/SplitFeature.astro';
 
 const { blocks = [] } = Astro.props
 // 1. Get a combined string of all "Container" block outputs
@@ -104,7 +104,6 @@ const uniqueBlocks = blocks.filter((block: any) => {
                     metricLabel={attrs.metricLabel}
                     iconName={attrs.iconName}
                     iconTitle={attrs.iconTitle}
-                    innerHTML={block.renderedHtml}
                     splitTitle={attrs.splitTitle}
                     splitDescription={attrs.splitDescription}
                 />

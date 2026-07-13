@@ -1,4 +1,25 @@
 ---
+export const SplitFeatureFragment = `
+  ... on AnotherstepSplitFeatureSection {
+    attributes {
+      splitTitle
+      splitDescription
+      imageAlignment
+      backgroundColor
+      eyebrowText
+      underlineAccent
+      mediaId
+      mediaUrl
+      mediaAlt
+      secondaryMediaUrl
+      metricNumber
+      metricLabel
+      iconName
+      iconTitle
+    }
+  }
+`;
+
 interface Props {
     splitTitle: string;
     splitDescription: string;
@@ -13,17 +34,16 @@ interface Props {
     metricLabel?: string;
     iconName?: string;
     iconTitle?: string;
-    innerHTML: string;
 }
 
-const { splitTitle, splitDescription, imageAlignment, backgroundColor, eyebrowText, underlineAccent, mediaUrl, mediaAlt, secondaryMediaUrl, metricNumber, metricLabel, iconName, iconTitle, innerHTML } = Astro.props;
+const { splitTitle, splitDescription, imageAlignment, backgroundColor, eyebrowText, underlineAccent, mediaUrl, mediaAlt, secondaryMediaUrl, metricNumber, metricLabel, iconName, iconTitle } = Astro.props;
 
 const alignment = imageAlignment || undefined;
 const bgClass = `bg-${backgroundColor}` || undefined;
 const isLeft = alignment === 'left';
 
 console.log("--- WORKING BLOCK PAYLOAD ---") ;
-console.log(JSON.stringify(innerHTML, null, 2));
+console.log(JSON.stringify(splitDescription, null, 2));
 ---
 <section class={`py-24 ${bgClass} project-split-feature`}>
   <div class="max-w-7xl mx-auto px-8">
@@ -35,22 +55,20 @@ console.log(JSON.stringify(innerHTML, null, 2));
           <span class="inline-block px-4 py-1 rounded-full bg-brand-blue-fixed text-on-brand-blue-fixed text-label-md font-bold mb-6">
             {eyebrowText}
           </span>
-        )}
-        <div class="content-wrapper-slot relative accent-underline pb-6">
-          
+        )}  
         {splitTitle && (
-            <h2 class="text-3xl md:text-4xl font-black text-brand-blue mb-4">
+            <h2 class="text-headline-lg font-bold text-on-surface mb-12 relative">
               {splitTitle}
+              {underlineAccent && (
+                <div class="absolute -bottom-4 left-0 w-24 h-2 bg-brand-red rounded-full"></div>
+              )}
             </h2>
         )}
-          
         {splitDescription && (
             <div class="text-lg text-on-surface-variant leading-relaxed [&>p]:mb-6 [&>blockquote]:border-l-4 [&>blockquote]:border-brand-blue [&>blockquote]:pl-4 [&>blockquote]:italic [&>blockquote]:my-6">
               <Fragment set:html={splitDescription} />
             </div>
         )}
-          
-        </div>
       </div>
 
       {/* Asymmetric Graphical Display Grid Segment */}
