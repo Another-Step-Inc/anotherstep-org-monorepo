@@ -9,3 +9,16 @@ export const SERVICES_ARCHIVE_QUERY = `
         }
     }
 `
+
+export const VALUES_ARCHIVE_QUERY = `
+    query GetValuesData {
+        values(first: 3) {
+            nodes {
+                title
+                content
+                cardIcon
+                cardTheme
+            }
+        }
+    }
+`
