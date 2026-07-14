@@ -44,3 +44,76 @@
       </div>
     </div>
   </section> -->
+
+    <!-- Ways to Give (Bento Cards) -->
+<!--   <section class="max-w-7xl mx-auto px-8 mb-24">
+    <h2 class="text-headline-lg font-bold text-on-surface mb-12 text-center">
+      Other Meaningful Ways to Give
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      Corporate Matching
+      <div
+        class="group bg-surface-container-low hover:bg-surface-container-lowest transition-colors p-8 rounded-[2rem] border border-transparent hover:border-brand-blue/20 hover:shadow-xl duration-300"
+      >
+        <span
+          class="material-symbols-outlined text-4xl text-brand-blue mb-6"
+          style="font-variation-settings: 'FILL' 0;">business</span
+        >
+        <h4 class="text-title-lg font-bold mb-4">Corporate Matching</h4>
+        <p class="text-on-surface-variant leading-relaxed mb-6">
+          Double your impact! Many employers match charitable contributions made
+          by their employees.
+        </p>
+        <a
+          class="text-brand-blue font-bold inline-flex items-center gap-2 group-hover:gap-4 transition-all"
+          href="#"
+          >Check Eligibility <span class="material-symbols-outlined"
+            >arrow_forward</span
+          ></a
+        >
+      </div>
+      Planned Giving
+      <div
+        class="group bg-surface-container-low hover:bg-surface-container-lowest transition-colors p-8 rounded-[2rem] border border-transparent hover:border-brand-blue/20 hover:shadow-xl duration-300"
+      >
+        <span
+          class="material-symbols-outlined text-4xl text-brand-dark-yellow mb-6"
+          style="font-variation-settings: 'FILL' 0;">history_edu</span
+        >
+        <h4 class="text-title-lg font-bold mb-4">Planned Giving</h4>
+        <p class="text-on-surface-variant leading-relaxed mb-6">
+          Leave a lasting legacy by including Another Step in your will or
+          estate plans to support future generations.
+        </p>
+        <a
+          class="text-brand-blue font-bold inline-flex items-center gap-2 group-hover:gap-4 transition-all"
+          href="#"
+          >Legacy Guide <span class="material-symbols-outlined"
+            >arrow_forward</span
+          ></a
+        >
+      </div>
+      In-Kind Donations
+      <div
+        class="group bg-surface-container-low hover:bg-surface-container-lowest transition-colors p-8 rounded-[2rem] border border-transparent hover:border-brand-blue/20 hover:shadow-xl duration-300"
+      >
+        <span
+          class="material-symbols-outlined text-4xl text-brand-dark-red mb-6"
+          style="font-variation-settings: 'FILL' 0;">inventory_2</span
+        >
+        <h4 class="text-title-lg font-bold mb-4">In-Kind Gifts</h4>
+        <p class="text-on-surface-variant leading-relaxed mb-6">
+          Donate supplies, equipment, or professional services directly to our
+          local programs and centers.
+        </p>
+        <a
+          class="text-brand-blue font-bold inline-flex items-center gap-2 group-hover:gap-4 transition-all"
+          href="#"
+          >Our Wishlist <span class="material-symbols-outlined"
+            >arrow_forward</span
+          ></a
+        >
+      </div>
+    </div>
+     Secondary Giving Options Bar
+  </section> -->
