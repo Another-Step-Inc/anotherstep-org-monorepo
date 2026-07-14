@@ -8,6 +8,10 @@ import TwoColumnsBorderTop from './blocks/TwoColumnsBorderTop.astro';
 import ThreeColumns from './blocks/ThreeColumns.astro';
 import OneColumnCard from './blocks/OneColumnCard.astro';
 import SplitFeature from './blocks/SplitFeature.astro';
+import CustomGridSection from './blocks/CustomGridSection.astro';
+
+import { wpFetch, EDITOR_BLOCKS_FRAGMENT } from '../lib/wp.js';
+import { VALUES_ARCHIVE_QUERY } from "../lib/queries";
 
 const { blocks = [] } = Astro.props
 // 1. Get a combined string of all "Container" block outputs
@@ -27,11 +31,24 @@ const uniqueBlocks = blocks.filter((block: any) => {
     }
     return true;
 });
+
+const valuesResponse = await wpFetch(VALUES_ARCHIVE_QUERY);
+
+const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
+  ? valuesResponse.values?.nodes?.map((node: any) => ({
+      title: node.title || '',
+      content: node.content || node.excerpt || '',
+      icon: node.cardIcon || '',  // Matches the field registered to the Value type
+      theme: node.cardTheme || '' // Matches the field registered to the Value type
+    })) || []
+  : [];
 ---
 
 {uniqueBlocks.map((block: any) => {
     if (!block) return null;
+    if (block.name === 'anotherstep/custom-grid-card') return false;
 
+    let attrs;
     switch (block.name) {
         case 'core/paragraph':
         case 'core/heading':
@@ -45,7 +62,7 @@ const uniqueBlocks = blocks.filter((block: any) => {
         
         case 'anotherstep/page-hero-section': {
             // Parse block attributes out of JSON string
-            const attrs = block.attributes || {};
+            attrs = block.attributes || {};
             return (
                 <Hero 
                     content={block.renderedHtml}
@@ -79,8 +96,33 @@ const uniqueBlocks = blocks.filter((block: any) => {
         case 'anotherstep/homepage-about-section':
             return <TwoColumns content={block.renderedHtml} />
 
-        case 'anotherstep/homepage-values-section':
-            return <ThreeColumns content={block.renderedHtml} />
+        case 'anotherstep/custom-grid-section':
+            attrs = block.attributes || {};
+
+            const resolvedInnerBlocks = (block.innerBlocks || []).map((child: any) => {
+                if (child.attributesJSON) {
+                    try {
+                        return { attributes: JSON.parse(child.attributesJSON) };
+                    } catch (e) {
+                        console.error("Failed to parse inner block JSON", e);
+                    }
+                }
+                return child; // Fallback to raw attributes if already an object
+            });
+
+            return <CustomGridSection 
+                headline={attrs.headline}
+                description={attrs.description}
+                bgStyle={attrs.bgStyle}
+                textAlignment={attrs.textAlignment}
+                styleVariant={attrs.styleVariant}
+                useQuery={attrs.useQuery}
+                postType={attrs.postType}
+                postsPerPage={attrs.postsPerPage}
+                renderedHtml={block.renderedHtml}
+                innerBlocks={resolvedInnerBlocks} 
+                dynamicCards={dynamicCardsData}
+            />
         
         case 'anotherstep/homepage-ethics-section':
             return <OneColumnCard content={block.renderedHtml} />
@@ -90,7 +132,7 @@ const uniqueBlocks = blocks.filter((block: any) => {
 
         case 'anotherstep/split-feature-section':
             // Parse block attributes out of JSON string
-            const attrs = block.attributes || {};
+            attrs = block.attributes || {};
             return (
                 <SplitFeature 
                     imageAlignment={attrs.imageAlignment}
