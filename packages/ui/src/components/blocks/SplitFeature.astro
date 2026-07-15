@@ -17,6 +17,10 @@ export const SplitFeatureFragment = `
       iconName
       iconTitle
     }
+    innerBlocks {
+      name
+      renderedHtml
+    }
   }
 `;
 
@@ -34,16 +38,19 @@ interface Props {
     metricLabel?: string;
     iconName?: string;
     iconTitle?: string;
+    innerBlocks?: { name: string; renderedHtml: string }[];
 }
 
-const { splitTitle, splitDescription, imageAlignment, backgroundColor, eyebrowText, underlineAccent, mediaUrl, mediaAlt, secondaryMediaUrl, metricNumber, metricLabel, iconName, iconTitle } = Astro.props;
+const { splitTitle, splitDescription, imageAlignment, backgroundColor, eyebrowText, underlineAccent, mediaUrl, mediaAlt, secondaryMediaUrl, metricNumber, metricLabel, iconName, iconTitle, innerBlocks = [] } = Astro.props;
 
 const alignment = imageAlignment || undefined;
 const bgClass = `bg-${backgroundColor}` || undefined;
 const isLeft = alignment === 'left';
 
 console.log("--- WORKING BLOCK PAYLOAD ---") ;
-console.log(JSON.stringify(splitDescription, null, 2));
+console.log(JSON.stringify(splitTitle));
+console.log("--- FULL SPLIT FEATURE PROPS RECEIVED ---");
+console.log(JSON.stringify(Astro.props, null, 2));
 ---
 <section class={`py-24 ${bgClass} project-split-feature`}>
   <div class="max-w-7xl mx-auto px-8">
@@ -64,11 +71,18 @@ console.log(JSON.stringify(splitDescription, null, 2));
               )}
             </h2>
         )}
-        {splitDescription && (
+        {/* Render splitDescription if it exists, otherwise render innerBlocks HTML */}
+        {splitDescription ? (
             <div class="text-lg text-on-surface-variant leading-relaxed [&>p]:mb-6 [&>blockquote]:border-l-4 [&>blockquote]:border-brand-blue [&>blockquote]:pl-4 [&>blockquote]:italic [&>blockquote]:my-6">
               <Fragment set:html={splitDescription} />
             </div>
-        )}
+        ) : innerBlocks.length > 0 ? (
+            <div class="text-lg text-on-surface-variant leading-relaxed [&>p]:mb-6 [&>blockquote]:border-l-4 [&>blockquote]:border-brand-blue [&>blockquote]:pl-4 [&>blockquote]:italic [&>blockquote]:my-6">
+              {innerBlocks.map((inner) => (
+                <Fragment set:html={inner.renderedHtml} />
+              ))}
+            </div>
+        ) : null}
       </div>
 
       {/* Asymmetric Graphical Display Grid Segment */}

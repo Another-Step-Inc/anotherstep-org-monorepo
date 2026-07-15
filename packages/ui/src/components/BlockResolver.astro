@@ -9,26 +9,33 @@ import ThreeColumns from './blocks/ThreeColumns.astro';
 import OneColumnCard from './blocks/OneColumnCard.astro';
 import SplitFeature from './blocks/SplitFeature.astro';
 import CustomGridSection from './blocks/CustomGridSection.astro';
+import CtaContactCardSection from './blocks/CtaContactCardSection.astro';
 
 import { wpFetch, EDITOR_BLOCKS_FRAGMENT } from '../lib/wp.js';
 import { VALUES_ARCHIVE_QUERY } from "../lib/queries";
 
-const { blocks = [] } = Astro.props
-// 1. Get a combined string of all "Container" block outputs
-const parentOutputs = blocks
-    .filter((b: any) => b.name.includes('anotherstep/'))
-    .map((b: any) => b.renderedHtml)
-    .join('');
+const { blocks = [] } = Astro.props;
 
-// 2. Filter the blocks
+// 1. Collect all clientIds or names of blocks that are nested inside ANY parent block
+const nestedBlockIds = new Set(
+    blocks
+        .filter((b: any) => b.innerBlocks && b.innerBlocks.length > 0)
+        .flatMap((b: any) => b.innerBlocks.map((child: any) => child.clientId || child.renderedHtml))
+);
+
+// 2. Filter the root blocks array
 const uniqueBlocks = blocks.filter((block: any) => {
-    // If it's a core paragraph/heading, check if it's already inside a parent's HTML
-    if (block.name === 'core/paragraph' || block.name === 'core/heading') {
-        // If the paragraph's HTML exists inside the combined parent HTML, skip it
-        if (parentOutputs.includes(block.renderedHtml)) {
-            return false;
-        }
+    // Skip standalone child cards because CustomGridSection handles them
+    if (block.name === 'anotherstep/custom-grid-card') {
+        return false;
     }
+
+    // Skip any block that is already nested inside a parent block
+    const identifier = block.clientId || block.renderedHtml;
+    if (nestedBlockIds.has(identifier)) {
+        return false;
+    }
+
     return true;
 });
 
@@ -49,6 +56,7 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
     if (block.name === 'anotherstep/custom-grid-card') return false;
 
     let attrs;
+
     switch (block.name) {
         case 'core/paragraph':
         case 'core/heading':
@@ -148,6 +156,26 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
                     iconTitle={attrs.iconTitle}
                     splitTitle={attrs.splitTitle}
                     splitDescription={attrs.splitDescription}
+                    innerBlocks={block.innerBlocks || []}
+                />
+            );
+
+        case 'anotherstep/cta-contact-card-section':
+            attrs = block.attributes || {};
+            return (
+                <CtaContactCardSection 
+                    headline={attrs.headline}
+                    description={attrs.description}
+                    btn1Text={attrs.btn1Text}
+                    btn1Url={attrs.btn1Url}
+                    btn2Text={attrs.btn2Text}
+                    btn2Url={attrs.btn2Url}
+                    directorName={attrs.directorName}
+                    directorTitle={attrs.directorTitle}
+                    directorRegions={attrs.directorRegions}
+                    directorPhone={attrs.directorPhone}
+                    directorImageUrl={attrs.directorImageUrl}
+                    directorImageId={attrs.directorImageId}
                 />
             );
         default:

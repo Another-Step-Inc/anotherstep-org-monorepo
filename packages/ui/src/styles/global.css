@@ -12,6 +12,7 @@
     --color-blue-fixed: #d3e4ff;
     --color-blue-fixed-dim: #a2c9ff;
     --color-blue-container: #0066b3;
+    --color-yellow-fixed: #fcf9d0;
     --color-darker-yellow: #BCAE00;
     --color-darkest-yellow: #464100;
     --color-red-fixed-dim: #ffb4ab;
@@ -75,7 +76,7 @@
   --color-background: var(--color-background);
   --color-brand-yellow: var(--color-yellow);
   --color-brand-dark-yellow: var(--color-darker-yellow);
-  --color-brand-yellow-fixed: var(--color-darkest-yellow);
+  --color-brand-yellow-fixed: var(--color-yellow-fixed);
   --color-on-brand-yellow: var(--color-text-on-brand-yellow);
   --color-on-brand-dark-yellow: var(--color-darkest-yellow);
   --color-brand-blue: var(--color-blue);

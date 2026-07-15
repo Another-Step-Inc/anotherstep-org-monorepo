@@ -1,6 +1,7 @@
 import { PageHeroFragment } from '../components/blocks/Hero.astro'
 import { SplitFeatureFragment } from '../components/blocks/SplitFeature.astro';
-import { CustomGridSectionFragment } from '../components/blocks/CustomGridSection.astro'
+import { CustomGridSectionFragment } from '../components/blocks/CustomGridSection.astro';
+import { CtaContactCardSectionFragment } from '../components/blocks/CtaContactCardSection.astro';
 
 const WP_URL = "http://host.docker.internal:8050/graphql";
 
@@ -12,6 +13,7 @@ export const EDITOR_BLOCKS_FRAGMENT = `
         ${PageHeroFragment}
         ${SplitFeatureFragment}
         ${CustomGridSectionFragment}
+        ${CtaContactCardSectionFragment}
         ... on CoreImage {
             attributes {
                 url
