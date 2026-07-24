@@ -2,8 +2,9 @@ import { PageHeroFragment } from '../components/blocks/Hero.astro'
 import { SplitFeatureFragment } from '../components/blocks/SplitFeature.astro';
 import { CustomGridSectionFragment } from '../components/blocks/CustomGridSection.astro';
 import { CtaContactCardSectionFragment } from '../components/blocks/CtaContactCardSection.astro';
+import { HomepageEthicsSectionFragment } from '../components/blocks/OneColumnCard.astro';
 
-const WP_URL = "http://host.docker.internal:8050/graphql";
+const WP_URL = import.meta.env.WORDPRESS_API_URL;
 
 // Reusable Editor Blocks Fragment
 export const EDITOR_BLOCKS_FRAGMENT = `
@@ -11,6 +12,7 @@ export const EDITOR_BLOCKS_FRAGMENT = `
         name
         renderedHtml
         ${PageHeroFragment}
+        ${HomepageEthicsSectionFragment}
         ${SplitFeatureFragment}
         ${CustomGridSectionFragment}
         ${CtaContactCardSectionFragment}

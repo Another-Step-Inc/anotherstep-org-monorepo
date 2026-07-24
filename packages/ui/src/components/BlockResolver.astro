@@ -57,10 +57,16 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
 
     let attrs;
 
+    console.log('Incoming block name:', block?.name);
+
     switch (block.name) {
         case 'core/paragraph':
+            attrs = block.attributes || {};
+            return <p class="text-2xl text-slate-700 leading-relaxed my-4">{attrs.content}</p>;
+
         case 'core/heading':
-            return <TextBlock content={block.renderedHtml} />
+            attrs = block.attributes || {};
+            return <h2 class="text-3xl font-bold text-slate-900 my-6">{attrs.content}</h2>;
 
         case 'core/image':
         case 'core/gallery':
@@ -133,7 +139,15 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
             />
         
         case 'anotherstep/homepage-ethics-section':
-            return <OneColumnCard content={block.renderedHtml} />
+            attrs = block.attributes || {};
+            return (
+                <OneColumnCard 
+                    headline={attrs.ethicsHeadline} 
+                    ethicsLinkText={attrs.ethicsLinkText}
+                    ethicsLinkUrl={attrs.ethicsLinkUrl}
+                    innerBlocks={block.innerBlocks} 
+                />
+            );
         
         case 'anotherstep/homepage-legal-section':
             return <TwoColumnsBorderTop content={block.renderedHtml} />

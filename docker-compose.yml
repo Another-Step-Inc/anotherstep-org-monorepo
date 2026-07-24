@@ -11,9 +11,10 @@ services:
     stdin_open: true
     environment:
       - COREPACK_DEFAULT_TO_LATEST=0
+      - CI=true
     ports:
       - 4321:4321
       - 4322:4322
-    command: sh -c "corepack enable && pnpm install --frozen-lockfile && pnpm dev --host 0.0.0.0"
+    command: sh -c "corepack enable && pnpm install && pnpm dev --host 0.0.0.0"
 volumes:
   pnpm-store:

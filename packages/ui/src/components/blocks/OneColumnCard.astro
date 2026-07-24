@@ -1,8 +1,69 @@
 ---
-const { content } = Astro.props
+// src/components/blocks/OneColumnCard.astro
+export const HomepageEthicsSectionFragment = `
+  ... on AnotherstepHomepageEthicsSection {
+    attributes {
+      ethicsHeadline
+      ethicsLinkText
+      ethicsLinkUrl
+    }
+    innerBlocks {
+      name
+      renderedHtml
+    }
+  }
+`;
+
+interface Props {
+  headline?: string;
+  ethicsLinkText?: string;
+  ethicsLinkUrl?: string;
+  innerBlocks?: any[];
+}
+
+const { headline, ethicsLinkText, ethicsLinkUrl, innerBlocks = [] } = Astro.props;
+
+console.log('OneColumnCard innerBlocks:', innerBlocks);
 ---
-<section class="py-12 px-4 md:px-8">
-    <div class="max-w-7xl mx-auto">
-        <Fragment set:html={content} />
-    </div>
+
+<section class="py-12 px-4 md:px-8 bg-surface">
+  <div class="max-w-7xl mx-auto bg-surface-container-low p-8 md:p-12 rounded-2xl border border-outline-variant/10 shadow-sm">
+    {headline && (
+      <h2 class="text-3xl font-extrabold text-brand-blue mb-6">
+        {headline}
+      </h2>
+    )}
+
+    {innerBlocks && innerBlocks.length > 0 ? (
+      <div class="space-y-4 text-on-surface-variant text-lg leading-relaxed">
+        {innerBlocks.map((child: any) => {
+          // Safely resolve content whether stored in attributes or renderedHtml
+          const content = child.renderedHtml || child.attributes?.value;
+          const strippedContent = content.replace(/<p>(.*?)<\/p>/g, '$1'); // Strip <p> tags if present
+
+          if (child.name === 'core/paragraph') {
+            return <p class="text-lg text-slate-700 leading-relaxed">{strippedContent}</p>;
+          }
+
+          if (child.name === 'core/heading') {
+            return <h3 class="text-2xl font-bold text-brand-blue">{content}</h3>;
+          }
+
+          // Fallback if child is a custom or raw block
+          return child.renderedHtml ? <Fragment set:html={child.renderedHtml} /> : null;
+        })}
+
+        {ethicsLinkText && ethicsLinkUrl && (
+          <a href={ethicsLinkUrl} class="inline-flex items-center gap-2 text-blue-700 font-bold hover:text-blue-900 transition-colors group">
+            <span>{ethicsLinkText}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
+        )}
+      </div>
+    ) : (
+      <slot />
+    )}
+  </div>
 </section>
