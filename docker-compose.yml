@@ -2,6 +2,8 @@ services:
   dev:
     image: node:20-alpine
     user: "root"
+    env_file:
+      - .env
     volumes:
       - .:/app
       - /app/node_modules

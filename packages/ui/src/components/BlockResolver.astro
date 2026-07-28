@@ -3,7 +3,7 @@
 import Hero from './blocks/Hero.astro';
 import TextBlock from './blocks/TextBlock.astro';
 import ImageGallery from './blocks/ImageGallery.astro';
-import TwoColumns from './blocks/TwoColumns.astro';
+import TwoColumnCardSection from './blocks/TwoColumnCardSection.astro';
 import TwoColumnsBorderTop from './blocks/TwoColumnsBorderTop.astro';
 import ThreeColumns from './blocks/ThreeColumns.astro';
 import OneColumnCard from './blocks/OneColumnCard.astro';
@@ -107,8 +107,19 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
                 />
             );
         }
-        case 'anotherstep/homepage-about-section':
-            return <TwoColumns content={block.renderedHtml} />
+        case 'anotherstep/two-column-card-section':
+            attrs = block.attributes || {};
+            return <TwoColumnCardSection 
+                aboutHeadline={attrs.aboutHeadline}
+                aboutSubHeadline={attrs.aboutSubHeadline}
+                aboutDescription={attrs.aboutDescription}
+                aboutImpactTitle1={attrs.aboutImpactTitle1}
+                aboutImpactParagraph1={attrs.aboutImpactParagraph1}
+                aboutImpactIcon1={attrs.aboutImpactIcon1}
+                aboutImpactTitle2={attrs.aboutImpactTitle2}
+                aboutImpactParagraph2={attrs.aboutImpactParagraph2}
+                aboutImpactIcon2={attrs.aboutImpactIcon2}
+            />
 
         case 'anotherstep/custom-grid-section':
             attrs = block.attributes || {};
@@ -149,8 +160,26 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
                 />
             );
         
-        case 'anotherstep/homepage-legal-section':
-            return <TwoColumnsBorderTop content={block.renderedHtml} />
+        case 'anotherstep/dynamic-info-section':
+            attrs = block.attributes || {};
+            return (
+                <TwoColumnsBorderTop 
+                    primaryTitle={attrs.primaryTitle}
+                    primaryDescription={attrs.primaryDescription}
+                    primaryFieldValue1={attrs.primaryFieldValue1}
+                    primaryFieldLabel1={attrs.primaryFieldLabel1}
+                    primaryFieldValue2={attrs.primaryFieldValue2}
+                    primaryFieldValue3={attrs.primaryFieldValue3}
+                    primaryFieldValue4={attrs.primaryFieldValue4}
+                    primaryFieldValue5={attrs.primaryFieldValue5}
+                    primaryFieldValue6={attrs.primaryFieldValue6}
+                    primaryFieldValue7={attrs.primaryFieldValue7}
+                    secondaryTitle={attrs.secondaryTitle}
+                    secondaryDescription={attrs.secondaryDescription}
+                    secondaryFieldValue1={attrs.secondaryFieldValue1}
+                    layoutType={attrs.layoutType}
+                />
+            );
 
         case 'anotherstep/split-feature-section':
             // Parse block attributes out of JSON string

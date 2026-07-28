@@ -17,7 +17,9 @@
         "astro": "^4.0.0 || ^5.0.0"
     },
     "dependencies": {
-        "@fortawesome/fontawesome-free": "^7.2.0"
+        "@fortawesome/fontawesome-free": "^7.2.0",
+        "@heroicons/react": "^2.2.0",
+        "astro-heroicons": "2.1.5-1"
     },
     "devDependencies": {
         "tailwindcss": "^4.2.4"

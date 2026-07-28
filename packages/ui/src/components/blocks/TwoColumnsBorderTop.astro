@@ -1,8 +1,144 @@
 ---
-const { content } = Astro.props;
+export const DynamicInfoSectionFragment = `
+  ... on AnotherstepDynamicInfoSection {
+    attributes {
+      layoutType
+      showSecondarySection
+      primaryTitle
+      primaryDescription
+      primaryFieldLabel1
+      primaryFieldValue1
+      primaryFieldLabel2
+      primaryFieldValue2
+      primaryFieldLabel3
+      primaryFieldValue3
+      primaryFieldLabel4
+      primaryFieldValue4
+      primaryFieldLabel5
+      primaryFieldValue5
+      primaryFieldLabel6
+      primaryFieldValue6
+      primaryFieldLabel7
+      primaryFieldValue7
+      secondaryTitle
+      secondaryDescription
+      secondaryFieldLabel1
+      secondaryFieldValue1
+    }
+  }
+`;
+
+interface Props {
+    layoutType?: 'two-column' | 'stacked';
+    showSecondarySection?: boolean;
+    primaryTitle?: string;
+    primaryDescription?: string;
+    primaryFieldLabel1?: string;
+    primaryFieldValue1?: string;
+    primaryFieldLabel2?: string;
+    primaryFieldValue2?: string;
+    primaryFieldLabel3?: string;
+    primaryFieldValue3?: string;
+    primaryFieldLabel4?: string;
+    primaryFieldValue4?: string;
+    primaryFieldLabel5?: string;
+    primaryFieldValue5?: string;
+    primaryFieldLabel6?: string;
+    primaryFieldValue6?: string;
+    primaryFieldLabel7?: string;
+    primaryFieldValue7?: string;
+    secondaryTitle?: string;
+    secondaryDescription?: string;
+    secondaryFieldLabel1?: string;
+    secondaryFieldValue1?: string;
+}
+const { 
+  layoutType,
+  showSecondarySection,
+  primaryTitle,
+  primaryDescription,
+  primaryFieldLabel1,
+  primaryFieldValue1,
+  primaryFieldLabel2,
+  primaryFieldValue2,
+  primaryFieldLabel3,
+  primaryFieldValue3,
+  primaryFieldLabel4,
+  primaryFieldValue4,
+  primaryFieldLabel5,
+  primaryFieldValue5,
+  primaryFieldLabel6,
+  primaryFieldValue6,
+  primaryFieldLabel7,
+  primaryFieldValue7,
+  secondaryTitle,
+  secondaryDescription,
+  secondaryFieldLabel1,
+  secondaryFieldValue1
+} = Astro.props;
+
+const cleanPhone = (phone: string) => phone.replace(/\D/g, '');
 ---
 <section class="py-12 px-4 md:px-8 border-t border-slate-100">
-  <Fragment set:html={content} />
+  <div class={`max-w-7xl mx-auto grid gap-12 ${layoutType === 'two-column' && !showSecondarySection ? 'md:grid-cols-2' : 'grid-cols-1'}`}>
+    {/* PRIMARY SECTION COLUMN */}
+    <div class="space-y-4">
+      {primaryTitle && (
+        <h3 class="font-bold text-blue-900 uppercase text-sm tracking-widest" set:html={primaryTitle} />
+      )}
+
+      {primaryDescription && (
+        <div class="text-slate-600 text-sm leading-relaxed" set:html={primaryDescription} />
+      )}
+
+      {/* Dynamic Address & Field Details Stack */}
+      <div class="text-slate-800 text-sm font-medium space-y-0.5">
+        {primaryFieldValue1 && (
+          <p class="font-bold">
+            {primaryFieldValue1}, {primaryFieldValue2 && <span>{primaryFieldValue2}, </span>}
+          </p>
+        )}
+        {primaryFieldValue3 && <p>{primaryFieldValue3}</p>}
+        {primaryFieldValue4 && <p>{primaryFieldValue4}</p>}
+        {primaryFieldValue5 && primaryFieldValue6 && primaryFieldValue7 && <p>{primaryFieldValue5} {primaryFieldValue6} {primaryFieldValue7}</p>}
+      </div>
+    </div>
+    {/* SECONDARY SECTION COLUMN */}
+    {!showSecondarySection && (
+      <div class="bg-blue-900 text-white p-8 rounded-3xl flex flex-col justify-center">
+        {secondaryTitle && (
+          <h3 class="font-bold mb-2 text-xl" set:html={secondaryTitle} />
+        )}
+
+        {secondaryDescription && (
+          <div class="text-blue-100 text-sm mb-4 leading-relaxed" set:html={secondaryDescription} />
+        )}
+
+        {/* Dynamic Action Detail (Phone or Generic Detail) */}
+        {secondaryFieldValue1 && (
+          <div>
+            {cleanPhone(secondaryFieldValue1).length >= 7 ? (
+              <a 
+                href={`tel:${cleanPhone(secondaryFieldValue1)}`} 
+                class="text-2xl font-bold text-yellow-400 hover:text-yellow-300 transition-colors inline-block"
+              >
+                {secondaryFieldValue1}
+              </a>
+            ) : (
+              <div class="text-xl font-bold text-yellow-400">
+                {secondaryFieldValue1}
+              </div>
+            )}
+          </div>
+        )}
+
+        <p class="text-black bg-white p-2">
+          Debug value: {JSON.stringify(showSecondarySection)} (Type: {typeof showSecondarySection})
+        </p>
+      </div>
+    )}
+
+  </div>
 </section>
 
 <style is:global>

@@ -39,7 +39,7 @@ console.log('OneColumnCard innerBlocks:', innerBlocks);
         {innerBlocks.map((child: any) => {
           // Safely resolve content whether stored in attributes or renderedHtml
           const content = child.renderedHtml || child.attributes?.value;
-          const strippedContent = content.replace(/<p>(.*?)<\/p>/g, '$1'); // Strip <p> tags if present
+          const strippedContent = content.replace(/<p\b[^>]*>(.*?)<\/p>/gis, '$1'); // Strip <p> tags if present
 
           if (child.name === 'core/paragraph') {
             return <p class="text-lg text-slate-700 leading-relaxed">{strippedContent}</p>;

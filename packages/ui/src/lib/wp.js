@@ -3,8 +3,10 @@ import { SplitFeatureFragment } from '../components/blocks/SplitFeature.astro';
 import { CustomGridSectionFragment } from '../components/blocks/CustomGridSection.astro';
 import { CtaContactCardSectionFragment } from '../components/blocks/CtaContactCardSection.astro';
 import { HomepageEthicsSectionFragment } from '../components/blocks/OneColumnCard.astro';
+import { TwoColumnCardSectionFragment } from '../components/blocks/TwoColumnCardSection.astro';
+import { DynamicInfoSectionFragment } from '../components/blocks/TwoColumnsBorderTop.astro';
 
-const WP_URL = import.meta.env.WORDPRESS_API_URL;
+const WP_URL = import.meta.env.PUBLIC_WORDPRESS_API_URL;
 
 // Reusable Editor Blocks Fragment
 export const EDITOR_BLOCKS_FRAGMENT = `
@@ -16,6 +18,8 @@ export const EDITOR_BLOCKS_FRAGMENT = `
         ${SplitFeatureFragment}
         ${CustomGridSectionFragment}
         ${CtaContactCardSectionFragment}
+        ${TwoColumnCardSectionFragment}
+        ${DynamicInfoSectionFragment}
         ... on CoreImage {
             attributes {
                 url
