@@ -143,6 +143,7 @@ const cardsToRender = useQuery ? dynamicCards : innerBlocks.map(block => block.a
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       {cardsToRender.map((card) => {
         const theme = (card.theme || '').toLowerCase();
+        const strippedContent = card.content ? card.content.replace(/<p\b[^>]*>(.*?)<\/p>/gis, '$1') : '';
 
         if (isEditorialHover) {
           let iconBg = 'bg-brand-blue/10 text-brand-blue group-hover:bg-brand-blue group-hover:text-on-brand-blue';
@@ -173,7 +174,7 @@ const cardsToRender = useQuery ? dynamicCards : innerBlocks.map(block => block.a
               )}
               {card.content && (
                 <div class="text-on-surface-variant leading-relaxed [&>p]:mb-4 last:[&>p]:mb-0">
-                  <Fragment set:html={card.content} />
+                  <p class="text-lg text-slate-700" set:html={strippedContent} />
                 </div>
               )}
               {card.linkUrl && (
@@ -206,7 +207,7 @@ const cardsToRender = useQuery ? dynamicCards : innerBlocks.map(block => block.a
                   )}
                   {card.content && (
                     <div class="text-on-surface-variant leading-relaxed [&>p]:mb-4 last:[&>p]:mb-0">
-                      <Fragment set:html={card.content} />
+                      <p class="text-lg text-slate-700" set:html={strippedContent} />
                     </div>
                   )}
                   {card.linkUrl && (
@@ -252,7 +253,7 @@ const cardsToRender = useQuery ? dynamicCards : innerBlocks.map(block => block.a
 
               {card.content && (
                 <div class="text-body-lg text-on-surface-variant leading-relaxed [&>p]:mb-4 last:[&>p]:mb-0">
-                  <Fragment set:html={card.content} />
+                  <p class="text-lg text-slate-700" set:html={strippedContent} />
                 </div>
               )}
             </div>
@@ -282,7 +283,7 @@ const cardsToRender = useQuery ? dynamicCards : innerBlocks.map(block => block.a
               
               {card.content && (
                 <div class="text-on-surface-variant leading-relaxed mb-6 text-sm md:text-base [&>p]:mb-4 last:[&>p]:mb-0">
-                  <Fragment set:html={card.content} />
+                  <p class="text-lg text-slate-700" set:html={strippedContent} />
                 </div>
               )}
 
@@ -318,7 +319,7 @@ const cardsToRender = useQuery ? dynamicCards : innerBlocks.map(block => block.a
             
             {card.content && (
               <div class="text-slate-600 leading-relaxed text-sm md:text-base [&>p]:mb-4 last:[&>p]:mb-0">
-                <Fragment set:html={card.content} />
+                <p class="text-lg text-slate-700" set:html={strippedContent} />
               </div>
             )}
           </div>

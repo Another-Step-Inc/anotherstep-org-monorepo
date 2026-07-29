@@ -112,13 +112,14 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
             return <TwoColumnCardSection 
                 aboutHeadline={attrs.aboutHeadline}
                 aboutSubHeadline={attrs.aboutSubHeadline}
-                aboutDescription={attrs.aboutDescription}
+                aboutImpactHeadline={attrs.aboutImpactHeadline}
                 aboutImpactTitle1={attrs.aboutImpactTitle1}
                 aboutImpactParagraph1={attrs.aboutImpactParagraph1}
                 aboutImpactIcon1={attrs.aboutImpactIcon1}
                 aboutImpactTitle2={attrs.aboutImpactTitle2}
                 aboutImpactParagraph2={attrs.aboutImpactParagraph2}
                 aboutImpactIcon2={attrs.aboutImpactIcon2}
+                innerBlocks={block.innerBlocks}
             />
 
         case 'anotherstep/custom-grid-section':

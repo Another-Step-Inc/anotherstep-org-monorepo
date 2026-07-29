@@ -4,7 +4,7 @@ export const TwoColumnCardSectionFragment = `
     attributes{
       aboutHeadline
       aboutSubHeadline
-      aboutDescription
+      aboutImpactHeadline
       aboutImpactTitle1
       aboutImpactParagraph1
       aboutImpactIcon1
@@ -12,31 +12,37 @@ export const TwoColumnCardSectionFragment = `
       aboutImpactParagraph2
       aboutImpactIcon2
     }
+    innerBlocks {
+      name
+      renderedHtml
+    }
   }
 `
 
 interface Props {
     aboutHeadline?: string;
     aboutSubHeadline?: string;
-    aboutDescription?: string;
+    aboutImpactHeadline?: string;
     aboutImpactTitle1?: string;
     aboutImpactParagraph1?: string;
     aboutImpactIcon1?: string;
     aboutImpactTitle2?: string;
     aboutImpactParagraph2?: string;
     aboutImpactIcon2?: string;
+    innerBlocks?: any[];
 }
 
 const { 
   aboutHeadline, 
   aboutSubHeadline, 
-  aboutDescription, 
+  aboutImpactHeadline,
   aboutImpactTitle1, 
   aboutImpactParagraph1,
   aboutImpactIcon1,
   aboutImpactTitle2,
   aboutImpactParagraph2,
-  aboutImpactIcon2
+  aboutImpactIcon2,
+  innerBlocks = []
 } = Astro.props;
 
 
@@ -76,15 +82,25 @@ const iconClass2 = getIconClass(aboutImpactIcon2, "fa-solid fa-house");
           <h2 class="text-3xl md:text-4xl font-bold text-slate-900 leading-tight" set:html={aboutHeadline} />
         )}
 
-        {aboutDescription && (
-          <div class="prose prose-lg text-slate-600 space-y-4" set:html={aboutDescription} />
-        )}
+        {innerBlocks && innerBlocks.length > 0 ? (
+          <div class="prose prose-lg space-y-4">
+
+            {innerBlocks.map((child: any) => {
+              const cleanedContent = child.renderedHtml || child.attributes?.value;
+              const strippedContent = cleanedContent.replace(/<p\b[^>]*>(.*?)<\/p>/gis, '$1'); // Strip <p> tags if present
+              return <p class="text-lg text-slate-700" set:html={strippedContent} />;
+            })}
+          </div>
+        ) : null}
       </div>
 
       {/* RIGHT COLUMN: IMAPCT CARDS */}
       <div class="relative">
         <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-xl border border-slate-100 relative z-10">
-          <h3 class="text-2xl font-bold text-blue-900 mb-6">Our Reach & Impact</h3>
+          
+          {aboutImpactHeadline && (
+            <h3 class="text-2xl font-bold text-brand-blue mb-6">{aboutImpactHeadline}</h3>
+          )}
 
           <div class="space-y-8">
             {/* IMPACT CARD 1 */}
