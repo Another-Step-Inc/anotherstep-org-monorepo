@@ -2,103 +2,21 @@
 import MainLayout from "src/layouts/MainLayout.astro";
 
 import "src/styles/global.css";
-import { wpFetch } from "@anothersteporg/ui/lib/wp";
+import { getGalleryPageData } from "@anothersteporg/ui/lib/wp";
+import BlockResolver from "@anothersteporg/ui/components/BlockResolver.astro";
 
-const data = await wpFetch(`
-  query GetPageByUri {
-    page(id: "gallery", idType: URI) {
-      title
-      featuredVideo {
-        embedLink
-        videoTitle
-        videoSubtitle
-        videoCoverImage {
-          node {
-            sourceUrl
-            altText
-          }
-        }
-      }
-      galleryItems {
-        galleryItems {
-          title
-          categoryTag
-          sizeVariant
-          image {
-            node {
-              sourceUrl
-              mediaItemUrl
-              altText
-            }
-          }
-        }
-      }
-    }
-  }
-`);
+const data = await getGalleryPageData();
 
-const galleryItems = data?.page?.galleryItems?.galleryItems || [];
-const featuredVideo = data?.page?.featuredVideo || null;
+const blocks = data?.pageBy?.editorBlocks || [];
 
-const getEmbedUrl = (input: string) => {
-  if (!input) return "";
+// 3. Log extracted blocks count and names
+console.log('--- DEBUG: Parsed Blocks ---', blocks.map((b: any) => b.name));
 
-  let url = input;
-  const iframeSrcMatch = input.match(/src=["']([^"']+)["']/);
-  if (iframeSrcMatch && iframeSrcMatch[1]) {
-    url = iframeSrcMatch[1];
-  }
-
-  const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
-  const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
-
-  if (youtubeMatch) {
-    return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
-  }
-  
-  if (vimeoMatch) {
-    return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
-  }
-
-  return url;
-};
-
-const resolveImageUrl = (imgField: any) => {
-  if (!imgField) return "";
-  // Check direct URL string, node properties, or root properties
-  if (typeof imgField === "string") return imgField;
-  const rawUrl = imgField.node?.sourceUrl || imgField.node?.mediaItemUrl || imgField.sourceUrl || imgField.mediaItemUrl || "";
-  
-  // If WP returns a relative URL, prepend your WP backend base domain
-  if (rawUrl.startsWith("/")) {
-    const wpBase = import.meta.env.PUBLIC_WORDPRESS_API_URL || "http://localhost:8000";
-    return `${wpBase.replace(/\/$/, "")}${rawUrl}`;
-  }
-  return rawUrl;
-};
-
-const getVariantClass = (rawVariant: any) => {
-  let value = "";
-  if (typeof rawVariant === "string") {
-    value = rawVariant;
-  } else if (Array.isArray(rawVariant) && rawVariant.length > 0) {
-    value = typeof rawVariant[0] === "string" ? rawVariant[0] : rawVariant[0]?.value || "";
-  } else if (typeof rawVariant === "object" && rawVariant !== null) {
-    value = rawVariant.value || rawVariant.label || "";
-  }
-
-  const normalized = value.toLowerCase().trim();
-
-  if (normalized === "tall") return "masonry-item-tall";
-  if (normalized === "wide") return "masonry-item-wide";
-  return "";
-};
-
-const videoEmbedUrl = getEmbedUrl(featuredVideo?.embedLink || "");
-const videoCoverImage = resolveImageUrl(featuredVideo?.videoCoverImage);
+const galleryData = data?.pageBy?.galleryItems || [];
+const videoData = data?.pageBy?.featuredVideo || null;
 ---
 
-<MainLayout title={data?.page?.title}>
+<MainLayout title={data?.pageBy?.title}>
   <!-- Hero Section -->
   <section class="max-w-[1440px] mx-auto px-12 pt-20 pb-12">
     <div class="max-w-3xl">
@@ -118,7 +36,7 @@ const videoCoverImage = resolveImageUrl(featuredVideo?.videoCoverImage);
     </div>
   </section>
   <!-- Video Section -->
-  {featuredVideo?.embedLink && (
+ <!--  {featuredVideo?.embedLink && (
     <section class="max-w-[1440px] mx-auto px-12 pb-24">
       <div class="relative w-full aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black">
         {/* If using an embed iframe */}
@@ -131,9 +49,9 @@ const videoCoverImage = resolveImageUrl(featuredVideo?.videoCoverImage);
         ></iframe>
       </div>
     </section>
-  )}
+  )} -->
   <!-- Expanded Photo Grid -->
-  <section class="max-w-[1440px] mx-auto px-12 pb-24">
+  <!-- <section class="max-w-[1440px] mx-auto px-12 pb-24">
     <h3 class="text-2xl font-bold text-brand-blue mb-8 flex items-center gap-3">
       <span class="material-symbols-outlined">auto_awesome_motion</span>
       Stories of Independence
@@ -166,62 +84,10 @@ const videoCoverImage = resolveImageUrl(featuredVideo?.videoCoverImage);
         );
       })}
     </div>
-  </section>
-  <!-- Impact Section -->
-  <section class="bg-brand-blue text-on-brand-blue py-24 relative overflow-hidden">
-    <!-- Decorative circle -->
-    <div
-      class="absolute -top-24 -right-24 w-96 h-96 bg-brand-blue-container rounded-full opacity-20"
-    >
-    </div>
-    <div
-      class="max-w-[1440px] mx-auto px-12 relative z-10 grid md:grid-cols-2 gap-16 items-center"
-    >
-      <div>
-        <h2 class="text-headline-lg font-black mb-6">Every Step Counts</h2>
-        <p class="text-body-lg opacity-90 leading-relaxed mb-8">
-          The moments captured here are more than just photos; they are the
-          milestones of independence. By integrating daily experiences with
-          professional coaching and community support, we provide the foundation
-          for a fulfilling life where everyone belongs.
-        </p>
-        <div class="flex gap-4">
-          <button
-            class="bg-brand-red text-on-brand-red rounded-full px-8 py-3 font-bold active:scale-95 transition-transform hover:shadow-lg"
-          >
-            Join Our Mission
-          </button>
-          <button
-            class="bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full px-8 py-3 font-bold hover:bg-white/20 transition-colors"
-          >
-            Read Impact Stories
-          </button>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div
-          class="bg-surface-container-lowest/10 backdrop-blur p-8 rounded-2xl border border-white/10 text-center"
-        >
-          <div class="text-display-lg font-black text-brand-yellow mb-2">
-            500+
-          </div>
-          <div class="text-label-md uppercase tracking-widest font-bold">
-            Monthly Outings
-          </div>
-        </div>
-        <div
-          class="bg-surface-container-lowest/10 backdrop-blur p-8 rounded-2xl border border-white/10 text-center translate-y-8"
-        >
-          <div class="text-display-lg font-black text-brand-red-fixed mb-2">
-            95%
-          </div>
-          <div class="text-label-md uppercase tracking-widest font-bold">
-            Goal Completion
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  </section> -->
+  
+  <!-- Dynamic Blocks from WordPress -->
+  <BlockResolver blocks={blocks} galleryData={galleryData} videoData={videoData} />
 </MainLayout>
 <style>
     .masonry-grid {

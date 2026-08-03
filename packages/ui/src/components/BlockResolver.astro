@@ -3,6 +3,8 @@
 import Hero from './blocks/Hero.astro';
 import TextBlock from './blocks/TextBlock.astro';
 import ImageGallery from './blocks/ImageGallery.astro';
+import GallerySection from './blocks/GallerySection.astro';
+import VideoSection from './blocks/VideoSection.astro';
 import TwoColumnCardSection from './blocks/TwoColumnCardSection.astro';
 import TwoColumnsBorderTop from './blocks/TwoColumnsBorderTop.astro';
 import ThreeColumns from './blocks/ThreeColumns.astro';
@@ -10,11 +12,12 @@ import OneColumnCard from './blocks/OneColumnCard.astro';
 import SplitFeature from './blocks/SplitFeature.astro';
 import CustomGridSection from './blocks/CustomGridSection.astro';
 import CtaContactCardSection from './blocks/CtaContactCardSection.astro';
+import CtaSection from './blocks/CtaSection.astro';
 
 import { wpFetch, EDITOR_BLOCKS_FRAGMENT } from '../lib/wp.js';
 import { VALUES_ARCHIVE_QUERY } from "../lib/queries";
 
-const { blocks = [] } = Astro.props;
+const { blocks = [], galleryData, videoData } = Astro.props;
 
 // 1. Collect all clientIds or names of blocks that are nested inside ANY parent block
 const nestedBlockIds = new Set(
@@ -73,6 +76,12 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
             // The attributesJson contains the URL and alt text from WP
             const imageAttrs = block.attributesJSON ? JSON.parse(block.attributesJSON) : {};
             return <ImageGallery url={block.attributes?.url} alt={block.attributes?.alt} />;
+
+        case 'anotherstep/gallery-placeholder':
+            return <GallerySection data={galleryData} />;
+
+        case 'anotherstep/video-placeholder':
+            return <VideoSection data={videoData} />
         
         case 'anotherstep/page-hero-section': {
             // Parse block attributes out of JSON string
@@ -220,6 +229,35 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
                     directorPhone={attrs.directorPhone}
                     directorImageUrl={attrs.directorImageUrl}
                     directorImageId={attrs.directorImageId}
+                />
+            );
+
+        case 'anotherstep/page-cta-section':
+            attrs = block.attributes || {};
+            return (
+                <CtaSection 
+                    ctaTitle={attrs.ctaTitle}
+                    ctaDescription={attrs.ctaDescription}
+                    ctaStyle={attrs.ctaStyle}
+                    btn1Text={attrs.btn1Text}
+                    btn1Url={attrs.btn1Url}
+                    btn1Style={attrs.btn1Style}
+                    btn2Text={attrs.btn2Text}
+                    btn2Url={attrs.btn2Url}
+                    hasSteps={attrs.hasSteps}
+                    step1Text={attrs.step1Text}
+                    step2Text={attrs.step2Text}
+                    step3Text={attrs.step3Text}
+                    hasCard={attrs.hasCard}
+                    cardTitle={attrs.cardTitle}
+                    cardDescription={attrs.cardDescription}
+                    cardBtnText={attrs.cardBtnText}
+                    cardBtnUrl={attrs.cardBtnUrl}
+                    hasStats={attrs.hasStats}
+                    stat1Number={attrs.stat1Number}
+                    stat1Label={attrs.stat1Label}
+                    stat2Number={attrs.stat2Number}
+                    stat2Label={attrs.stat2Label}
                 />
             );
         default:

@@ -267,3 +267,65 @@
         </div>
       </div>
     </section> -->
+
+
+        <!-- CTA Section -->
+<!--     <section
+      class="bg-brand-blue rounded-[3rem] p-12 md:p-20 text-on-brand-blue overflow-hidden relative"
+    >
+      <div class="relative z-10 grid md:grid-cols-2 gap-16 items-center">
+        <div>
+          <h2 class="text-[2.5rem] font-black mb-8 leading-tight">
+            Your Path Forward, Step by Step
+          </h2>
+          <div class="space-y-6">
+            <div class="flex items-center gap-6">
+              <div
+                class="w-16 h-16 bg-brand-yellow text-on-brand-yellow rounded-2xl flex items-center justify-center font-black text-2xl"
+              >
+                01
+              </div>
+              <span class="text-xl font-bold"
+                >Initial Consultation &amp; Assessment</span
+              >
+            </div>
+            <div class="flex items-center gap-6">
+              <div
+                class="w-16 h-16 bg-brand-blue-fixed text-on-brand-blue-fixed rounded-2xl flex items-center justify-center font-black text-2xl"
+              >
+                02
+              </div>
+              <span class="text-xl font-bold">Personalized Action Plan</span>
+            </div>
+            <div class="flex items-center gap-6">
+              <div
+                class="w-16 h-16 bg-brand-red-fixed text-on-brand-red-fixed rounded-2xl flex items-center justify-center font-black text-2xl"
+              >
+                03
+              </div>
+              <span class="text-xl font-bold"
+                >Daily Mentorship &amp; Real-World Practice</span
+              >
+            </div>
+          </div>
+        </div>
+        <div
+          class="bg-surface-container-lowest/10 backdrop-blur-xl p-10 rounded-[2rem] border border-white/10"
+        >
+          <h4 class="text-2xl font-black mb-6">Need Immediate Support?</h4>
+          <p class="text-lg opacity-90 mb-8">
+            Our team is ready to help you navigate the next step of your journey
+            today.
+          </p>
+          <button
+            class="w-full bg-on-primary text-brand-blue py-5 rounded-full text-xl font-black hover:bg-brand-blue-fixed transition-colors"
+          >
+            Book a Discovery Call
+          </button>
+        </div>
+      </div>
+      <div
+        class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary-container/40 to-transparent pointer-events-none"
+      >
+      </div>
+    </section> -->

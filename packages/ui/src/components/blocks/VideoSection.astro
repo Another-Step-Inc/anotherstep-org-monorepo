@@ -1,0 +1,36 @@
+---
+export const VideoSectionFragment = `
+    ... on AnotherstepVideoPlaceholder {
+        attributes {
+          layoutType
+          showFilterBar
+          itemsPerPage
+          videoTitle
+          videoDescription
+          categorySlug
+          tagFilter
+          maxItems
+        }
+    }
+`;
+
+import { getVariantClass, resolveImageUrl, getEmbedUrl } from '../../lib/utils.ts';
+const { data } = Astro.props;
+
+const videoEmbedUrl = getEmbedUrl(data?.embedLink || "");
+const videoCoverImage = resolveImageUrl(data?.videoCoverImage);
+---
+  {data?.embedLink && (
+    <section class="max-w-[1440px] mx-auto px-12 pb-24">
+      <div class="relative w-full aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black">
+        {/* If using an embed iframe */}
+        <iframe
+          src={videoEmbedUrl}
+          title={data.videoTitle || "Featured Video"}
+          class="w-full h-full border-0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+    </section>
+  )}

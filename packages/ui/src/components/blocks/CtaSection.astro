@@ -1,0 +1,305 @@
+---
+export const PageCtaSectionFragment = `
+  ... on AnotherstepPageCtaSection {
+    attributes {
+      ctaTitle
+      ctaDescription
+      ctaStyle
+      btn1Text
+      btn1Url
+      btn1Style
+      btn2Text
+      btn2Url
+      hasSteps
+      step1Text
+      step2Text
+      step3Text
+      hasCard
+      cardTitle
+      cardDescription
+      cardBtnText
+      cardBtnUrl
+      hasStats
+      stat1Number
+      stat1Label
+      stat2Number
+      stat2Label
+    }
+  }
+`
+
+interface Props {
+  ctaTitle?: string;
+  ctaDescription?: string;
+  ctaStyle?: "centered" | "split-steps" | "banner" | string;
+  btn1Text?: string;
+  btn1Url?: string;
+  btn1Style?: "yellow" | "red" | "white" | string;
+  btn2Text?: string;
+  btn2Url?: string;
+  hasSteps?: boolean;
+  step1Text?: string;
+  step2Text?: string;
+  step3Text?: string;
+  hasCard?: boolean;
+  cardTitle?: string;
+  cardDescription?: string;
+  cardBtnText?: string;
+  cardBtnUrl?: string;
+  hasStats?: boolean;
+  stat1Number?: string;
+  stat1Label?: string;
+  stat2Number?: string;
+  stat2Label?: string;
+  attributes?: Record<string, any>;
+}
+
+const props = Astro.props;
+
+// Support both flat GraphQL props or nested attributes object from BlockResolver
+const attrs = props.attributes || props;
+
+const ctaTitle = attrs.ctaTitle || "";
+const ctaDescription = attrs.ctaDescription || "";
+const ctaStyle = attrs.ctaStyle || "centered";
+
+const btn1Text = attrs.btn1Text || "";
+const btn1Url = attrs.btn1Url || "#";
+const btn1Style = attrs.btn1Style || "yellow";
+
+const btn2Text = attrs.btn2Text || "";
+const btn2Url = attrs.btn2Url || "#";
+
+const hasSteps = Boolean(attrs.hasSteps);
+const step1Text = attrs.step1Text || "Initial Consultation & Assessment";
+const step2Text = attrs.step2Text || "Personalized Action Plan";
+const step3Text = attrs.step3Text || "Daily Mentorship & Real-World Practice";
+
+const hasCard = Boolean(attrs.hasCard);
+const cardTitle = attrs.cardTitle || "Need Immediate Support?";
+const cardDescription = attrs.cardDescription || "Our team is ready to help you navigate the next step of your journey today.";
+const cardBtnText = attrs.cardBtnText || "Book a Discovery Call";
+const cardBtnUrl = attrs.cardBtnUrl || "#";
+
+const hasStats = Boolean(attrs.hasStats);
+const stat1Number = attrs.stat1Number || "500+";
+const stat1Label = attrs.stat1Label || "Monthly Outings";
+const stat2Number = attrs.stat2Number || "95%";
+const stat2Label = attrs.stat2Label || "Goal Completion";
+
+// Resolve primary button theme classes
+const getBtn1Classes = (styleKey: string) => {
+  if (styleKey === "red") {
+    return "bg-brand-red text-on-brand-red hover:shadow-lg active:scale-95";
+  }
+  if (styleKey === "white") {
+    return "bg-white text-brand-blue hover:bg-surface-container-high shadow-sm";
+  }
+  // Default to yellow
+  return "bg-brand-yellow text-on-tertiary-fixed shadow-lg hover:scale-105";
+};
+
+const btn1Class = getBtn1Classes(btn1Style);
+const isFullWidth = ctaStyle === "full-width" || ctaStyle === "banner";
+---
+
+{ctaStyle === "split-steps" ? (
+  /* Split Steps Layout (Services Page) */
+  <section class="bg-brand-blue text-on-brand-blue max-w-7xl mx-auto rounded-[3rem] p-12 md:p-20 not-prose">
+    <div class="relative z-10 grid md:grid-cols-2 gap-16 items-center">
+      <div>
+        {ctaTitle && (
+          <h2 class="text-[2.5rem] font-black mb-8 leading-tight">
+            {ctaTitle}
+          </h2>
+        )}
+
+        {ctaDescription && (
+          <p class="text-lg opacity-90 leading-relaxed">
+            {ctaDescription}
+          </p>
+        )}
+        
+        {hasSteps && (
+          <div class="mt-12 space-y-6">
+            {step1Text && (
+              <div class="flex items-center gap-6">
+                <div
+                  class="w-16 h-16 bg-brand-yellow text-on-tertiary-fixed rounded-2xl flex items-center justify-center font-black text-2xl"
+                >
+                  01
+                </div>
+                <span class="text-xl font-bold">{step1Text}</span>
+              </div>
+            )}
+            {step2Text && (
+              <div class="flex items-center gap-6">
+                <div
+                  class="w-16 h-16 bg-brand-blue-fixed text-on-brand-blue-fixed rounded-2xl flex items-center justify-center font-black text-2xl"
+                >
+                  02
+                </div>
+                <span class="text-xl font-bold">{step2Text}</span>
+              </div>
+            )}
+            {step3Text && (
+              <div class="flex items-center gap-6">
+                <div
+                  class="w-16 h-16 bg-brand-red-fixed text-on-brand-red-fixed rounded-2xl flex items-center justify-center font-black text-2xl"
+                >
+                  03
+                </div>
+                <span class="text-xl font-bold">{step3Text}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div class="space-y-6">
+          {btn1Text && (
+            <a
+              href={btn1Url}
+              class={`rounded-full px-8 py-4 font-black text-lg active:scale-95 transition-all ${btn1Class}`}
+            >
+              {btn1Text}
+            </a>
+          )}
+
+          {btn2Text && (
+            <a
+              href={btn2Url}
+              class="bg-white/10 border border-white/20 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/20 transition-all"
+            >
+              {btn2Text}
+            </a>
+          )}
+        </div>
+      </div>
+
+        {hasCard && (
+            <div
+            class="bg-surface-container-lowest/10 backdrop-blur-xl p-10 rounded-[2rem] border border-white/10"
+            >
+            {cardTitle && (
+                <h4 class="text-2xl font-black mb-6">{cardTitle}</h4>
+            )}
+    
+            {cardDescription && (
+                <p class="text-lg opacity-90 mb-8">
+                {cardDescription}
+                </p>
+            )}
+    
+            {cardBtnText && (
+                <a
+                href={cardBtnUrl}
+                class="w-full bg-on-primary text-brand-blue py-5 rounded-full text-xl font-black hover:bg-brand-blue-fixed transition-colors block text-center"
+                >
+                {cardBtnText}
+                </a>
+            )}
+            </div>
+        )}
+    </div>
+  </section>
+) : isFullWidth ? (
+  /* Edge-to-Edge Full-Width Layout (Contact Us & Gallery) */
+  <section class="bg-brand-blue text-on-brand-blue py-24 relative overflow-hidden w-screen relative left-1/2 -translate-x-1/2 not-prose">
+    <div class="absolute -top-24 -right-24 w-96 h-96 bg-brand-blue-container rounded-full opacity-20 pointer-events-none"></div>
+    <div class={`max-w-[1440px] mx-auto px-8 md:px-12 relative z-10 ${hasStats ? 'grid md:grid-cols-2 gap-16 items-center' : 'text-center max-w-4xl'}`}>
+      <div class={!hasStats ? "mx-auto space-y-6" : ""}>
+        {ctaTitle && (
+          <h2 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
+            {ctaTitle}
+          </h2>
+        )}
+
+        {ctaDescription && (
+          <p class="text-xl opacity-90 leading-relaxed mb-8">
+            {ctaDescription}
+          </p>
+        )}
+
+        <div class={`flex flex-wrap gap-4 ${!hasStats ? 'justify-center' : ''}`}>
+          {btn1Text && (
+            <a
+              href={btn1Url}
+              class={`rounded-full px-8 py-4 font-black text-lg active:scale-95 transition-all ${btn1Class}`}
+            >
+              {btn1Text}
+            </a>
+          )}
+
+          {btn2Text && (
+            <a
+              href={btn2Url}
+              class="bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full px-8 py-4 font-bold text-lg hover:bg-white/20 transition-colors"
+            >
+              {btn2Text}
+            </a>
+          )}
+        </div>
+      </div>
+
+      {hasStats && (
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-surface-container-lowest/10 backdrop-blur p-8 rounded-2xl border border-white/10 text-center">
+            <div class="text-5xl font-black text-brand-yellow mb-2">
+              {stat1Number}
+            </div>
+            <div class="text-sm uppercase tracking-widest font-bold opacity-90">
+              {stat1Label}
+            </div>
+          </div>
+          <div class="bg-surface-container-lowest/10 backdrop-blur p-8 rounded-2xl border border-white/10 text-center translate-y-8">
+            <div class="text-5xl font-black text-brand-red-fixed mb-2">
+              {stat2Number}
+            </div>
+            <div class="text-sm uppercase tracking-widest font-bold opacity-90">
+              {stat2Label}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+) : (
+  /* Centered Rounded Box CTA Style */
+  <section class="max-w-7xl mx-auto px-8 py-20 not-prose">
+    <div class="bg-brand-blue rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden">
+      <div class="relative z-10 space-y-8">
+        {ctaTitle && (
+          <h2 class="text-4xl md:text-6xl font-black text-white leading-tight">
+            {ctaTitle}
+          </h2>
+        )}
+
+        {ctaDescription && (
+          <p class="text-xl md:text-2xl text-on-blue-container max-w-2xl mx-auto opacity-90">
+            {ctaDescription}
+          </p>
+        )}
+
+        <div class="flex flex-col sm:flex-row gap-6 justify-center pt-6">
+          {btn1Text && (
+            <a
+              href={btn1Url}
+              class={`px-10 py-5 rounded-full font-black text-xl transition-all ${btn1Class}`}
+            >
+              {btn1Text}
+            </a>
+          )}
+
+          {btn2Text && (
+            <a
+              href={btn2Url}
+              class="bg-white text-brand-blue px-10 py-5 rounded-full font-black text-xl shadow-sm hover:bg-surface-container-high transition-all"
+            >
+              {btn2Text}
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  </section>
+)}
