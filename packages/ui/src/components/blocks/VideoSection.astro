@@ -1,19 +1,4 @@
 ---
-export const VideoSectionFragment = `
-    ... on AnotherstepVideoPlaceholder {
-        attributes {
-          layoutType
-          showFilterBar
-          itemsPerPage
-          videoTitle
-          videoDescription
-          categorySlug
-          tagFilter
-          maxItems
-        }
-    }
-`;
-
 import { getVariantClass, resolveImageUrl, getEmbedUrl } from '../../lib/utils.ts';
 const { data } = Astro.props;
 

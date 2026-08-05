@@ -1,0 +1,102 @@
+---
+interface Props {
+    title?: string;
+    hasUnderline?: boolean;
+    headline?: string;
+    backgroundColor?: string;
+    card1Icon?: string;
+    card1IconColor?: string;
+    card1Title?: string;
+    card1Text?: string;
+    card2Icon?: string;
+    card2IconColor?: string;
+    card2Title?: string;
+    card2Text?: string;
+
+    innerBlocks?: { name: string; renderedHtml: string }[];
+}
+
+const { title, hasUnderline, headline, backgroundColor, card1Icon, card1IconColor, card1Title, card1Text, card2Icon, card2IconColor, card2Title, card2Text, innerBlocks } = Astro.props;
+
+const cleanHtml = (htmlString: string = "") => {
+    return htmlString
+        .replace(/<blockquote\b[^>]*>(.*?)<\/blockquote>/gis, '$1')
+        .replace(/<p\b[^>]*>(.*?)<\/p>/gis, '$1')
+        .trim();
+}
+---
+<section class=`${backgroundColor} py-24`>
+    <div class="max-w-7xl mx-auto px-8">
+      <div class="flex flex-col md:flex-row gap-12 items-start">
+        <div class="md:w-1/3">
+            {title && (
+            <h2
+                class="text-3xl font-black text-brand-blue uppercase tracking-widest mb-4"
+            >
+                {title}
+            </h2>                
+            )}
+
+            {hasUnderline && <div class="h-2 w-24 bg-brand-dark-yellow rounded-full"></div>}
+        </div>
+        <div class="md:w-2/3">
+            <div class="space-y-8 mb-12">
+                {headline ? (
+                <p class="text-3xl font-black text-brand-blue leading-tight">
+                    {headline}
+                </p>                    
+                ) : null}
+
+                {innerBlocks && innerBlocks.length > 0 ? (
+                <div class="prose prose-lg space-y-4">
+                    {innerBlocks.map((child: any) => {
+                        const isQuote = child.name === 'core/quote' || child.name === 'core/pullquote';
+                        const rawContent = child.renderedHtml
+                        const strippedContent = cleanHtml(rawContent)
+                    if(isQuote){
+                        return (
+                            <div class="pullquote border-l-4 border-brand-yellow pl-6 space-y-4">
+                                <p 
+                                class="text-lg text-on-surface-variant leading-relaxed font-medium" 
+                                set:html={strippedContent} 
+                                />
+                            </div>
+                        )
+                    }
+                    
+                    return <p class="text-lg text-on-surface-variant" set:html={strippedContent} />;
+                    })}
+                </div>
+                ) : null}
+            </div>
+
+          {(card1Title || card2Title) && (
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {card1Title && (
+                <div class="bg-white p-8 rounded-2xl flex flex-col gap-4 shadow-sm">
+                    {card1Icon && (
+                    <span class={`material-symbols-outlined text-${card1IconColor} text-4xl`} data-icon={card1Icon}>
+                        {card1Icon}
+                    </span>
+                    )}
+                    <h3 class={`text-xl font-bold text-${card1IconColor}`}>{card1Title}</h3>
+                    {card1Text && <p class="text-on-surface-variant">{card1Text}</p>}
+                </div>
+                )}
+                {card2Title && (
+                <div class="bg-white p-8 rounded-2xl flex flex-col gap-4 shadow-sm">
+                    {card2Icon && (
+                    <span class={`material-symbols-outlined text-${card2IconColor} text-4xl`} data-icon={card2Icon}>
+                        {card2Icon}
+                    </span>
+                    )}
+                    <h3 class={`text-xl font-bold text-${card2IconColor}`}>{card2Title}</h3>
+                    {card2Text && <p class="text-on-surface-variant">{card2Text}</p>}
+                </div>
+                )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+</section>

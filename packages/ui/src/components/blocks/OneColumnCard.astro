@@ -1,19 +1,5 @@
 ---
 // src/components/blocks/OneColumnCard.astro
-export const HomepageEthicsSectionFragment = `
-  ... on AnotherstepHomepageEthicsSection {
-    attributes {
-      ethicsHeadline
-      ethicsLinkText
-      ethicsLinkUrl
-    }
-    innerBlocks {
-      name
-      renderedHtml
-    }
-  }
-`;
-
 interface Props {
   headline?: string;
   ethicsLinkText?: string;

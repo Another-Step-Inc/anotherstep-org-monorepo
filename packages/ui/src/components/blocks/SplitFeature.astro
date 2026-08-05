@@ -1,29 +1,4 @@
 ---
-export const SplitFeatureFragment = `
-  ... on AnotherstepSplitFeatureSection {
-    attributes {
-      splitTitle
-      splitDescription
-      imageAlignment
-      backgroundColor
-      eyebrowText
-      underlineAccent
-      mediaId
-      mediaUrl
-      mediaAlt
-      secondaryMediaUrl
-      metricNumber
-      metricLabel
-      iconName
-      iconTitle
-    }
-    innerBlocks {
-      name
-      renderedHtml
-    }
-  }
-`;
-
 interface Props {
     splitTitle: string;
     splitDescription: string;

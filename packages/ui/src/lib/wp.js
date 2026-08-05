@@ -1,13 +1,17 @@
-import { PageHeroFragment } from '../components/blocks/Hero.astro'
-import { SplitFeatureFragment } from '../components/blocks/SplitFeature.astro';
-import { CustomGridSectionFragment } from '../components/blocks/CustomGridSection.astro';
-import { CtaContactCardSectionFragment } from '../components/blocks/CtaContactCardSection.astro';
-import { PageCtaSectionFragment } from '../components/blocks/CtaSection.astro';
-import { HomepageEthicsSectionFragment } from '../components/blocks/OneColumnCard.astro';
-import { TwoColumnCardSectionFragment } from '../components/blocks/TwoColumnCardSection.astro';
-import { DynamicInfoSectionFragment } from '../components/blocks/TwoColumnsBorderTop.astro';
-import { VideoSectionFragment } from '../components/blocks/VideoSection.astro';
-import { GallerySectionFragment } from '../components/blocks/GallerySection.astro';
+import { 
+    PageHeroFragment, 
+    SplitFeatureFragment, 
+    CustomGridSectionFragment, 
+    CtaContactCardSectionFragment, 
+    HomepageEthicsSectionFragment,
+    PageCtaSectionFragment,
+    TwoColumnCardSectionFragment,
+    DynamicInfoSectionFragment,
+    VideoSectionFragment,
+    GallerySectionFragment,
+    SplitNarrativeFragment,
+    BentoGridSectionFragment,
+} from '../lib/fragments.js';
 
 const WP_URL = import.meta.env.PUBLIC_WORDPRESS_API_URL;
 
@@ -19,7 +23,9 @@ export const EDITOR_BLOCKS_FRAGMENT = `
         ${PageHeroFragment}
         ${HomepageEthicsSectionFragment}
         ${SplitFeatureFragment}
+        ${SplitNarrativeFragment}
         ${CustomGridSectionFragment}
+        ${BentoGridSectionFragment}
         ${CtaContactCardSectionFragment}
         ${PageCtaSectionFragment}
         ${TwoColumnCardSectionFragment}

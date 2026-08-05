@@ -1,24 +1,4 @@
 ---
-export const TwoColumnCardSectionFragment = `
-  ... on AnotherstepTwoColumnCardSection {
-    attributes{
-      aboutHeadline
-      aboutSubHeadline
-      aboutImpactHeadline
-      aboutImpactTitle1
-      aboutImpactParagraph1
-      aboutImpactIcon1
-      aboutImpactTitle2
-      aboutImpactParagraph2
-      aboutImpactIcon2
-    }
-    innerBlocks {
-      name
-      renderedHtml
-    }
-  }
-`
-
 interface Props {
     aboutHeadline?: string;
     aboutSubHeadline?: string;
@@ -88,7 +68,7 @@ const iconClass2 = getIconClass(aboutImpactIcon2, "fa-solid fa-house");
             {innerBlocks.map((child: any) => {
               const cleanedContent = child.renderedHtml || child.attributes?.value;
               const strippedContent = cleanedContent.replace(/<p\b[^>]*>(.*?)<\/p>/gis, '$1'); // Strip <p> tags if present
-              return <p class="text-lg text-slate-700" set:html={strippedContent} />;
+              return <p class="text-lg text-on-surface-variant" set:html={strippedContent} />;
             })}
           </div>
         ) : null}

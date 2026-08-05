@@ -1,19 +1,4 @@
 ---
-export const GallerySectionFragment = `
-    ... on AnotherstepGalleryPlaceholder {
-        attributes {
-          layoutType
-          showFilterBar
-          itemsPerPage
-          galleryTitle
-          galleryDescription
-          categorySlug
-          tagFilter
-          maxItems
-        }
-    }
-`;
-
 import { getVariantClass, resolveImageUrl } from '../../lib/utils.ts';
 const { data } = Astro.props;
 ---

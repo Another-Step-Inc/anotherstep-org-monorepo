@@ -1,33 +1,4 @@
 ---
-export const DynamicInfoSectionFragment = `
-  ... on AnotherstepDynamicInfoSection {
-    attributes {
-      layoutType
-      showSecondarySection
-      primaryTitle
-      primaryDescription
-      primaryFieldLabel1
-      primaryFieldValue1
-      primaryFieldLabel2
-      primaryFieldValue2
-      primaryFieldLabel3
-      primaryFieldValue3
-      primaryFieldLabel4
-      primaryFieldValue4
-      primaryFieldLabel5
-      primaryFieldValue5
-      primaryFieldLabel6
-      primaryFieldValue6
-      primaryFieldLabel7
-      primaryFieldValue7
-      secondaryTitle
-      secondaryDescription
-      secondaryFieldLabel1
-      secondaryFieldValue1
-    }
-  }
-`;
-
 interface Props {
     layoutType?: 'two-column' | 'stacked';
     showSecondarySection?: boolean;

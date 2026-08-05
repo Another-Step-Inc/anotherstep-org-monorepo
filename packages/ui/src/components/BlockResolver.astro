@@ -10,7 +10,10 @@ import TwoColumnsBorderTop from './blocks/TwoColumnsBorderTop.astro';
 import ThreeColumns from './blocks/ThreeColumns.astro';
 import OneColumnCard from './blocks/OneColumnCard.astro';
 import SplitFeature from './blocks/SplitFeature.astro';
+import SplitNarrative from './blocks/SplitNarrative.astro';
 import CustomGridSection from './blocks/CustomGridSection.astro';
+import BentoGridSection from './blocks/BentoGridSection.astro';
+import BentoCard from './blocks/BentoCard.astro';
 import CtaContactCardSection from './blocks/CtaContactCardSection.astro';
 import CtaSection from './blocks/CtaSection.astro';
 
@@ -19,17 +22,42 @@ import { VALUES_ARCHIVE_QUERY } from "../lib/queries";
 
 const { blocks = [], galleryData, videoData } = Astro.props;
 
-// 1. Collect all clientIds or names of blocks that are nested inside ANY parent block
-const nestedBlockIds = new Set(
-    blocks
-        .filter((b: any) => b.innerBlocks && b.innerBlocks.length > 0)
-        .flatMap((b: any) => b.innerBlocks.map((child: any) => child.clientId || child.renderedHtml))
-);
+const resolveInnerBlocks = (innerBlocks: any[] = []) => {
+    return innerBlocks.map((child: any) => {
+        let childAttrs = child.attributes || {};
+        if (child.attributesJSON) {
+            try {
+                childAttrs = { ...childAttrs, ...JSON.parse(child.attributesJSON) };
+            } catch (e) {
+                console.error("Failed to parse inner block JSON", e);
+            }
+        }
+        return {
+            ...child,
+            attributes: childAttrs
+        };
+    });
+};
+
+// 1. Collect ALL clientIds recursively to prevent duplicate root rendering
+const getNestedIds = (blockList: any[]) => {
+    let ids: string[] = [];
+    blockList.forEach(b => {
+        if (b.innerBlocks?.length) {
+            b.innerBlocks.forEach((child: any) => {
+                ids.push(child.clientId || child.renderedHtml);
+                ids = ids.concat(getNestedIds([child])); // Deep search
+            });
+        }
+    });
+    return ids;
+};
+const nestedBlockIds = new Set(getNestedIds(blocks));
 
 // 2. Filter the root blocks array
 const uniqueBlocks = blocks.filter((block: any) => {
     // Skip standalone child cards because CustomGridSection handles them
-    if (block.name === 'anotherstep/custom-grid-card') {
+    if (block.name === 'anotherstep/custom-grid-card' || block.name === 'anotherstep/bento-card') {
         return false;
     }
 
@@ -56,7 +84,7 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
 
 {uniqueBlocks.map((block: any) => {
     if (!block) return null;
-    if (block.name === 'anotherstep/custom-grid-card') return false;
+    if (block.name === 'anotherstep/custom-grid-card' || block.name === 'anotherstep/bento-card') return false;
 
     let attrs;
 
@@ -118,6 +146,9 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
         }
         case 'anotherstep/two-column-card-section':
             attrs = block.attributes || {};
+
+            const resolvedCustomInnerBlocks = resolveInnerBlocks(block.innerBlocks);
+
             return <TwoColumnCardSection 
                 aboutHeadline={attrs.aboutHeadline}
                 aboutSubHeadline={attrs.aboutSubHeadline}
@@ -128,7 +159,7 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
                 aboutImpactTitle2={attrs.aboutImpactTitle2}
                 aboutImpactParagraph2={attrs.aboutImpactParagraph2}
                 aboutImpactIcon2={attrs.aboutImpactIcon2}
-                innerBlocks={block.innerBlocks}
+                innerBlocks={resolvedCustomInnerBlocks}
             />
 
         case 'anotherstep/custom-grid-section':
@@ -158,7 +189,63 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
                 innerBlocks={resolvedInnerBlocks} 
                 dynamicCards={dynamicCardsData}
             />
-        
+
+        case 'anotherstep/bento-grid-section': {
+            attrs = block.attributes || {};
+            
+            // Parse JSON attributes if attributes object is empty
+            if (block.attributesJSON && typeof block.attributesJSON === 'string') {
+                try {
+                    attrs = { ...attrs, ...JSON.parse(block.attributesJSON) };
+                } catch (e) {
+                    console.error('Error parsing BentoGridSection attributesJSON', e);
+                }
+            }
+
+            const cards = block.innerBlocks || [];
+
+            return (
+                <BentoGridSection
+                    title={attrs.title}
+                    subtitle={attrs.subtitle}
+                    hasUnderline={attrs.hasUnderline}
+                    underlineColor={attrs.underlineColor}
+                    backgroundColor={attrs.backgroundColor}
+                    columns={Number(attrs.columns) || 3}
+                >
+                    {cards.map((childBlock: any) => {
+                        let childAttrs = childBlock.attributes || {};
+                        
+                        if (childBlock.attributesJSON && typeof childBlock.attributesJSON === 'string') {
+                            try {
+                                childAttrs = { ...childAttrs, ...JSON.parse(childBlock.attributesJSON) };
+                            } catch (e) {
+                                console.error('Error parsing BentoCard attributesJSON', e);
+                            }
+                        }
+
+                        const subInnerBlocks = childBlock.innerBlocks || [];
+
+                        return (
+                            <BentoCard
+                                colSpan={childAttrs.colSpan}
+                                cardBgStyle={childAttrs.cardBgStyle}
+                                textColor={childAttrs.textColor}
+                                icon={childAttrs.icon}
+                                iconColor={childAttrs.iconColor}
+                                title={childAttrs.title}
+                                description={childAttrs.description}
+                            >
+                                {subInnerBlocks.length > 0 && subInnerBlocks.map((subBlock: any) => (
+                                    subBlock.renderedHtml && <Fragment set:html={subBlock.renderedHtml} />
+                                ))}
+                            </BentoCard>
+                        );
+                    })}
+                </BentoGridSection>
+            );
+        }
+
         case 'anotherstep/homepage-ethics-section':
             attrs = block.attributes || {};
             return (
@@ -209,6 +296,27 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
                     iconTitle={attrs.iconTitle}
                     splitTitle={attrs.splitTitle}
                     splitDescription={attrs.splitDescription}
+                    innerBlocks={block.innerBlocks || []}
+                />
+            );
+
+        case 'anotherstep/split-narrative-section':
+            // Parse block attributes out of JSON string
+            attrs = block.attributes || {};
+            return (
+                <SplitNarrative
+                    title={attrs.title}
+                    hasUnderline={attrs.hasUnderline}
+                    headline={attrs.headline}
+                    backgroundColor={attrs.backgroundColor}
+                    card1Icon={attrs.card1Icon}
+                    card1IconColor={attrs.card1IconColor}
+                    card1Title={attrs.card1Title}
+                    card1Text={attrs.card1Text}
+                    card2Icon={attrs.card2Icon}
+                    card2IconColor={attrs.card2IconColor}
+                    card2Title={attrs.card2Title}
+                    card2Text={attrs.card2Text}
                     innerBlocks={block.innerBlocks || []}
                 />
             );

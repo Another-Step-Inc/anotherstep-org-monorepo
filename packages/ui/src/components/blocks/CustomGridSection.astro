@@ -1,32 +1,5 @@
 ---
 // src/components/CustomGridSection.astro
-export const CustomGridSectionFragment = `
-  ... on AnotherstepCustomGridSection {
-    attributes {
-      headline
-      description
-      bgStyle
-      textAlignment
-      styleVariant
-      useQuery
-      postType
-      postsPerPage
-    }
-    innerBlocks {
-      ... on AnotherstepCustomGridCard {
-        attributes {
-          title
-          content
-          icon
-          theme
-          linkText
-          linkUrl
-        }
-      }
-    }
-  }
-`;
-
 interface CardAttribute {
   title?: string;
   content?: string;
@@ -102,7 +75,7 @@ const cardsToRender = useQuery ? dynamicCards : innerBlocks.map(block => block.a
             )}
             <div class="w-24 h-1 bg-yellow-400 mx-auto rounded-full mb-6"></div>
             {description && (
-              <p class="text-lg text-slate-600 max-w-3xl mx-auto italic">
+              <p class="text-lg text-on-surface-variant max-w-3xl mx-auto italic">
                 "{description}"
               </p>
             )}
@@ -174,7 +147,7 @@ const cardsToRender = useQuery ? dynamicCards : innerBlocks.map(block => block.a
               )}
               {card.content && (
                 <div class="text-on-surface-variant leading-relaxed [&>p]:mb-4 last:[&>p]:mb-0">
-                  <p class="text-lg text-slate-700" set:html={strippedContent} />
+                  <p class="text-lg text-on-surface-variant" set:html={strippedContent} />
                 </div>
               )}
               {card.linkUrl && (
@@ -207,7 +180,7 @@ const cardsToRender = useQuery ? dynamicCards : innerBlocks.map(block => block.a
                   )}
                   {card.content && (
                     <div class="text-on-surface-variant leading-relaxed [&>p]:mb-4 last:[&>p]:mb-0">
-                      <p class="text-lg text-slate-700" set:html={strippedContent} />
+                      <p class="text-lg text-on-surface-variant" set:html={strippedContent} />
                     </div>
                   )}
                   {card.linkUrl && (
@@ -253,7 +226,7 @@ const cardsToRender = useQuery ? dynamicCards : innerBlocks.map(block => block.a
 
               {card.content && (
                 <div class="text-body-lg text-on-surface-variant leading-relaxed [&>p]:mb-4 last:[&>p]:mb-0">
-                  <p class="text-lg text-slate-700" set:html={strippedContent} />
+                  <p class="text-lg text-on-surface-variant" set:html={strippedContent} />
                 </div>
               )}
             </div>
@@ -283,7 +256,7 @@ const cardsToRender = useQuery ? dynamicCards : innerBlocks.map(block => block.a
               
               {card.content && (
                 <div class="text-on-surface-variant leading-relaxed mb-6 text-sm md:text-base [&>p]:mb-4 last:[&>p]:mb-0">
-                  <p class="text-lg text-slate-700" set:html={strippedContent} />
+                  <p class="text-lg text-on-surface-variant" set:html={strippedContent} />
                 </div>
               )}
 
@@ -319,7 +292,7 @@ const cardsToRender = useQuery ? dynamicCards : innerBlocks.map(block => block.a
             
             {card.content && (
               <div class="text-slate-600 leading-relaxed text-sm md:text-base [&>p]:mb-4 last:[&>p]:mb-0">
-                <p class="text-lg text-slate-700" set:html={strippedContent} />
+                <p class="text-lg text-on-surface-variant" set:html={strippedContent} />
               </div>
             )}
           </div>
