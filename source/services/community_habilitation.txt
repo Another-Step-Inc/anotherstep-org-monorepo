@@ -127,3 +127,87 @@
       </div>
     </div>
   </section> -->
+
+    <!-- Training Section: Bento Style -->
+<!--   <section class="py-24 bg-surface-container-low">
+    <div class="max-w-screen-2xl mx-auto px-8">
+      <div class="mb-16">
+        <h2 class="text-[2.5rem] font-bold text-brand-blue mb-4">
+          We provide training to develop and enhance:
+        </h2>
+        <div class="h-2 w-32 bg-brand-dark-red rounded-full"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
+        Self Help
+        <div
+          class="md:col-span-3 bg-surface-container-lowest p-10 rounded-xl shadow-[0_16px_32px_rgba(0,0,0,0.04)] hover:scale-[1.02] transition-transform flex flex-col justify-between"
+        >
+          <div>
+            <span
+              class="material-symbols-outlined text-brand-red text-5xl mb-6"
+              data-weight="fill">accessibility_new</span
+            >
+            <h3 class="text-2xl font-bold mb-4">Self help skills</h3>
+            <p class="text-on-surface-variant">
+              Fostering personal autonomy through daily living mastery and
+              self-care routines tailored to individual needs.
+            </p>
+          </div>
+        </div>
+        Independent Living
+        <div
+          class="md:col-span-3 bg-surface-container-lowest p-10 rounded-xl shadow-[0_16px_32px_rgba(0,0,0,0.04)] hover:scale-[1.02] transition-transform flex flex-col justify-between"
+        >
+          <div>
+            <span
+              class="material-symbols-outlined text-brand-blue text-5xl mb-6"
+              data-weight="fill">home_work</span
+            >
+            <h3 class="text-2xl font-bold mb-4">Independent living skills</h3>
+            <p class="text-on-surface-variant">
+              Building the foundation for a life lived on one's own terms with
+              practical household and management training.
+            </p>
+          </div>
+        </div>
+        Community Integration
+        <div
+          class="md:col-span-2 bg-brand-dark-yellow text-on-brand-color p-10 rounded-xl shadow-lg hover:scale-[1.02] transition-transform"
+        >
+          <span class="material-symbols-outlined text-5xl mb-6">groups</span>
+          <h3 class="text-2xl font-bold mb-4">Community integration</h3>
+          <p class="opacity-90">
+            Meaningful participation in the local neighborhood, connecting with
+            peers and public spaces.
+          </p>
+        </div>
+        Social Skills
+        <div
+          class="md:col-span-2 bg-surface-container-lowest p-10 rounded-xl shadow-[0_16px_32px_rgba(0,0,0,0.04)] hover:scale-[1.02] transition-transform"
+        >
+          <span
+            class="material-symbols-outlined text-brand-blue-container text-5xl mb-6"
+            data-weight="fill">forum</span
+          >
+          <h3 class="text-2xl font-bold mb-4">Social skills</h3>
+          <p class="text-on-surface-variant">
+            Navigating relationships and social environments with confidence and
+            grace.
+          </p>
+        </div>
+        Communication Skills
+        <div
+          class="md:col-span-2 bg-brand-dark-red text-on-brand-red p-10 rounded-xl shadow-lg hover:scale-[1.02] transition-transform"
+        >
+          <span class="material-symbols-outlined text-5xl mb-6"
+            >record_voice_over</span
+          >
+          <h3 class="text-2xl font-bold mb-4">Communication skills</h3>
+          <p class="opacity-90">
+            Developing effective tools for expression and understanding within
+            all spheres of life.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section> -->
