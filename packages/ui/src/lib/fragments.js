@@ -46,6 +46,67 @@ export const PageCtaSectionFragment = `
   }
 `;
 
+export const JourneyForwardSectionFragment = `
+  ... on AnotherstepJourneyForwardSection {
+    attributes {
+      sectionTitle
+      step1Number
+      step1Label
+      step2Number
+      step2Label
+      step3Number
+      step3Label
+    }
+  }
+`;
+
+export const UpcomingEventsFragment = `
+  ... on AnotherstepUpcomingEvents {
+    attributes {
+      sectionTitle
+      sideTitle
+      sideDescription
+      saveTheDateText
+      meetingTitle
+      meetingDescription
+      inPersonTitle
+      inPersonDetails
+      digitalTitle
+      zoomUrl
+      zoomButtonText
+      phoneText
+      phoneDetails
+      meetingId
+    }
+  }
+`;
+
+export const InclusionAndSupportFragment = `
+  ... on AnotherstepInclusionAndSupport {
+    attributes {
+      title
+      resourceTitle
+      resourceDescription
+      helplineTitle
+      helplineNumber
+      helplineDescription
+    }
+    innerBlocks {
+      name
+      renderedHtml
+    }
+  }
+`;
+
+export const ImportantNoticeFragment = `
+  ... on AnotherstepImportantNotice {
+    attributes {
+      heading
+      noticeText
+    }
+  }
+`;
+
 export const CustomGridSectionFragment = `
   ... on AnotherstepCustomGridSection {
     attributes {
@@ -274,6 +335,11 @@ export const BentoGridSectionFragment = `
                     name
                     clientId
                     renderedHtml
+                    innerBlocks {
+                        name
+                        clientId
+                        renderedHtml
+                    }
                 }
             }
         }
