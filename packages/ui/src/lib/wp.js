@@ -4,6 +4,7 @@ import {
     CustomGridSectionFragment, 
     CtaContactCardSectionFragment, 
     HomepageEthicsSectionFragment,
+    JourneyForwardSectionFragment,
     PageCtaSectionFragment,
     TwoColumnCardSectionFragment,
     DynamicInfoSectionFragment,
@@ -11,6 +12,9 @@ import {
     GallerySectionFragment,
     SplitNarrativeFragment,
     BentoGridSectionFragment,
+    ImportantNoticeFragment,
+    InclusionAndSupportFragment,
+    UpcomingEventsFragment
 } from '../lib/fragments.js';
 
 const WP_URL = import.meta.env.PUBLIC_WORDPRESS_API_URL;
@@ -28,6 +32,10 @@ export const EDITOR_BLOCKS_FRAGMENT = `
         ${BentoGridSectionFragment}
         ${CtaContactCardSectionFragment}
         ${PageCtaSectionFragment}
+        ${JourneyForwardSectionFragment}
+        ${UpcomingEventsFragment}
+        ${InclusionAndSupportFragment}
+        ${ImportantNoticeFragment}
         ${TwoColumnCardSectionFragment}
         ${DynamicInfoSectionFragment}
         ${VideoSectionFragment}
