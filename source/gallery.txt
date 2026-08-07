@@ -1,3 +1,72 @@
+  <!-- Hero Section -->
+<!--   <section class="max-w-[1440px] mx-auto px-12 pt-20 pb-12">
+    <div class="max-w-3xl">
+      <h1
+        class="text-[3.5rem] leading-tight font-black text-brand-blue mb-6 font-display"
+      >
+        Community in Action
+      </h1>
+      <p
+        class="text-body-lg text-on-surface leading-relaxed mb-8 border-l-4 border-brand-yellow-fixed pl-6"
+      >
+        At Another Step, we believe that true inclusion happens in the heart of
+        our neighborhoods. Our participants are active contributors to the
+        community, building relationships, developing skills, and discovering
+        their passions through authentic, everyday experiences.
+      </p>
+    </div>
+  </section> -->
+  <!-- Video Section -->
+ <!--  {featuredVideo?.embedLink && (
+    <section class="max-w-[1440px] mx-auto px-12 pb-24">
+      <div class="relative w-full aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black">
+        {/* If using an embed iframe */}
+        <iframe
+          src={videoEmbedUrl}
+          title={featuredVideo.videoTitle || "Featured Video"}
+          class="w-full h-full border-0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+    </section>
+  )} -->
+  <!-- Expanded Photo Grid -->
+  <!-- <section class="max-w-[1440px] mx-auto px-12 pb-24">
+    <h3 class="text-2xl font-bold text-brand-blue mb-8 flex items-center gap-3">
+      <span class="material-symbols-outlined">auto_awesome_motion</span>
+      Stories of Independence
+    </h3>
+    <div class="masonry-grid">
+      {galleryItems.map((item: any) => {
+        const variantClass = getVariantClass(item.sizeVariant);
+
+        const imageUrl = resolveImageUrl(item.image);
+        const altText = item.image?.node?.altText || item.title || "Gallery image";
+
+        return (
+          <div class={`group relative overflow-hidden rounded-2xl bg-surface-container-low transition-all duration-500 hover:shadow-xl ${variantClass}`}>
+            <img
+              src={imageUrl}
+              alt={altText}
+              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-brand-blue/90 via-brand-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+              <div>
+                {item.categoryTag && (
+                  <span class="text-label-md uppercase tracking-wider font-bold mb-1 block opacity-80 text-white">
+                    {item.categoryTag}
+                  </span>
+                )}
+                <span class="text-white font-bold text-lg">{item.title}</span>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </section> -->
+  
   <!-- Impact Section -->
   <!--<section class="bg-brand-blue text-on-brand-blue py-24 relative overflow-hidden">
     Decorative circle
