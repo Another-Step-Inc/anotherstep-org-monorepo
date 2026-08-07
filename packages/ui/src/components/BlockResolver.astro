@@ -6,7 +6,7 @@ import ImageGallery from './blocks/ImageGallery.astro';
 import GallerySection from './blocks/GallerySection.astro';
 import VideoSection from './blocks/VideoSection.astro';
 import TwoColumnCardSection from './blocks/TwoColumnCardSection.astro';
-import TwoColumnsBorderTop from './blocks/TwoColumnsBorderTop.astro';
+import DynamicLegalInfoCard from './blocks/DynamicLegalInfoCard.astro';
 import ThreeColumns from './blocks/ThreeColumns.astro';
 import OneColumnCard from './blocks/OneColumnCard.astro';
 import SplitFeature from './blocks/SplitFeature.astro';
@@ -14,14 +14,62 @@ import SplitNarrative from './blocks/SplitNarrative.astro';
 import CustomGridSection from './blocks/CustomGridSection.astro';
 import BentoGridSection from './blocks/BentoGridSection.astro';
 import BentoCard from './blocks/BentoCard.astro';
+import JourneyForwardSection from './blocks/JourneyForwardSection.astro';
 import CtaContactCardSection from './blocks/CtaContactCardSection.astro';
 import CtaSection from './blocks/CtaSection.astro';
+import ImportantNotice from './blocks/ImportantNotice.astro';
+import InclusionAndSupport from "./blocks/InclusionAndSupport.astro";
+import UpcomingEvents from "./blocks/UpcomingEvents.astro";
 
 import { wpFetch, EDITOR_BLOCKS_FRAGMENT } from '../lib/wp.js';
 import { VALUES_ARCHIVE_QUERY } from "../lib/queries";
 
+// 1. Dynamic Block Component Map for standard blocks
+const STANDARD_BLOCKS: Record<string, any> = {
+    'anotherstep/page-hero-section': Hero,
+    'anotherstep/gallery-placeholder': GallerySection,
+    'anotherstep/video-placeholder': VideoSection,
+    'anotherstep/two-column-card-section': TwoColumnCardSection,
+    'anotherstep/homepage-ethics-section': OneColumnCard,
+    'anotherstep/split-feature-section': SplitFeature,
+    'anotherstep/split-narrative-section': SplitNarrative,
+    'anotherstep/dynamic-info-section': DynamicLegalInfoCard,
+    'anotherstep/cta-contact-card-section': CtaContactCardSection,
+    'anotherstep/page-cta-section': CtaSection,
+    'anotherstep/journey-forward-section': JourneyForwardSection,
+    'anotherstep/important-notice': ImportantNotice,
+    'anotherstep/inclusion-and-support': InclusionAndSupport,
+    'anotherstep/upcoming-events': UpcomingEvents
+};
+
 const { blocks = [], galleryData, videoData } = Astro.props;
 
+// 2. Helper to extract and normalize attributes
+const getBlockProps = (block: any) => {
+    let attrs = block.attributes || {};
+    if (block.attributesJSON && typeof block.attributesJSON === 'string') {
+        try {
+            attrs = { ...attrs, ...JSON.parse(block.attributesJSON) };
+        } catch (e) {
+            console.error(`Error parsing attributesJSON for ${block.name}`, e);
+        }
+    }
+
+    // Remap specific attributes where prop names differ from GraphQL field names
+    return {
+        ...attrs,
+        title: attrs.heroTitle || attrs.title,
+        paragraph: attrs.heroDescription,
+        imageSrc: attrs.heroImageUrl,
+        headline: attrs.ethicsHeadline || attrs.headline,
+        heading: attrs.heading,
+        noticeText: attrs.noticeText,
+        innerBlocks: block.innerBlocks || [],
+        content: block.renderedHtml
+    };
+};
+
+// 3. Helper to resolve inner block attributes safely
 const resolveInnerBlocks = (innerBlocks: any[] = []) => {
     return innerBlocks.map((child: any) => {
         let childAttrs = child.attributes || {};
@@ -39,23 +87,38 @@ const resolveInnerBlocks = (innerBlocks: any[] = []) => {
     });
 };
 
-// 1. Collect ALL clientIds recursively to prevent duplicate root rendering
+// 4. Recursive nested ID collection
 const getNestedIds = (blockList: any[]) => {
     let ids: string[] = [];
     blockList.forEach(b => {
         if (b.innerBlocks?.length) {
             b.innerBlocks.forEach((child: any) => {
-                ids.push(child.clientId || child.renderedHtml);
-                ids = ids.concat(getNestedIds([child])); // Deep search
+                if (child.clientId) ids.push(child.clientId);
+                if (child.renderedHtml) ids.push(child.renderedHtml);
+                
+                // Deep search for sub-inner blocks (e.g. core/button inside core/buttons inside bento-card)
+                ids = ids.concat(getNestedIds([child])); 
             });
         }
     });
     return ids;
 };
+
 const nestedBlockIds = new Set(getNestedIds(blocks));
 
-// 2. Filter the root blocks array
+// 5. Root blocks filter
+const CHILD_BLOCK_TYPES = new Set([
+    'anotherstep/custom-grid-card',
+    'anotherstep/bento-card',
+    'core/list-item',
+    'core/button',
+]);
+
 const uniqueBlocks = blocks.filter((block: any) => {
+    if (CHILD_BLOCK_TYPES.has(block.name)) {
+        return false;
+    }
+
     // Skip standalone child cards because CustomGridSection handles them
     if (block.name === 'anotherstep/custom-grid-card' || block.name === 'anotherstep/bento-card') {
         return false;
@@ -63,15 +126,15 @@ const uniqueBlocks = blocks.filter((block: any) => {
 
     // Skip any block that is already nested inside a parent block
     const identifier = block.clientId || block.renderedHtml;
-    if (nestedBlockIds.has(identifier)) {
+    if (identifier && nestedBlockIds.has(identifier)) {
         return false;
     }
 
     return true;
 });
 
+// 6. Dynamic Values Fetching
 const valuesResponse = await wpFetch(VALUES_ARCHIVE_QUERY);
-
 const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
   ? valuesResponse.values?.nodes?.map((node: any) => ({
       title: node.title || '',
@@ -93,6 +156,9 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
     switch (block.name) {
         case 'core/paragraph':
             attrs = block.attributes || {};
+            if (!attrs.content || !attrs.content.replace(/&nbsp;|<br\s*\/?>|\s/g, '')) {
+                return null;
+            }
             return <p class="text-2xl text-slate-700 leading-relaxed my-4">{attrs.content}</p>;
 
         case 'core/heading':
@@ -213,35 +279,50 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
                     backgroundColor={attrs.backgroundColor}
                     columns={Number(attrs.columns) || 3}
                 >
-                    {cards.map((childBlock: any) => {
-                        let childAttrs = childBlock.attributes || {};
-                        
-                        if (childBlock.attributesJSON && typeof childBlock.attributesJSON === 'string') {
-                            try {
-                                childAttrs = { ...childAttrs, ...JSON.parse(childBlock.attributesJSON) };
-                            } catch (e) {
-                                console.error('Error parsing BentoCard attributesJSON', e);
-                            }
+                {cards.map((childBlock: any) => {
+                    let childAttrs = childBlock.attributes || {};
+                    
+                    if (childBlock.attributesJSON && typeof childBlock.attributesJSON === 'string') {
+                        try {
+                            childAttrs = { ...childAttrs, ...JSON.parse(childBlock.attributesJSON) };
+                        } catch (e) {
+                            console.error('Error parsing BentoCard attributesJSON', e);
                         }
+                    }
 
-                        const subInnerBlocks = childBlock.innerBlocks || [];
+                    const subInnerBlocks = childBlock.innerBlocks || [];
 
-                        return (
-                            <BentoCard
-                                colSpan={childAttrs.colSpan}
-                                cardBgStyle={childAttrs.cardBgStyle}
-                                textColor={childAttrs.textColor}
-                                icon={childAttrs.icon}
-                                iconColor={childAttrs.iconColor}
-                                title={childAttrs.title}
-                                description={childAttrs.description}
-                            >
-                                {subInnerBlocks.length > 0 && subInnerBlocks.map((subBlock: any) => (
-                                    subBlock.renderedHtml && <Fragment set:html={subBlock.renderedHtml} />
-                                ))}
-                            </BentoCard>
-                        );
-                    })}
+                    return (
+                        <BentoCard
+                            colSpan={childAttrs.colSpan}
+                            cardBgStyle={childAttrs.cardBgStyle}
+                            textColor={childAttrs.textColor}
+                            icon={childAttrs.icon}
+                            iconColor={childAttrs.iconColor}
+                            title={childAttrs.title}
+                            description={childAttrs.description}
+                        >
+                            {subInnerBlocks.length > 0 && subInnerBlocks.map((subBlock: any) => {
+                                if (!subBlock.renderedHtml) return null;
+
+                                let html = subBlock.renderedHtml;
+
+                                // 1. Remove rogue <br> tags at the start of <li> tags
+                                html = html.replace(/<li>\s*<br\s*\/?>/gi, '<li>');
+
+                                // 2. Target checkmark lists and inject Material Symbol icons directly into <li> elements
+                                if (html.includes('is-style-checkmark-list')) {
+                                    html = html.replace(
+                                        /<li([^>]*)>/gi, 
+                                        `<li$1 class="flex items-start gap-3"><span class="material-symbols-outlined text-tertiary-fixed shrink-0" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span> <span>`
+                                    ).replace(/<\/li>/gi, '</span></li>');
+                                }
+
+                                return <Fragment set:html={html} />;
+                            })}
+                        </BentoCard>
+                    );
+                })}
                 </BentoGridSection>
             );
         }
@@ -260,7 +341,7 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
         case 'anotherstep/dynamic-info-section':
             attrs = block.attributes || {};
             return (
-                <TwoColumnsBorderTop 
+                <DynamicLegalInfoCard 
                     primaryTitle={attrs.primaryTitle}
                     primaryDescription={attrs.primaryDescription}
                     primaryFieldValue1={attrs.primaryFieldValue1}
@@ -340,6 +421,100 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
                 />
             );
 
+        case 'anotherstep/important-notice':
+            attrs = block.attributes || {};
+            
+            // Safe JSON attribute fallback parsing
+            if (block.attributesJSON && typeof block.attributesJSON === 'string') {
+                try {
+                    attrs = { ...attrs, ...JSON.parse(block.attributesJSON) };
+                } catch (e) {
+                    console.error('Error parsing ImportantNotice attributesJSON', e);
+                }
+            }
+
+            return (
+                <ImportantNotice 
+                    heading={attrs.heading}
+                    noticeText={attrs.noticeText}
+                />
+            );
+
+        case 'anotherstep/inclusion-and-support':
+            attrs = block.attributes || {};
+            
+            // Safe JSON attribute fallback parsing (matching your codebase pattern)
+            if (block.attributesJSON && typeof block.attributesJSON === 'string') {
+                try {
+                    attrs = { ...attrs, ...JSON.parse(block.attributesJSON) };
+                } catch (e) {
+                    console.error('Error parsing InclusionAndSupport attributesJSON', e);
+                }
+            }
+
+            return (
+                <InclusionAndSupport 
+                    title={attrs.title}
+                    resourceTitle={attrs.resourceTitle}
+                    resourceDescription={attrs.resourceDescription}
+                    helplineTitle={attrs.helplineTitle}
+                    helplineNumber={attrs.helplineNumber}
+                    helplineDescription={attrs.helplineDescription}
+                    innerBlocks={block.innerBlocks || []}
+                />
+            );
+
+        case 'anotherstep/upcoming-events':
+            attrs = block.attributes || {};
+
+            if (block.attributesJSON && typeof block.attributesJSON === 'string') {
+                try {
+                    attrs = { ...attrs, ...JSON.parse(block.attributesJSON) };
+                } catch (e) {
+                    console.error('Error parsing UpcomingEvents attributesJSON', e);
+                }
+            }
+
+            return (
+                <UpcomingEvents 
+                    sectionTitle={attrs.sectionTitle}
+                    sideTitle={attrs.sideTitle}
+                    sideDescription={attrs.sideDescription}
+                    saveTheDateText={attrs.saveTheDateText}
+                    meetingTitle={attrs.meetingTitle}
+                    meetingDescription={attrs.meetingDescription}
+                    inPersonTitle={attrs.inPersonTitle}
+                    inPersonDetails={attrs.inPersonDetails}
+                    digitalTitle={attrs.digitalTitle}
+                    zoomUrl={attrs.zoomUrl}
+                    zoomButtonText={attrs.zoomButtonText}
+                    phoneText={attrs.phoneText}
+                    phoneDetails={attrs.phoneDetails}
+                    meetingId={attrs.meetingId}
+                />
+            );
+
+        case 'anotherstep/journey-forward-section':
+            attrs = block.attributes || {};
+            if (block.attributesJSON && typeof block.attributesJSON === 'string') {
+                try {
+                    attrs = { ...attrs, ...JSON.parse(block.attributesJSON) };
+                } catch (e) {
+                    console.error('Error parsing JourneyForwardSection attributesJSON', e);
+                }
+            }
+            return (
+                <JourneyForwardSection 
+                    sectionTitle={attrs.sectionTitle}
+                    step1Number={attrs.step1Number}
+                    step1Label={attrs.step1Label}
+                    step2Number={attrs.step2Number}
+                    step2Label={attrs.step2Label}
+                    step3Number={attrs.step3Number}
+                    step3Label={attrs.step3Label}
+                />
+            );
+
         case 'anotherstep/page-cta-section':
             attrs = block.attributes || {};
             return (
@@ -368,8 +543,14 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
                     stat2Label={attrs.stat2Label}
                 />
             );
+        
         default:
-            // Fallback for blocks there are no components built yet
+            if (CHILD_BLOCK_TYPES.has(block.name) || block.name === 'core/freeform') {
+                return null;
+            }
+
+            if (!block.renderedHtml) return null;
+
             return <div class="wp-block-fallback"set:html={block.renderedHtml} />;
     }
 })}
