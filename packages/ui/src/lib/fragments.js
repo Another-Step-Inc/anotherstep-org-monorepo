@@ -345,3 +345,53 @@ export const BentoGridSectionFragment = `
         }
     }
 `;
+
+export const ContactInfoCardFragment = `
+  ... on AnotherstepContactInfoCard {
+    attributes {
+      cardType
+      title
+      subtitle
+      value
+      href
+    }
+  }
+`;
+
+export const HoursCardFragment = `
+  ... on AnotherstepContactHoursCard {
+    attributes {
+      title
+      weekdayHours
+      saturdayHours
+      sundayHours
+    }
+  }
+`;
+
+export const ContactFormFragment = `
+  ... on AnotherstepContactForm {
+    attributes {
+      title
+      subtitle
+      buttonText
+      endpointUrl
+    }
+  }
+`;
+
+export const ContactGridFragment = `
+  ... on AnotherstepContactGrid {
+    attributes {
+      layout
+    }
+    innerBlocks {
+      name
+      clientId
+      renderedHtml
+      ${ContactInfoCardFragment}
+      ${HoursCardFragment}
+      ${ContactFormFragment}
+    }
+  }
+`;

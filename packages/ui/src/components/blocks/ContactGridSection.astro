@@ -1,0 +1,143 @@
+---
+// src/components/blocks/ContactGridSection.astro
+import BlockResolver from '../BlockResolver.astro';
+
+const { innerBlocks = [] } = Astro.props;
+
+// Process and resolve attributes for inner child blocks
+const resolvedInnerBlocks = innerBlocks.map((child: any) => {
+  let attrs = child.attributes || {};
+  if (child.attributesJSON && typeof child.attributesJSON === 'string') {
+    try {
+      attrs = { ...attrs, ...JSON.parse(child.attributesJSON) };
+    } catch (e) {
+      console.error('Failed to parse inner block JSON in ContactGridSection', e);
+    }
+  }
+  return {
+    ...child,
+    attributes: attrs,
+  };
+});
+
+// Separate sidebar cards from form component for explicit column placement
+const sidebarBlocks = resolvedInnerBlocks.filter(
+  (b: any) => b.name === 'anotherstep/contact-info-card' || b.name === 'anotherstep/contact-hours-card'
+);
+const formBlocks = resolvedInnerBlocks.filter(
+  (b: any) => b.name === 'anotherstep/contact-form'
+);
+---
+
+<section class="py-24 bg-surface" id="contact-section">
+  <div class="max-w-7xl mx-auto px-6 md:px-12">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      
+      <!-- 1/3 Sidebar Column -->
+      <div class="md:col-span-1 space-y-6">
+        {sidebarBlocks.map((block: any) => {
+          const { name, attributes: attrs } = block;
+
+          if (name === 'anotherstep/contact-info-card') {
+            const isEmail = attrs.cardType === 'email';
+            const icon = isEmail ? 'mail' : 'call';
+            const bgColor = isEmail ? 'bg-brand-yellow' : 'bg-brand-blue-fixed';
+            const iconColor = isEmail ? 'text-brand-yellow-fixed' : 'text-brand-blue';
+
+            return (
+              <div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.04)] group hover:translate-y-[-4px] transition-all duration-300">
+                <div class={`w-16 h-16 ${bgColor} rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                  <span class={`material-symbols-outlined ${iconColor} text-3xl`} data-icon={icon}>{icon}</span>
+                </div>
+                <h3 class="text-2xl font-bold text-brand-blue mb-2">{attrs.title}</h3>
+                <p class="text-on-surface-variant mb-6">{attrs.subtitle}</p>
+                <a 
+                  class={isEmail ? "text-xl font-bold text-brand-blue hover:text-brand-blue-container transition-colors" : "text-2xl font-black text-brand-red tracking-tight hover:underline"} 
+                  href={attrs.href || '#'}
+                >
+                  {attrs.value}
+                </a>
+              </div>
+            );
+          }
+
+          if (name === 'anotherstep/contact-hours-card') {
+            return (
+              <div class="bg-surface-container-low p-8 rounded-xl">
+                <h3 class="text-xl font-bold text-brand-blue mb-4 flex items-center gap-2">
+                  <span class="material-symbols-outlined" data-icon="schedule">schedule</span>
+                  {attrs.title || 'Operating Hours'}
+                </h3>
+                <ul class="space-y-3 text-on-surface-variant">
+                  <li class="flex justify-between">
+                    <span>Monday - Friday</span>
+                    <span class="font-bold">{attrs.weekdayHours || '9:00 - 17:00'}</span>
+                  </li>
+                  <li class="flex justify-between">
+                    <span>Saturday</span>
+                    <span class="font-bold">{attrs.saturdayHours || '10:00 - 14:00'}</span>
+                  </li>
+                  <li class="flex justify-between">
+                    <span>Sunday</span>
+                    <span class="font-bold">{attrs.sundayHours || 'Closed'}</span>
+                  </li>
+                </ul>
+              </div>
+            );
+          }
+
+          return null;
+        })}
+      </div>
+
+      <!-- 2/3 Form Column -->
+      <div class="md:col-span-2">
+        {formBlocks.map((block: any) => {
+          const attrs = block.attributes || {};
+          const endpoint = attrs.endpointUrl || '/wp-json/anotherstep/v1/contact';
+
+          return (
+            <div class="bg-surface-container-lowest p-10 md:p-14 rounded-xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.06)] relative overflow-hidden border border-outline-variant/10">
+              <div class="absolute -top-24 -right-24 w-64 h-64 bg-brand-blue-fixed opacity-20 rounded-full blur-3xl"></div>
+              <h2 class="text-3xl font-black text-brand-blue mb-2">{attrs.title || 'Send a Message'}</h2>
+              <p class="text-on-surface-variant mb-10 text-lg">{attrs.subtitle || 'Tell us how we can best support you today.'}</p>
+              
+              <form class="space-y-8" action={endpoint} method="POST" id="contact-grid-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div class="space-y-2">
+                    <label class="block text-brand-blue font-bold text-lg ml-1">Full Name</label>
+                    <input class="w-full bg-surface-container-high border-none rounded-xl px-6 py-5 text-lg focus:ring-4 focus:ring-brand-blue-fixed-dim transition-all outline-none" placeholder="Your Name" type="text" name="full_name" required />
+                  </div>
+                  <div class="space-y-2">
+                    <label class="block text-brand-blue font-bold text-lg ml-1">Email Address</label>
+                    <input class="w-full bg-surface-container-high border-none rounded-xl px-6 py-5 text-lg focus:ring-4 focus:ring-brand-blue-fixed-dim transition-all outline-none" placeholder="email@example.com" type="email" name="email" required />
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <label class="block text-brand-blue font-bold text-lg ml-1">How can we help?</label>
+                  <select class="w-full bg-surface-container-high border-none rounded-xl px-6 py-5 text-lg focus:ring-4 focus:ring-brand-blue-fixed-dim transition-all outline-none appearance-none" name="subject">
+                    <option>General Inquiry</option>
+                    <option>Technical Support</option>
+                    <option>Service Information</option>
+                    <option>Billing Question</option>
+                  </select>
+                </div>
+                <div class="space-y-2">
+                  <label class="block text-brand-blue font-bold text-lg ml-1">Message</label>
+                  <textarea class="w-full bg-surface-container-high border-none rounded-xl px-6 py-5 text-lg focus:ring-4 focus:ring-brand-blue-fixed-dim transition-all outline-none resize-none" placeholder="Tell us more about your needs..." rows="5" name="message" required></textarea>
+                </div>
+                <div class="pt-4">
+                  <button class="w-full md:w-auto bg-brand-blue text-on-brand-blue px-12 py-5 rounded-full text-xl font-black shadow-xl hover:bg-brand-blue-container hover:translate-y-[-2px] active:scale-95 transition-all flex items-center justify-center gap-3" type="submit">
+                    {attrs.buttonText || 'Send Message'}
+                    <span class="material-symbols-outlined" data-icon="send">send</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          );
+        })}
+      </div>
+
+    </div>
+  </div>
+</section>

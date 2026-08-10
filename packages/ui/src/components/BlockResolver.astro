@@ -20,6 +20,7 @@ import CtaSection from './blocks/CtaSection.astro';
 import ImportantNotice from './blocks/ImportantNotice.astro';
 import InclusionAndSupport from "./blocks/InclusionAndSupport.astro";
 import UpcomingEvents from "./blocks/UpcomingEvents.astro";
+import ContactGridSection from './blocks/ContactGridSection.astro';
 
 import { wpFetch, EDITOR_BLOCKS_FRAGMENT } from '../lib/wp.js';
 import { VALUES_ARCHIVE_QUERY } from "../lib/queries";
@@ -39,7 +40,8 @@ const STANDARD_BLOCKS: Record<string, any> = {
     'anotherstep/journey-forward-section': JourneyForwardSection,
     'anotherstep/important-notice': ImportantNotice,
     'anotherstep/inclusion-and-support': InclusionAndSupport,
-    'anotherstep/upcoming-events': UpcomingEvents
+    'anotherstep/upcoming-events': UpcomingEvents,
+    'anotherstep/contact-grid-section': ContactGridSection
 };
 
 const { blocks = [], galleryData, videoData } = Astro.props;
@@ -110,6 +112,9 @@ const nestedBlockIds = new Set(getNestedIds(blocks));
 const CHILD_BLOCK_TYPES = new Set([
     'anotherstep/custom-grid-card',
     'anotherstep/bento-card',
+    'anotherstep/contact-info-card',
+    'anotherstep/contact-hours-card',
+    'anotherstep/contact-form',
     'core/list-item',
     'core/button',
 ]);
@@ -147,7 +152,13 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
 
 {uniqueBlocks.map((block: any) => {
     if (!block) return null;
-    if (block.name === 'anotherstep/custom-grid-card' || block.name === 'anotherstep/bento-card') return false;
+    if (
+        block.name === 'anotherstep/custom-grid-card' || 
+        block.name === 'anotherstep/bento-card' ||
+        block.name === 'anotherstep/contact-info-card' ||
+        block.name === 'anotherstep/contact-hours-card' ||
+        block.name === 'anotherstep/contact-form'
+    ) return false;
 
     let attrs;
 
@@ -541,6 +552,23 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
                     stat1Label={attrs.stat1Label}
                     stat2Number={attrs.stat2Number}
                     stat2Label={attrs.stat2Label}
+                />
+            );
+
+        case 'anotherstep/contact-grid':
+            attrs = block.attributes || {};
+            
+            if (block.attributesJSON && typeof block.attributesJSON === 'string') {
+                try {
+                    attrs = { ...attrs, ...JSON.parse(block.attributesJSON) };
+                } catch (e) {
+                    console.error('Error parsing ContactGrid attributesJSON', e);
+                }
+            }
+
+            return (
+                <ContactGridSection 
+                    innerBlocks={block.innerBlocks || []} 
                 />
             );
         

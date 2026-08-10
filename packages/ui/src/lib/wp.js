@@ -14,7 +14,8 @@ import {
     BentoGridSectionFragment,
     ImportantNoticeFragment,
     InclusionAndSupportFragment,
-    UpcomingEventsFragment
+    UpcomingEventsFragment,
+    ContactGridFragment
 } from '../lib/fragments.js';
 
 const WP_URL = import.meta.env.PUBLIC_WORDPRESS_API_URL;
@@ -40,6 +41,7 @@ export const EDITOR_BLOCKS_FRAGMENT = `
         ${DynamicInfoSectionFragment}
         ${VideoSectionFragment}
         ${GallerySectionFragment}
+        ${ContactGridFragment}
         ... on CoreImage {
             attributes {
                 url
