@@ -1,3 +1,13 @@
+export const CoreImageFragment = `
+  ... on CoreImage {
+    attributes {
+      url
+      alt
+      caption
+    }
+  }
+`;
+
 export const CtaContactCardSectionFragment = `
   ... on AnotherstepCtaContactCardSection {
     attributes {
@@ -392,6 +402,64 @@ export const ContactGridFragment = `
       ${ContactInfoCardFragment}
       ${HoursCardFragment}
       ${ContactFormFragment}
+    }
+  }
+`;
+
+export const DonationGridSectionFragment = `
+  ... on AnotherstepDonationGridSection {
+    attributes {
+      formColumnSpan
+      sidebarColumnSpan
+    }
+    innerBlocks {
+      name
+      clientId
+      renderedHtml
+      ... on AnotherstepDonorPerfectForm {
+        attributes {
+          title
+          description
+          showModeToggle
+          generalFormUrl
+          tributeFormUrl
+          taxDisclosure
+          showSecurityBadge
+        }
+      }
+      ... on AnotherstepSidebarTrustCard {
+        attributes {
+          title
+          body
+          iconName
+          cardStyle
+        }
+      }
+    }
+  }
+`;
+
+export const DonorPerfectFormFragment = `
+  ... on AnotherstepDonorPerfectForm {
+    attributes {
+      title
+      description
+      showModeToggle
+      generalFormUrl
+      tributeFormUrl
+      taxDisclosure
+      showSecurityBadge
+    }
+  }
+`;
+
+export const SidebarTrustCardFragment = `
+  ... on AnotherstepSidebarTrustCard {
+    attributes {
+      title
+      body
+      iconName
+      cardStyle
     }
   }
 `;

@@ -1,0 +1,45 @@
+---
+import DonorPerfectForm from './DonorPerfectForm.astro';
+import SidebarTrustCard from './SidebarTrustCard.astro';
+
+interface Props {
+  formColumnSpan?: number;
+  sidebarColumnSpan?: number;
+  innerBlocks?: Array<{
+    name: string;
+    attributes: Record<string, any>;
+  }>;
+}
+
+const {
+  formColumnSpan = 8,
+  sidebarColumnSpan = 4,
+  innerBlocks = [],
+} = Astro.props;
+
+// Isolate child block instances
+const formBlock = innerBlocks.find(
+  (b) => b.name === 'anotherstep/donor-perfect-form'
+);
+const trustCardBlocks = innerBlocks.filter(
+  (b) => b.name === 'anotherstep/sidebar-trust-card'
+);
+---
+
+<section class="max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 mb-24">
+  <!-- Form Column -->
+  <div class={`lg:col-span-${formColumnSpan}`}>
+    {formBlock ? <DonorPerfectForm {...formBlock.attributes} /> : <slot name="form" />}
+  </div>
+
+  <!-- Sidebar Column -->
+  <div class={`lg:col-span-${sidebarColumnSpan} space-y-8`}>
+    {
+      trustCardBlocks.length > 0 ? (
+        trustCardBlocks.map((card) => <SidebarTrustCard {...card.attributes} />)
+      ) : (
+        <slot name="sidebar" />
+      )
+    }
+  </div>
+</section>

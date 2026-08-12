@@ -1,0 +1,33 @@
+---
+interface Props {
+  title?: string;
+  body?: string;
+  iconName?: string;
+  cardStyle?: 'primary-blue' | 'surface-light' | string;
+}
+
+const {
+  title = '',
+  body = '',
+  iconName = 'gavel',
+  cardStyle = 'primary-blue',
+} = Astro.props;
+
+const styleClasses =
+  cardStyle === 'primary-blue'
+    ? 'bg-brand-blue-container text-on-brand-blue'
+    : 'bg-surface-container-low text-on-surface';
+---
+
+<div class={`p-8 rounded-[2rem] relative overflow-hidden space-y-8 ${styleClasses}`}>
+  {
+    iconName && (
+      <span class="material-symbols-outlined absolute -right-8 -bottom-8 text-[12rem] opacity-10 pointer-events-none select-none">
+        {iconName}
+      </span>
+    )
+  }
+
+  {title && <h3 class="text-title-lg font-bold mb-4">{title}</h3>}
+  {body && <p class="text-body-lg opacity-90 leading-relaxed">{body}</p>}
+</div>

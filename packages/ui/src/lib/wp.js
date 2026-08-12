@@ -1,4 +1,5 @@
-import { 
+import {
+    CoreImageFragment,
     PageHeroFragment, 
     SplitFeatureFragment, 
     CustomGridSectionFragment, 
@@ -15,7 +16,8 @@ import {
     ImportantNoticeFragment,
     InclusionAndSupportFragment,
     UpcomingEventsFragment,
-    ContactGridFragment
+    ContactGridFragment,
+    DonationGridSectionFragment
 } from '../lib/fragments.js';
 
 const WP_URL = import.meta.env.PUBLIC_WORDPRESS_API_URL;
@@ -42,13 +44,8 @@ export const EDITOR_BLOCKS_FRAGMENT = `
         ${VideoSectionFragment}
         ${GallerySectionFragment}
         ${ContactGridFragment}
-        ... on CoreImage {
-            attributes {
-                url
-                alt
-                caption
-            }
-        }
+        ${DonationGridSectionFragment}
+        ${CoreImageFragment}
     }
 `;
 

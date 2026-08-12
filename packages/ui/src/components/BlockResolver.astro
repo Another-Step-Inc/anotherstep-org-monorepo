@@ -21,6 +21,7 @@ import ImportantNotice from './blocks/ImportantNotice.astro';
 import InclusionAndSupport from "./blocks/InclusionAndSupport.astro";
 import UpcomingEvents from "./blocks/UpcomingEvents.astro";
 import ContactGridSection from './blocks/ContactGridSection.astro';
+import DonationGridSection from './blocks/DonationGridSection.astro';
 
 import { wpFetch, EDITOR_BLOCKS_FRAGMENT } from '../lib/wp.js';
 import { VALUES_ARCHIVE_QUERY } from "../lib/queries";
@@ -41,7 +42,8 @@ const STANDARD_BLOCKS: Record<string, any> = {
     'anotherstep/important-notice': ImportantNotice,
     'anotherstep/inclusion-and-support': InclusionAndSupport,
     'anotherstep/upcoming-events': UpcomingEvents,
-    'anotherstep/contact-grid-section': ContactGridSection
+    'anotherstep/contact-grid-section': ContactGridSection,
+    'anotherstep/donation-grid-section': DonationGridSection
 };
 
 const { blocks = [], galleryData, videoData } = Astro.props;
@@ -115,6 +117,8 @@ const CHILD_BLOCK_TYPES = new Set([
     'anotherstep/contact-info-card',
     'anotherstep/contact-hours-card',
     'anotherstep/contact-form',
+    'anotherstep/donor-perfect-form',
+    'anotherstep/sidebar-trust-card',
     'core/list-item',
     'core/button',
 ]);
@@ -157,7 +161,9 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
         block.name === 'anotherstep/bento-card' ||
         block.name === 'anotherstep/contact-info-card' ||
         block.name === 'anotherstep/contact-hours-card' ||
-        block.name === 'anotherstep/contact-form'
+        block.name === 'anotherstep/contact-form' ||
+        block.name === 'anotherstep/donor-perfect-form' ||
+        block.name === 'anotherstep/sidebar-trust-card'
     ) return false;
 
     let attrs;
@@ -572,6 +578,28 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
                 />
             );
         
+        case 'anotherstep/donation-grid-section': {
+            attrs = block.attributes || {};
+            
+            if (block.attributesJSON && typeof block.attributesJSON === 'string') {
+                try {
+                    attrs = { ...attrs, ...JSON.parse(block.attributesJSON) };
+                } catch (e) {
+                    console.error('Error parsing DonationGridSection attributesJSON', e);
+                }
+            }
+
+            const resolvedInnerBlocks = resolveInnerBlocks(block.innerBlocks || []);
+
+            return (
+                <DonationGridSection
+                    formColumnSpan={attrs.formColumnSpan}
+                    sidebarColumnSpan={attrs.sidebarColumnSpan}
+                    innerBlocks={resolvedInnerBlocks}
+                />
+            );
+        }
+
         default:
             if (CHILD_BLOCK_TYPES.has(block.name) || block.name === 'core/freeform') {
                 return null;
