@@ -141,3 +141,46 @@ const formBlocks = resolvedInnerBlocks.filter(
     </div>
   </div>
 </section>
+<script>
+  const form = document.getElementById('contact-grid-form') as HTMLFormElement | null;
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+      if (submitBtn) submitBtn.disabled = true;
+
+      const formData = new FormData(form);
+      
+      // Base WP URL without trailing slash
+      const wpBase = (import.meta.env.PUBLIC_WORDPRESS_URL || 'http://localhost:8000').replace(/\/$/, '');
+      const endpoint = `${wpBase}/wp-json/anotherstep/v1/contact`;
+
+      const targetUrl = form.action.startsWith('http')
+        ? form.action
+        : `${import.meta.env.PUBLIC_WORDPRESS_URL || ''}${form.action}`;
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert(result.message || 'Message sent Successfully!');
+          form.reset();
+        } else {
+          alert(result.messsage || 'Error submitting form.');
+        }
+      } catch (error) {
+        console.error('Submission error: ', error);
+        alert('An unexpected error occured. Please try again.');
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+  }
+</script>
