@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import logoReg from '../assets/another_step_logo.png';
 import accessibilityIcon from '../assets/accessibility-svgrepo-com.svg?raw';
+import ComplianceForm from './ComplianceForm.astro';
 
 interface MenuItem {
   label: string;
@@ -140,6 +141,8 @@ async function fetchFooterData(): Promise<FooterData> {
 }
 
 const { quickLinks, ourServices, legalLinks, offices, brand } = await fetchFooterData();
+
+const isExternal = (url: string) => /^https?:\/\//.test(url);
 ---
 
 <footer class="bg-[#F3F3F6] py-16">
@@ -166,14 +169,41 @@ const { quickLinks, ourServices, legalLinks, offices, brand } = await fetchFoote
       <h3 id="quick-links-heading" class="text-[#004E8B] text-md font-black pb-5">Quick Links</h3>
       <ul class="flex flex-col gap-4">
         {quickLinks.length > 0 ? (
-          quickLinks.map((item) => (
-            <li><a href={item.path}>{item.label}</a></li>
-          ))
+          quickLinks.map((item) => {
+            const external = isExternal(item.path);
+            const isCompliance = item.label.toLowerCase() === 'compliance form' || item.path.includes('compliance');
+
+            if (isCompliance) {
+              return (
+                <li>
+                  <button type="button" id="openComplianceDrawer" class="text-left hover:underline">
+                    {item.label}
+                  </button>
+                </li>
+              );
+            }
+
+            return (
+              <li>
+                <a 
+                  href={item.path}
+                  target={external ? "_blank" : undefined}
+                  rel={external ? "noopener noreferrer" : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            );
+          })
         ) : (
           <>
             <li><a href="#">Career</a></li>
             <li><a href="#">Contact HR</a></li>
-            <li><a href="#">Compliance Form</a></li>
+            <li>
+              <button type="button" id="openComplianceDrawer" class="text-left hover:underline">
+                Compliance Form
+              </button>
+            </li>
             <li><a href="#">Incident Reporting</a></li>
             <li><a href="#">OPWDD Statement</a></li>
           </>
@@ -262,4 +292,141 @@ const { quickLinks, ourServices, legalLinks, offices, brand } = await fetchFoote
       </button>
     </div>
   </div>
+
+  <!-- Slide-over Drawer Overlay -->
+  <div id="complianceDrawerOverlay" class="drawer-overlay" aria-hidden="true">
+    <div id="complianceDrawerBackdrop" class="drawer-backdrop"></div>
+    
+    <div class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+      <div class="drawer-header">
+        <h2 id="drawerTitle">Agency Compliance</h2>
+        <button type="button" id="closeComplianceDrawer" class="close-btn" aria-label="Close drawer">
+          &times;
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <ComplianceForm />
+      </div>
+    </div>
+  </div>
 </footer>
+<script>
+  const openBtn = document.getElementById('openComplianceDrawer');
+  const closeBtn = document.getElementById('closeComplianceDrawer');
+  const overlay = document.getElementById('complianceDrawerOverlay');
+  const backdrop = document.getElementById('complianceDrawerBackdrop');
+
+  const openDrawer = () => {
+    overlay?.classList.add('is-open');
+    overlay?.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  const closeDrawer = () => {
+    overlay?.classList.remove('is-open');
+    overlay?.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = ''; // Restore scroll
+  };
+
+  // Delegation check to capture button click regardless of render timing
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (target && target.closest('#openComplianceDrawer')) {
+      e.preventDefault();
+      openDrawer();
+    }
+  });
+
+  openBtn?.addEventListener('click', openDrawer);
+  closeBtn?.addEventListener('click', closeDrawer);
+  backdrop?.addEventListener('click', closeDrawer);
+
+  // Close on Escape key
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay?.classList.contains('is-open')) {
+      closeDrawer();
+    }
+  });
+</script>
+<style>
+  /* Slide-over Drawer Styles */
+  .drawer-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    visibility: hidden;
+    pointer-events: none;
+    transition: visibility 0.3s ease;
+  }
+
+  .drawer-overlay.is-open {
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .drawer-backdrop {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .drawer-overlay.is-open .drawer-backdrop {
+    opacity: 1;
+  }
+
+  .drawer-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 540px;
+    background-color: #ffffff;
+    color: #1a202c;
+    box-shadow: -4px 0 25px rgba(0, 0, 0, 0.15);
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .drawer-overlay.is-open .drawer-panel {
+    transform: translateX(0);
+  }
+
+  .drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .drawer-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.75rem;
+    cursor: pointer;
+    color: #718096;
+    line-height: 1;
+  }
+
+  .close-btn:hover {
+    color: #1a202c;
+  }
+
+  .drawer-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+  }
+</style>
