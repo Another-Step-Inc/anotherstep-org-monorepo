@@ -95,14 +95,22 @@ const resolveInnerBlocks = (innerBlocks: any[] = []) => {
 const getNestedIds = (blockList: any[]) => {
     let ids: string[] = [];
     blockList.forEach(b => {
+        // Collect IDs from innerBlocks
         if (b.innerBlocks?.length) {
             b.innerBlocks.forEach((child: any) => {
                 if (child.clientId) ids.push(child.clientId);
                 if (child.renderedHtml) ids.push(child.renderedHtml);
                 
-                // Deep search for sub-inner blocks (e.g. core/button inside core/buttons inside bento-card)
                 ids = ids.concat(getNestedIds([child])); 
             });
+        }
+
+        // Collect list HTML strings contained inside renderedHtml (e.g., inside core/group)
+        if (b.renderedHtml && b.name !== 'core/list') {
+            const listMatches = b.renderedHtml.match(/<ul[\s\S]*?<\/ul>|<ol[\s\S]*?<\/ol>/gi);
+            if (listMatches) {
+                listMatches.forEach((htmlMatch: string) => ids.push(htmlMatch.trim()));
+            }
         }
     });
     return ids;
@@ -128,15 +136,22 @@ const uniqueBlocks = blocks.filter((block: any) => {
         return false;
     }
 
-    // Skip standalone child cards because CustomGridSection handles them
     if (block.name === 'anotherstep/custom-grid-card' || block.name === 'anotherstep/bento-card') {
         return false;
     }
 
-    // Skip any block that is already nested inside a parent block
+    // Direct identifier check
     const identifier = block.clientId || block.renderedHtml;
     if (identifier && nestedBlockIds.has(identifier)) {
         return false;
+    }
+
+    // Extra safeguard for core/list whose HTML was already embedded inside a parent block
+    if (block.name === 'core/list' && block.renderedHtml) {
+        const trimmedHtml = block.renderedHtml.trim();
+        if (nestedBlockIds.has(trimmedHtml)) {
+            return false;
+        }
     }
 
     return true;
@@ -163,7 +178,8 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
         block.name === 'anotherstep/contact-hours-card' ||
         block.name === 'anotherstep/contact-form' ||
         block.name === 'anotherstep/donor-perfect-form' ||
-        block.name === 'anotherstep/sidebar-trust-card'
+        block.name === 'anotherstep/sidebar-trust-card' ||
+        block.name === 'core/list-item'
     ) return false;
 
     let attrs;
@@ -181,6 +197,41 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
         case 'core/heading':
             attrs = block.attributes || {};
             return <h2 class="text-3xl font-bold text-slate-900 my-6">{attrs.content}</h2>;
+
+        case 'core/list':
+            if (!block.renderedHtml) return null;
+
+            let html = block.renderedHtml;
+
+            // Ensure <ul> has list-style and padding even if Tailwind CSS reset strips it
+            html = html
+                .replace(/<ul([^>]*)>/gi, '<ul$1 class="list-disc pl-6 my-4 space-y-2 text-slate-700" style="list-style-type: disc !important; padding-left: 1.5rem !important;">')
+                .replace(/<ol([^>]*)>/gi, '<ol$1 class="list-decimal pl-6 my-4 space-y-2 text-slate-700" style="list-style-type: decimal !important; padding-left: 1.5rem !important;">');
+
+            return <div class="wp-block-list-wrapper" set:html={html} />;
+        
+        case 'core/list-item':
+            return null;
+
+        case 'core/group': 
+            const innerBlocks = block.innerBlocks || [];
+            if (innerBlocks.length > 0) {
+                return (
+                    <div class="wp-block-group my-6">
+                        <Astro.self blocks={innerBlocks} galleryData={galleryData} videoData={videoData} />
+                    </div>
+                );
+            }
+            
+            // If innerBlocks are empty, fallback to renderedHtml but apply list style replacements
+            if (block.renderedHtml) {
+                let html = block.renderedHtml
+                    .replace(/<ul([^>]*)>/gi, '<ul$1 class="list-disc pl-6 my-4 space-y-2 text-slate-700" style="list-style-type: disc !important; padding-left: 1.5rem !important;">')
+                    .replace(/<ol([^>]*)>/gi, '<ol$1 class="list-decimal pl-6 my-4 space-y-2 text-slate-700" style="list-style-type: decimal !important; padding-left: 1.5rem !important;">');
+
+                return <div class="wp-block-group my-6" set:html={html} />;
+            }
+            return null;
 
         case 'core/image':
         case 'core/gallery':

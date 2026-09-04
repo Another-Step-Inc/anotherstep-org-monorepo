@@ -1,0 +1,47 @@
+---
+import BaseLayout from '@anothersteporg/ui/layouts/BaseLayout.astro';
+
+import "src/styles/global.css";
+---
+
+<BaseLayout 
+  title="Privacy Policy" 
+  description="Privacy Policy for Another Step, Inc. Learn how we collect, protect, and handle your information."
+>
+  <main class="flex-1 py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
+    <header class="border-b border-slate-200 pb-6 mb-8">
+      <h1 class="text-3xl font-black text-[#004E8B] mb-2">Privacy Policy</h1>
+      <p class="text-sm text-slate-500">Last updated: September 2026</p>
+    </header>
+
+    <div class="prose prose-slate max-w-none space-y-6 text-slate-700 font-normal leading-relaxed">
+      <section>
+        <h2 class="text-xl font-bold text-[#004E8B] mb-3">1. Information We Collect</h2>
+        <p>
+          Another Step, Inc. respects your personal privacy. We collect personal information when you voluntarily submit forms on our site, such as contact requests, employment applications, or compliance reporting.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-[#004E8B] mb-3">2. How We Use Information</h2>
+        <p>
+          Information collected through this site is strictly used to fulfill your requests, process inquiries, manage employment opportunities, and comply with state regulatory reporting requirements.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-[#004E8B] mb-3">3. Data Protection & Confidentiality</h2>
+        <p>
+          We employ security measures to protect against unauthorized access to or alteration of your personal data. We do not sell, rent, or trade your personal information to third parties.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-[#004E8B] mb-3">4. Contact Us</h2>
+        <p>
+          If you have questions regarding this Privacy Policy, please contact our administrative team at <a href="mailto:info@anotherstep.org" class="text-brand-blue font-semibold hover:underline">info@anotherstep.org</a>.
+        </p>
+      </section>
+    </div>
+  </main>
+</BaseLayout>

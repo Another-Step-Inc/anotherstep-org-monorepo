@@ -1,0 +1,213 @@
+---
+interface Props {
+    endpoint?: string;
+}
+
+const { endpoint = '/api/incident' } = Astro.props;
+---
+<div class="incident-form-wrapper">
+    <h2>Incident Reporting Form</h2>
+    <p class="form-description">
+        If you need to report an incident of abuse or neglect, please send us a message. We will reply within 24 hours.
+    </p>
+    <form id="incidentForm" action={endpoint} method="POST" novalidate>
+        <div class="form-group">
+            <label for="incidentReporterName">Name <span class="optional">(optional)</span></label>
+            <input type="text" id="incidentReporterName" name="reporterName" placeholder="Leave blank to remain anonymous" />
+        </div>
+        <div class="form-row">
+        <div class="form-group">
+            <label for="incidentPhone">Phone <span class="optional">(optional)</span></label>
+            <input type="tel" id="incidentPhone" name="phone" placeholder="(555) 000-0000" />
+        </div>
+
+        <div class="form-group">
+            <label for="incidentEmail">Email <span class="optional">(optional)</span></label>
+            <input type="email" id="incidentEmail" name="email" placeholder="name@example.com" />
+        </div>
+        </div>
+
+        <div class="form-row">
+        <div class="form-group">
+            <label for="incidentDate">Date of Incident <span class="required">*</span></label>
+            <input type="date" id="incidentDate" name="dateOfIncident" required />
+        </div>
+
+        <div class="form-group">
+            <label for="incidentLocation">Location of Occurrence <span class="required">*</span></label>
+            <input type="text" id="incidentLocation" name="location" placeholder="Site, facility, or address" required />
+        </div>
+        </div>
+
+        <div class="form-group">
+        <label for="incidentDetails">What occurred? (Please provide complete details) <span class="required">*</span></label>
+        <textarea id="incidentDetails" name="details" rows="5" required placeholder="Describe the incident, circumstances, and context..."></textarea>
+        </div>
+
+        <div class="form-group">
+        <label for="incidentPersonsInvolved">Please provide names of all involved <span class="required">*</span></label>
+        <textarea id="incidentPersonsInvolved" name="personsInvolved" rows="3" required placeholder="Names and roles of individuals involved"></textarea>
+        </div>
+
+        <button type="submit" id="incidentSubmitBtn">Submit Report</button>
+        <div id="incidentStatusMessage" class="status-message" aria-live="polite"></div>
+    </form>
+</div>
+<script>
+    const form = document.getElementById('incidentForm') as HTMLFormElement | null;
+    const submitBtn = document.getElementById('incidentSubmitBtn') as HTMLButtonElement | null;
+    const statusMessage = document.getElementById('incidentStatusMessage') as HTMLDivElement | null;
+
+    form?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!submitBtn || !statusMessage) return;
+
+        statusMessage.textContent = '';
+        statusMessage.className = 'status-message';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+
+        const formData = new FormData(form);
+        const targetEndpoint = form.action || '/api/incident';
+
+        try {
+            const response = await fetch(targetEndpoint, {
+                method: 'POST',
+                body: formData,
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                statusMessage.textContent = result.message || 'Incident report submitted successfully.';
+                statusMessage.classList.add('success');
+                form.reset();
+
+                setTimeout(() => {
+                    const overlay = document.getElementById('incidentDrawerOverlay');
+                    if (overlay) {
+                        overlay.classList.remove('is-open');
+                        overlay.setAttribute('aria-hidden', 'true');
+                        document.body.style.overflow = '';
+                        statusMessage.textContent = '';
+                        statusMessage.className = 'status-message';
+                    }
+                }, 2200);
+            } else {
+                statusMessage.textContent = result.error || 'Submission failed.'
+                statusMessage.classList.add('error');
+            }
+        } catch (err) {
+            statusMessage.textContent = 'Network error. Please try again.';
+            statusMessage.classList.add('error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Report';
+        }
+    });
+</script>
+<style>
+    .incident-form-wrapper {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 1rem 0;
+    }
+
+    .form-description {
+        color: #4b5563;
+        margin-bottom: 1.5rem;
+        font-size: 1.25rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    @media (max-width: 600px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+        color: #1f2937;
+        font-size: 0.95rem;
+    }
+
+    .required { 
+        color: #dc2626;
+    }
+
+    .optional { 
+        font-weight: normal;
+        color: #6b7280;
+        font-size: 0.85em;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="email"],
+    input[type="date"],
+    textarea {
+        width: 100%;
+        padding: 0.65rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        box-sizing: border-box;
+        background-color: #fff;
+        color: #111827;
+    }
+
+    input:focus, textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    button[type="submit"] {
+        background-color: #dc2626;
+        color: #ffffff;
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 1rem;
+        transition: background-color 0.2s ease;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #b91c1c;
+    }
+
+    button[type="submit"]:disabled {
+        background-color: #9ca3af;
+        cursor: not-allowed;
+    }
+
+    .status-message.success {
+        display: block;
+        background-color: #f0fdf4;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+
+    .status-message.error {
+        display: block;
+        background-color: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+</style>

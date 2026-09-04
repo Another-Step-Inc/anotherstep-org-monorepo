@@ -1,0 +1,68 @@
+---
+import MainLayout from "src/layouts/MainLayout.astro";
+import BlockResolver from "@anothersteporg/ui/components/BlockResolver.astro";
+
+import "src/styles/global.css";
+
+import { wpFetch, EDITOR_BLOCKS_FRAGMENT } from '@anothersteporg/ui/lib/wp.js';
+
+const data = await wpFetch(`
+  query GetPageByUri {
+    page(id: "terms-of-service", idType: URI) {
+      title
+      date
+      ${EDITOR_BLOCKS_FRAGMENT}
+    }
+  }
+`);
+
+const page = data?.page || {};
+const blocks = page.editorBlocks || [];
+
+// Format date if available, or fall back to default
+const formattedDate = page.date 
+  ? new Date(page.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+  : 'September 2026';
+---
+
+<MainLayout 
+  title={page?.title}
+  description="Terms of Service and Code of Ethics governing the use of Another Step, Inc. services and web platforms."
+>
+    <div class="flex-1 py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
+        <header class="border-b border-slate-200 pb-6 mb-8">
+            <h1 class="text-3xl font-black text-[#004E8B] mb-2">{page.title || "Terms of Service"}</h1>
+            <p class="text-sm text-slate-500">Effective Date: {formattedDate}</p>
+        </header>
+
+        <div class="prose prose-slate max-w-none space-y-8 text-slate-700 leading-relaxed">
+        <section>
+            <h2 class="text-xl font-bold text-[#004E8B] mb-3">1. Terms of Use</h2>
+            <p>
+            By accessing or using the website of Another Step, Inc., you agree to comply with and be bound by these Terms of Service. All content provided on this website is for informational purposes related to community services and support programs.
+            </p>
+        </section>
+
+        <!-- Code of Ethics Section -->
+        <section class="bg-slate-100 p-6 rounded-lg border border-slate-200">
+            <h2 class="text-xl font-bold text-[#004E8B] mb-3">2. Agency Code of Ethics</h2>
+            <p class="mb-3">
+            Another Step, Inc. operates under a strict Code of Ethics centered on dignity, respect, and self-determination for every individual we support:
+            </p>
+            <ul class="list-disc pl-6 space-y-2 text-slate-800">
+            <li><strong>Person-Centered Support:</strong> We honor individual choices, autonomy, and rights in all service delivery.</li>
+            <li><strong>Integrity & Accountability:</strong> We maintain honesty, compliance, and transparency across financial, administrative, and clinical operations.</li>
+            <li><strong>Safety & Protection:</strong> We uphold an uncompromising commitment to human rights and maintaining environments free from harm or abuse.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2 class="text-xl font-bold text-[#004E8B] mb-3">3. Limitation of Liability</h2>
+            <p>
+            Another Step, Inc. strives to keep website information current and accurate. However, material is provided "as is" without warranties of any kind regarding completeness or accuracy.
+            </p>
+        </section>
+        </div>
+        <BlockResolver blocks={blocks} />
+    </div>
+</MainLayout>

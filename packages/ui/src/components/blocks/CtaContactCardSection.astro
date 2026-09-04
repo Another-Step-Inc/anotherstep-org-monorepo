@@ -28,21 +28,6 @@ const {
   directorImageUrl,
   directorImageId
 } = Astro.props;
-
-const decodeHtml = (str: string = '') => {
-  return str
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#039;/g, "'");
-};
-
-const cleanHeadline = decodeHtml(headline);
-const cleanDescription = decodeHtml(description);
-const cleanDirectorTitle = decodeHtml(directorTitle);
-const cleanDirectorName = decodeHtml(directorName);
-const cleanDirectorRegions = decodeHtml(directorRegions);
 ---
 <section class="py-24 bg-surface">
   <div class="max-w-screen-2xl mx-auto px-8">
@@ -59,14 +44,10 @@ const cleanDirectorRegions = decodeHtml(directorRegions);
         <!-- Call to Action Text Area -->
         <div>
           {headline && (
-            <h2 class="text-[3rem] font-extrabold text-brand-blue leading-tight mb-6">
-              {cleanHeadline}
-            </h2>
+            <h2 class="text-[3rem] font-extrabold text-brand-blue leading-tight mb-6" set:html={headline} />
           )}
           {description && (
-            <p class="text-xl text-on-surface-variant mb-12">
-              {cleanDescription}
-            </p>
+            <p class="text-xl text-on-surface-variant mb-12" set:html={description} />
           )}
           <div class="mt-12 flex flex-wrap gap-4">
             {btn1Text && (
@@ -97,17 +78,15 @@ const cleanDirectorRegions = decodeHtml(directorRegions);
               </div>
             )}
             <div>
-              <h4 class="text-2xl font-bold text-on-surface">{cleanDirectorName}</h4>
-              {cleanDirectorTitle && (
-                <p class="text-brand-red font-medium uppercase tracking-wider text-sm mb-4">
-                  {cleanDirectorTitle}
-                </p>
+              <h4 class="text-2xl font-bold text-on-surface" set:html={directorName} />
+              {directorTitle && (
+                <p class="text-brand-red font-medium uppercase tracking-wider text-sm mb-4" set:html={directorTitle} />
               )}
               <div class="space-y-3">
                 {directorRegions && (
                   <div class="flex items-center gap-3 text-on-surface-variant">
                     <span class="material-symbols-outlined text-brand-blue">location_on</span>
-                    <span>{cleanDirectorRegions}</span>
+                    <span>{directorRegions}</span>
                   </div>
                 )}
                 {directorPhone && (

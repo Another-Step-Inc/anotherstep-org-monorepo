@@ -1,0 +1,48 @@
+---
+import BaseLayout from '@anothersteporg/ui/layouts/BaseLayout.astro';
+
+import "src/styles/global.css";
+---
+
+<BaseLayout 
+  title="Accessibility Statement" 
+  description="Accessibility Statement for Another Step, Inc. Our commitment to digital inclusion and WCAG standards."
+>
+  <main class="flex-1 py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
+    <header class="border-b border-slate-200 pb-6 mb-8">
+      <h1 class="text-3xl font-black text-[#004E8B] mb-2">Accessibility Statement</h1>
+      <p class="text-sm text-slate-500">Updated: September 2026</p>
+    </header>
+
+    <div class="prose prose-slate max-w-none space-y-6 text-slate-700 leading-relaxed">
+      <section>
+        <h2 class="text-xl font-bold text-[#004E8B] mb-3">Our Commitment</h2>
+        <p>
+          Another Step, Inc. is committed to ensuring digital accessibility for people of all abilities. We continuously improve the user experience for everyone and apply the relevant accessibility standards to satisfy Web Content Accessibility Guidelines (WCAG) 2.1 Level AA requirements.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-[#004E8B] mb-3">Measures to Support Accessibility</h2>
+        <ul class="list-disc pl-6 space-y-2">
+          <li>Incorporating clear structural headings and landmark regions across all pages.</li>
+          <li>Ensuring text contrast meets WCAG standards for optimal readability.</li>
+          <li>Supporting keyboard navigation for interactive buttons, drawers, and form controls.</li>
+          <li>Providing alternative text for visual imagery and screen-reader accessibility options.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-[#004E8B] mb-3">Feedback & Assistance</h2>
+        <p>
+          We welcome your feedback on the accessibility of our website. If you encounter accessibility barriers or require assistance with any content on this site, please reach out to us:
+        </p>
+        <div class="mt-4 p-4 bg-slate-100 rounded-md">
+          <p class="font-bold text-[#004E8B]">Accessibility Coordinator</p>
+          <p>Email: <a href="mailto:info@anotherstep.org" class="text-brand-blue hover:underline">info@anotherstep.org</a></p>
+          <p>Phone: (845) 268-8200</p>
+        </div>
+      </section>
+    </div>
+  </main>
+</BaseLayout>
