@@ -1,5 +1,8 @@
 import {
+    CoreGroupFragment,
     CoreImageFragment,
+    CoreParagraphFragment,
+    CoreHeadingFragment,
     PageHeroFragment, 
     SplitFeatureFragment, 
     CustomGridSectionFragment, 
@@ -25,6 +28,7 @@ const WP_URL = import.meta.env.PUBLIC_WORDPRESS_API_URL;
 // Reusable Editor Blocks Fragment
 export const EDITOR_BLOCKS_FRAGMENT = `
     editorBlocks {
+        clientId
         name
         renderedHtml
         ${PageHeroFragment}
@@ -46,6 +50,9 @@ export const EDITOR_BLOCKS_FRAGMENT = `
         ${ContactGridFragment}
         ${DonationGridSectionFragment}
         ${CoreImageFragment}
+        ${CoreParagraphFragment}
+        ${CoreHeadingFragment}
+        ${CoreGroupFragment}
     }
 `;
 

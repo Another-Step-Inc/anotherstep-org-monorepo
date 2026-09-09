@@ -1,17 +1,43 @@
 ---
-import BaseLayout from '@anothersteporg/ui/layouts/BaseLayout.astro';
+import MainLayout from "src/layouts/MainLayout.astro";
+import BlockResolver from "@anothersteporg/ui/components/BlockResolver.astro";
 
 import "src/styles/global.css";
+
+import { wpFetch, EDITOR_BLOCKS_FRAGMENT } from '@anothersteporg/ui/lib/wp';
+
+const data = await wpFetch(`
+  query GetPageByUri {
+    page(id: "privacy-policy", idType: URI) {
+      title
+      date
+      ${EDITOR_BLOCKS_FRAGMENT}
+    }
+  }
+`);
+
+const page = data?.page || {};
+
+console.log("Privacy policy page:", page);
+console.log("Editor blocks:", page.editorBlocks);
+
+const blocks = Array.isArray(page.editorBlocks)
+  ? page.editorBlocks
+  : page.editorBlocks?.nodes || [];
+
+const formattedDate = page.date 
+  ? new Date(page.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+  : 'September 2026';
 ---
 
-<BaseLayout 
+<MainLayout 
   title="Privacy Policy" 
   description="Privacy Policy for Another Step, Inc. Learn how we collect, protect, and handle your information."
 >
-  <main class="flex-1 py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
+  <div class="flex-1 py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
     <header class="border-b border-slate-200 pb-6 mb-8">
-      <h1 class="text-3xl font-black text-[#004E8B] mb-2">Privacy Policy</h1>
-      <p class="text-sm text-slate-500">Last updated: September 2026</p>
+      <h1 class="text-3xl font-black text-[#004E8B] mb-2">{page.title || "Privacy Policy"}</h1>
+      <p class="text-sm text-slate-500">Last updated: {formattedDate}</p>
     </header>
 
     <div class="prose prose-slate max-w-none space-y-6 text-slate-700 font-normal leading-relaxed">
@@ -43,5 +69,7 @@ import "src/styles/global.css";
         </p>
       </section>
     </div>
-  </main>
-</BaseLayout>
+
+    <BlockResolver blocks={blocks} />
+  </div>
+</MainLayout>

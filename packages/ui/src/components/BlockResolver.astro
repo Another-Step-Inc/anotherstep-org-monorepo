@@ -92,31 +92,29 @@ const resolveInnerBlocks = (innerBlocks: any[] = []) => {
 };
 
 // 4. Recursive nested ID collection
-const getNestedIds = (blockList: any[]) => {
-    let ids: string[] = [];
-    blockList.forEach(b => {
-        // Collect IDs from innerBlocks
-        if (b.innerBlocks?.length) {
-            b.innerBlocks.forEach((child: any) => {
-                if (child.clientId) ids.push(child.clientId);
-                if (child.renderedHtml) ids.push(child.renderedHtml);
-                
-                ids = ids.concat(getNestedIds([child])); 
-            });
-        }
+const getNestedClientIds = (blockList: any[] = []): Set<string> => {
+    const ids = new Set<string>();
 
-        // Collect list HTML strings contained inside renderedHtml (e.g., inside core/group)
-        if (b.renderedHtml && b.name !== 'core/list') {
-            const listMatches = b.renderedHtml.match(/<ul[\s\S]*?<\/ul>|<ol[\s\S]*?<\/ol>/gi);
-            if (listMatches) {
-                listMatches.forEach((htmlMatch: string) => ids.push(htmlMatch.trim()));
+    const visit = (list: any[] = []) => {
+        if (!Array.isArray(list)) return;
+
+        for (const block of list) {
+            const children = Array.isArray(block?.innerBlocks)
+                ? block.innerBlocks
+                : [];
+
+            for (const child of children) {
+                if (child.clientId) ids.add(child.clientId);
+                visit([child]);
             }
         }
-    });
+    };
+
+    visit(blockList);
     return ids;
 };
 
-const nestedBlockIds = new Set(getNestedIds(blocks));
+const nestedClientIds = getNestedClientIds(blocks);
 
 // 5. Root blocks filter
 const CHILD_BLOCK_TYPES = new Set([
@@ -132,29 +130,11 @@ const CHILD_BLOCK_TYPES = new Set([
 ]);
 
 const uniqueBlocks = blocks.filter((block: any) => {
-    if (CHILD_BLOCK_TYPES.has(block.name)) {
+    if (block.clientId && nestedClientIds.has(block.clientId)) {
         return false;
     }
 
-    if (block.name === 'anotherstep/custom-grid-card' || block.name === 'anotherstep/bento-card') {
-        return false;
-    }
-
-    // Direct identifier check
-    const identifier = block.clientId || block.renderedHtml;
-    if (identifier && nestedBlockIds.has(identifier)) {
-        return false;
-    }
-
-    // Extra safeguard for core/list whose HTML was already embedded inside a parent block
-    if (block.name === 'core/list' && block.renderedHtml) {
-        const trimmedHtml = block.renderedHtml.trim();
-        if (nestedBlockIds.has(trimmedHtml)) {
-            return false;
-        }
-    }
-
-    return true;
+    return !CHILD_BLOCK_TYPES.has(block.name);
 });
 
 // 6. Dynamic Values Fetching
@@ -188,15 +168,24 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
 
     switch (block.name) {
         case 'core/paragraph':
-            attrs = block.attributes || {};
-            if (!attrs.content || !attrs.content.replace(/&nbsp;|<br\s*\/?>|\s/g, '')) {
-                return null;
-            }
-            return <p class="text-2xl text-slate-700 leading-relaxed my-4">{attrs.content}</p>;
+            if (!block.renderedHtml?.trim()) return null;
+
+            return (
+                <div
+                    class="leading-relaxed mb-3"
+                    set:html={block.renderedHtml}
+                />
+            );
 
         case 'core/heading':
+            if (!block.renderedHtml) return null;
             attrs = block.attributes || {};
-            return <h2 class="text-3xl font-bold text-slate-900 my-6">{attrs.content}</h2>;
+            return (
+                <div
+                    class="text-xl font-bold text-[#004E8B] mb-3"
+                    set:html={block.renderedHtml}
+                />
+            );
 
         case 'core/list':
             if (!block.renderedHtml) return null;
@@ -213,25 +202,26 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
         case 'core/list-item':
             return null;
 
-        case 'core/group': 
-            const innerBlocks = block.innerBlocks || [];
-            if (innerBlocks.length > 0) {
-                return (
-                    <div class="wp-block-group my-6">
-                        <Astro.self blocks={innerBlocks} galleryData={galleryData} videoData={videoData} />
-                    </div>
-                );
-            }
-            
-            // If innerBlocks are empty, fallback to renderedHtml but apply list style replacements
-            if (block.renderedHtml) {
-                let html = block.renderedHtml
-                    .replace(/<ul([^>]*)>/gi, '<ul$1 class="list-disc pl-6 my-4 space-y-2 text-slate-700" style="list-style-type: disc !important; padding-left: 1.5rem !important;">')
-                    .replace(/<ol([^>]*)>/gi, '<ol$1 class="list-decimal pl-6 my-4 space-y-2 text-slate-700" style="list-style-type: decimal !important; padding-left: 1.5rem !important;">');
+        case 'core/group':
+            const groupAttrs = block.attributes || {};
+            const innerBlocks = Array.isArray(block.innerBlocks)
+                ? block.innerBlocks
+                : [];
 
-                return <div class="wp-block-group my-6" set:html={html} />;
-            }
-            return null;
+            return (
+                <section
+                    class:list={[
+                        'bg-slate-100 p-6 rounded-lg border border-slate-200 my-6',
+                        groupAttrs.className
+                    ]}
+                >
+                    <Astro.self
+                        blocks={innerBlocks}
+                        galleryData={galleryData}
+                        videoData={videoData}
+                    />
+                </section>
+            );
 
         case 'core/image':
         case 'core/gallery':

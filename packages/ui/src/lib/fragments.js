@@ -1,9 +1,39 @@
+export const CoreGroupFragment = `
+  ... on CoreGroup {
+    attributes {
+      className
+    }
+    innerBlocks {
+      clientId
+      name
+      renderedHtml
+    }
+  }
+`;
+
 export const CoreImageFragment = `
   ... on CoreImage {
     attributes {
       url
       alt
       caption
+    }
+  }
+`;
+
+export const CoreParagraphFragment = `
+  ... on CoreParagraph {
+    attributes {
+      content
+    }
+  }
+`;
+
+export const CoreHeadingFragment = `
+  ... on CoreHeading {
+    attributes {
+      content
+      level
     }
   }
 `;
