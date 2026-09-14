@@ -114,7 +114,43 @@ const getNestedClientIds = (blockList: any[] = []): Set<string> => {
     return ids;
 };
 
+const normalizeBlockHtml = (html: string = '') =>
+    html
+        .replace(/\sclass=(['"]).*?\1/gi, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+const getNestedBlockKeys = (blockList: any[] = []): Set<string> => {
+    const keys = new Set<string>();
+
+    const visit = (list: any[] = []) => {
+        if (!Array.isArray(list)) return;
+
+        for (const block of list) {
+            const children = Array.isArray(block?.innerBlocks)
+                ? block.innerBlocks
+                : [];
+
+            for (const child of children) {
+                if (child.name && child.renderedHtml?.trim()) {
+                    keys.add(`${child.name}:${normalizeBlockHtml(child.renderedHtml)}`);
+                }
+                visit([child]);
+            }
+        }
+    };
+
+    visit(blockList);
+    return keys;
+};
+
 const nestedClientIds = getNestedClientIds(blocks);
+const nestedBlockKeys = getNestedBlockKeys(blocks);
+const quoteBlockTypes = new Set(['core/quote', 'core/pullquote']);
+const splitNarrativeHasQuote = blocks.some((block: any) =>
+    block.name === 'anotherstep/split-narrative-section' &&
+    block.innerBlocks?.some((child: any) => quoteBlockTypes.has(child.name))
+);
 
 // 5. Root blocks filter
 const CHILD_BLOCK_TYPES = new Set([
@@ -131,6 +167,15 @@ const CHILD_BLOCK_TYPES = new Set([
 
 const uniqueBlocks = blocks.filter((block: any) => {
     if (block.clientId && nestedClientIds.has(block.clientId)) {
+        return false;
+    }
+
+    if (block.name && block.renderedHtml?.trim()) {
+        const blockKey = `${block.name}:${normalizeBlockHtml(block.renderedHtml)}`;
+        if (nestedBlockKeys.has(blockKey)) return false;
+    }
+
+    if (splitNarrativeHasQuote && quoteBlockTypes.has(block.name)) {
         return false;
     }
 
@@ -349,6 +394,7 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
                     }
 
                     const subInnerBlocks = childBlock.innerBlocks || [];
+                    const imageBlocks = subInnerBlocks.filter((subBlock: any) => subBlock.name === 'core/image');
 
                     return (
                         <BentoCard
@@ -365,14 +411,59 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
 
                                 let html = subBlock.renderedHtml;
 
+                                if (subBlock.name === 'core/image') {
+                                    const imageIndex = imageBlocks.indexOf(subBlock);
+
+                                    if (imageBlocks.length > 1) {
+                                        if (imageIndex !== 0) return null;
+
+                                        return (
+                                            <div class="mt-auto flex -space-x-4">
+                                                {imageBlocks.map((imageBlock: any, index: number) => {
+                                                    let imageHtml = imageBlock.renderedHtml;
+                                                    imageHtml = imageHtml.replace(/(<img\b[^>]*\bclass=")([^"]*)("[^>]*>)/i, '$1$2 w-full h-full object-cover$3');
+                                                    if (!/\bclass=/i.test(imageHtml)) {
+                                                        imageHtml = imageHtml.replace(/<img\b([^>]*)>/i, '<img$1 class="w-full h-full object-cover">');
+                                                    }
+
+                                                    const avatarBackground = ['bg-slate-300', 'bg-slate-400', 'bg-slate-500'][index % 3];
+
+                                                    return (
+                                                        <div class={`w-12 h-12 rounded-full border-4 border-brand-dark-yellow ${avatarBackground} overflow-hidden`} set:html={imageHtml} />
+                                                    );
+                                                })}
+                                            </div>
+                                        );
+                                    }
+
+                                    html = html.replace(/(<img\b[^>]*\bclass=")([^"]*)("[^>]*>)/i, '$1$2 w-full h-full object-cover$3');
+                                    if (!/\bclass=/i.test(html)) {
+                                        html = html.replace(/<img\b([^>]*)>/i, '<img$1 class="w-full h-full object-cover">');
+                                    }
+                                    return <div class="mt-auto h-32 w-full rounded-xl overflow-hidden" set:html={html} />;
+                                }
+
                                 // 1. Remove rogue <br> tags at the start of <li> tags
                                 html = html.replace(/<li>\s*<br\s*\/?>/gi, '<li>');
 
                                 // 2. Target checkmark lists and inject Material Symbol icons directly into <li> elements
                                 if (html.includes('is-style-checkmark-list')) {
                                     html = html.replace(
-                                        /<li([^>]*)>/gi, 
-                                        `<li$1 class="flex items-start gap-3"><span class="material-symbols-outlined text-tertiary-fixed shrink-0" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span> <span>`
+                                        /(<ul\b[^>]*\bclass=")([^"]*)("[^>]*>)/i,
+                                        '$1$2 space-y-4 text-lg opacity-90$3'
+                                    );
+                                    if (!/<ul\b[^>]*\bclass=/i.test(html)) {
+                                        html = html.replace(/<ul\b([^>]*)>/i, '<ul$1 class="space-y-4 text-lg opacity-90">');
+                                    }
+                                    html = html.replace(
+                                        /(<li\b[^>]*\bclass=")([^"]*)("[^>]*>)/gi,
+                                        '$1$2 flex items-start gap-3$3'
+                                    ).replace(
+                                        /<li\b(?![^>]*\bclass=)([^>]*)>/gi,
+                                        '<li$1 class="flex items-start gap-3">'
+                                    ).replace(
+                                        /<li([^>]*)>/gi,
+                                        `<li$1><span class="material-symbols-outlined text-tertiary-fixed shrink-0" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span> <span>`
                                     ).replace(/<\/li>/gi, '</span></li>');
                                 }
 
@@ -462,8 +553,18 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
 
         case 'anotherstep/cta-contact-card-section':
             attrs = block.attributes || {};
+
+            if (block.attributesJSON && typeof block.attributesJSON === 'string') {
+                try {
+                    attrs = { ...attrs, ...JSON.parse(block.attributesJSON) };
+                } catch (e) {
+                    console.error('Error parsing CtaContactCardSection attributesJSON', e);
+                }
+            }
+
             return (
                 <CtaContactCardSection 
+                    renderedHtml={block.renderedHtml}
                     headline={attrs.headline}
                     description={attrs.description}
                     btn1Text={attrs.btn1Text}

@@ -38,6 +38,26 @@ export const CoreHeadingFragment = `
   }
 `;
 
+export const CoreQuoteFragment = `
+  ... on CoreQuote {
+    innerBlocks {
+      clientId
+      name
+      renderedHtml
+    }
+  }
+`;
+
+export const CorePullquoteFragment = `
+  ... on CorePullquote {
+    innerBlocks {
+      clientId
+      name
+      renderedHtml
+    }
+  }
+`;
+
 export const CtaContactCardSectionFragment = `
   ... on AnotherstepCtaContactCardSection {
     attributes {
@@ -255,6 +275,7 @@ export const SplitFeatureFragment = `
       iconTitle
     }
     innerBlocks {
+      clientId
       name
       renderedHtml
     }
@@ -275,6 +296,7 @@ export const TwoColumnCardSectionFragment = `
       aboutImpactIcon2
     }
     innerBlocks {
+      clientId
       name
       renderedHtml
     }
@@ -342,8 +364,11 @@ export const SplitNarrativeFragment = `
             card2Text
         }
         innerBlocks {
+            clientId
             name
             renderedHtml
+            ${CoreQuoteFragment}
+            ${CorePullquoteFragment}
         }
     }
 `;

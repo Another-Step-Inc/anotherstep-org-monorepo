@@ -3,6 +3,8 @@ import {
     CoreImageFragment,
     CoreParagraphFragment,
     CoreHeadingFragment,
+    CoreQuoteFragment,
+    CorePullquoteFragment,
     PageHeroFragment, 
     SplitFeatureFragment, 
     CustomGridSectionFragment, 
@@ -52,6 +54,8 @@ export const EDITOR_BLOCKS_FRAGMENT = `
         ${CoreImageFragment}
         ${CoreParagraphFragment}
         ${CoreHeadingFragment}
+        ${CoreQuoteFragment}
+        ${CorePullquoteFragment}
         ${CoreGroupFragment}
     }
 `;

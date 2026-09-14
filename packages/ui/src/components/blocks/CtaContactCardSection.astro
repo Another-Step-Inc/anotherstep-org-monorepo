@@ -1,5 +1,6 @@
 ---
 interface Props {
+  renderedHtml?: string;
   headline?: string;
   description?: string;
   btn1Text?: string;
@@ -15,6 +16,7 @@ interface Props {
 }
 
 const {
+  renderedHtml,
   headline,
   description,
   btn1Text,
@@ -29,6 +31,9 @@ const {
   directorImageId
 } = Astro.props;
 ---
+{renderedHtml ? (
+  <Fragment set:html={renderedHtml} />
+) : (
 <section class="py-24 bg-surface">
   <div class="max-w-screen-2xl mx-auto px-8">
     <div class="bg-surface-container p-12 md:p-20 rounded-xl relative overflow-hidden">
@@ -104,3 +109,4 @@ const {
     </div>
   </div>
 </section>
+)}
