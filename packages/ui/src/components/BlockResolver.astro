@@ -91,6 +91,26 @@ const resolveInnerBlocks = (innerBlocks: any[] = []) => {
     });
 };
 
+const isRenderedBlockMarkup = (value: unknown) =>
+    typeof value === 'string' && /<(?:div|section|svg|h[1-6]|p|img)\b/i.test(value);
+
+const extractCtaAttribute = (html: string, pattern: RegExp) =>
+    html.match(pattern)?.[1]?.trim() || '';
+
+const resolveCtaAttributes = (block: any, attrs: Record<string, any>) => {
+    const renderedMarkup = block.renderedHtml || attrs.directorName || '';
+
+    if (!isRenderedBlockMarkup(attrs.directorName)) return attrs;
+
+    return {
+        ...attrs,
+        directorName: extractCtaAttribute(renderedMarkup, /<h4\b[^>]*>([\s\S]*?)<\/h4>/i),
+        directorTitle: extractCtaAttribute(renderedMarkup, /<p\b[^>]*text-brand-red[^>]*>([\s\S]*?)<\/p>/i),
+        directorRegions: extractCtaAttribute(renderedMarkup, /<span\b[^>]*>location_on<\/span>\s*<span>([\s\S]*?)<\/span>/i),
+        directorPhone: extractCtaAttribute(renderedMarkup, /<span\b[^>]*>call<\/span>\s*<span\b[^>]*>([\s\S]*?)<\/span>/i)
+    };
+};
+
 // 4. Recursive nested ID collection
 const getNestedClientIds = (blockList: any[] = []): Set<string> => {
     const ids = new Set<string>();
@@ -166,14 +186,18 @@ const CHILD_BLOCK_TYPES = new Set([
 ]);
 
 const uniqueBlocks = blocks.filter((block: any) => {
-    if (block.clientId && nestedClientIds.has(block.clientId)) {
+    const nestedByClientId = Boolean(block.clientId && nestedClientIds.has(block.clientId));
+    const nestedByRenderedHtml = Boolean(
+        block.name &&
+        block.renderedHtml?.trim() &&
+        nestedBlockKeys.has(`${block.name}:${normalizeBlockHtml(block.renderedHtml)}`)
+    );
+
+    if (nestedByClientId) {
         return false;
     }
 
-    if (block.name && block.renderedHtml?.trim()) {
-        const blockKey = `${block.name}:${normalizeBlockHtml(block.renderedHtml)}`;
-        if (nestedBlockKeys.has(blockKey)) return false;
-    }
+    if (nestedByRenderedHtml) return false;
 
     if (splitNarrativeHasQuote && quoteBlockTypes.has(block.name)) {
         return false;
@@ -562,9 +586,10 @@ const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
                 }
             }
 
+            attrs = resolveCtaAttributes(block, attrs);
+
             return (
                 <CtaContactCardSection 
-                    renderedHtml={block.renderedHtml}
                     headline={attrs.headline}
                     description={attrs.description}
                     btn1Text={attrs.btn1Text}
