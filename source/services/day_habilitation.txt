@@ -10,15 +10,12 @@
           <h1
             class="text-[3.5rem] leading-[1.1] font-extrabold text-brand-blue mb-8 tracking-tight"
           >
-            Day Habilitation <br />
-            <span class="text-brand-dark-yellow">(Day Services)</span>
+            Day Habilitation <br /><span class="text-brand-dark-yellow">(Day Services)</span>
           </h1>
           <p
             class="text-[1.25rem] leading-relaxed text-on-surface-variant max-w-2xl mb-8"
           >
-            Another Step offers a unique approach to the provision of day
-            supports for people with developmental disabilities. The agency
-            provides all-day supports utilizing generic community resources.
+            Another Step offers a unique approach to the provision of day supports for people with developmental disabilities. The agency provides all-day supports utilizing generic community resources.
           </p>
           <div
             class="flex items-center gap-4 p-4 rounded-xl bg-surface-container-low max-w-lg"
@@ -27,8 +24,7 @@
               >domain_disabled</span
             >
             <p class="text-body-lg font-medium text-on-surface">
-              There is no “center”, “program site”, or other types of artificial
-              setting operated by our agency.
+              There is no “center”, “program site”, or other types of artificial setting operated by our agency.
             </p>
           </div>
         </div>
