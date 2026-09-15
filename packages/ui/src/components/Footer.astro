@@ -109,13 +109,15 @@ async function fetchFooterData(): Promise<FooterData> {
 
     const data = json.data;
 
+    const isExternal = (url: string) => /^https?:\/\//.test(url);
+
     const formatMenu = (menuData: any, stripParent = false): MenuItem[] =>
       menuData?.menuItems?.nodes
         ?.filter((item: any) => !item.parentId)
         .map((item: any) => {
           let path = item.path;
 
-          if (stripParent) {
+          if (stripParent && !isExternal(path)) {
             const segments = path.split('/').filter(Boolean);
             path = segments.length > 0 ? `/${segments.pop()}/` : path;
           }
