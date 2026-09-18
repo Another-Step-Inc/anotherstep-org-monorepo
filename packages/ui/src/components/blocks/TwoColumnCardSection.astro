@@ -49,17 +49,17 @@ const iconClass2 = getIconClass(aboutImpactIcon2, "fa-solid fa-house");
       {/* LEFT COLUMN: HEADINGS & DESCRIPTION */}
       <div class="space-y-6">
         {aboutSubHeadline && (
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-900 text-sm font-bold uppercase tracking-wider">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-blue/10 text-blue-900 text-sm font-bold uppercase tracking-wider">
             <div class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-blue"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-blue-fixed-dim"></span>
             </div>
             {aboutSubHeadline}
           </div>
         )}
 
         {aboutHeadline && (
-          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 leading-tight" set:html={aboutHeadline} />
+          <h2 class="text-3xl md:text-4xl font-bold text-on-background leading-tight" set:html={aboutHeadline} />
         )}
 
         {innerBlocks && innerBlocks.length > 0 ? (
@@ -86,15 +86,13 @@ const iconClass2 = getIconClass(aboutImpactIcon2, "fa-solid fa-house");
             {/* IMPACT CARD 1 */}
             {(aboutImpactTitle1 || aboutImpactParagraph1) && (
               <div class="flex items-start gap-4">
-                <div class="w-12 h-12 bg-yellow-400 rounded-2xl flex items-center justify-center shrink-0">
-                  <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
+                  <div class="w-12 h-12 rounded-xl bg-brand-blue/40 text-brand-blue flex items-center justify-center text-xl">
                     <i class={iconClass1}></i>
                   </div>
-                </div>
                 <div>
-                  {aboutImpactTitle1 && <h4 class="font-bold text-slate-900">{aboutImpactTitle1}</h4>}
+                  {aboutImpactTitle1 && <h4 class="font-bold text-on-background">{aboutImpactTitle1}</h4>}
                   {aboutImpactParagraph1 && (
-                    <div class="text-slate-500 text-sm" set:html={aboutImpactParagraph1} />
+                    <div class="text-on-brackground text-sm" set:html={aboutImpactParagraph1} />
                   )}
                 </div>
               </div>
@@ -103,13 +101,13 @@ const iconClass2 = getIconClass(aboutImpactIcon2, "fa-solid fa-house");
             {/* IMPACT CARD 2 */}
             {(aboutImpactTitle2 || aboutImpactParagraph2) && (
               <div class="flex items-start gap-4">
-                <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
+                <div class="w-12 h-12 rounded-xl bg-brand-blue/40 text-brand-blue flex items-center justify-center text-xl">
                   <i class={iconClass2}></i>
                 </div>
                 <div>
-                  {aboutImpactTitle2 && <h4 class="font-bold text-slate-900">{aboutImpactTitle2}</h4>}
+                  {aboutImpactTitle2 && <h4 class="font-bold text-on-background">{aboutImpactTitle2}</h4>}
                   {aboutImpactParagraph2 && (
-                    <div class="text-slate-500 text-sm" set:html={aboutImpactParagraph2} />
+                    <div class="text-on-background text-sm" set:html={aboutImpactParagraph2} />
                   )}
                 </div>
               </div>
@@ -119,7 +117,7 @@ const iconClass2 = getIconClass(aboutImpactIcon2, "fa-solid fa-house");
       </div>
 
       {/* BACKGROUND BLUR ACCENT */}
-      <div class="absolute -bottom-6 -right-6 w-64 h-64 bg-yellow-100 rounded-full blur-3xl opacity-50 -z-0"></div>
+      <div class="absolute -bottom-6 -right-6 w-64 h-64 bg-brand-yellow/20 rounded-full blur-3xl opacity-50 -z-0"></div>
     </div>
   </div>
 </section>

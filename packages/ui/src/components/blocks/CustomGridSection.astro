@@ -69,13 +69,13 @@ const cardsToRender = useQuery ? dynamicCards : innerBlocks.map(block => block.a
           /* "accent-line" -> Bold title with decorative yellow line & italicized description */
           <>
             {headline && (
-              <h2 class="text-3xl md:text-4xl font-bold text-blue-900 mb-4">
+              <h2 class="text-3xl md:text-4xl font-bold text-brand-blue mb-4">
                 {headline}
               </h2>
             )}
-            <div class="w-24 h-1 bg-yellow-400 mx-auto rounded-full mb-6"></div>
+            <div class="w-24 h-1 bg-brand-yellow mx-auto rounded-full mb-6"></div>
             {description && (
-              <p class="text-lg text-on-surface-variant max-w-3xl mx-auto italic">
+              <p class="text-lg text-on-brand-dark-yellow max-w-3xl mx-auto italic">
                 "{description}"
               </p>
             )}
@@ -98,7 +98,7 @@ const cardsToRender = useQuery ? dynamicCards : innerBlocks.map(block => block.a
           /* "standard" -> Default Simple Layout */
           <>
             {headline && (
-              <h2 class="text-3xl md:text-4xl font-bold mb-4 text-on-surface">
+              <h2 class="text-3xl md:text-4xl font-bold mb-4 text-brand-blue">
                 {headline}
               </h2>
             )}

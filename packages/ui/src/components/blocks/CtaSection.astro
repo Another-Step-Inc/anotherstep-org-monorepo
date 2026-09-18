@@ -69,7 +69,7 @@ const getBtn1Classes = (styleKey: string) => {
     return "bg-white text-brand-blue hover:bg-surface-container-high shadow-sm";
   }
   // Default to yellow
-  return "bg-brand-yellow text-on-tertiary-fixed shadow-lg hover:scale-105";
+  return "bg-brand-yellow text-on-brand-dark-yellow shadow-lg hover:scale-105";
 };
 
 const btn1Class = getBtn1Classes(btn1Style);
@@ -96,7 +96,7 @@ const isFullWidth = ctaStyle === "full-width" || ctaStyle === "banner";
             <div class="mt-12 space-y-6">
               {step1Text && (
                 <div class="flex items-center gap-6">
-                  <div class="w-16 h-16 bg-brand-yellow text-on-tertiary-fixed rounded-2xl flex items-center justify-center font-black text-2xl">
+                  <div class="w-16 h-16 bg-brand-yellow text-on-brand-dark-yellow rounded-2xl flex items-center justify-center font-black text-2xl">
                     01
                   </div>
                   <span class="text-xl font-bold">{step1Text}</span>
@@ -239,7 +239,7 @@ const isFullWidth = ctaStyle === "full-width" || ctaStyle === "banner";
           )}
 
           {ctaDescription && (
-            <p class="text-xl md:text-2xl text-on-blue-container max-w-2xl mx-auto opacity-90">
+            <p class="text-xl md:text-2xl text-on-brand-blue max-w-2xl mx-auto opacity-90">
               {ctaDescription}
             </p>
           )}
