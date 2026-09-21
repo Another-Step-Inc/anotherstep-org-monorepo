@@ -4,6 +4,7 @@ export const SERVICES_ARCHIVE_QUERY = `
             nodes {
                 id
                 title
+                slug
                 content
             }
         }

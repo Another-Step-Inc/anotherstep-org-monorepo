@@ -28,7 +28,7 @@ console.log('OneColumnCard innerBlocks:', innerBlocks);
           const strippedContent = content.replace(/<p\b[^>]*>(.*?)<\/p>/gis, '$1'); // Strip <p> tags if present
 
           if (child.name === 'core/paragraph') {
-            return <p class="text-lg text-slate-700 leading-relaxed">{strippedContent}</p>;
+            return <p class="text-lg text-on-surface leading-relaxed">{strippedContent}</p>;
           }
 
           if (child.name === 'core/heading') {
@@ -40,7 +40,7 @@ console.log('OneColumnCard innerBlocks:', innerBlocks);
         })}
 
         {ethicsLinkText && ethicsLinkUrl && (
-          <a href={ethicsLinkUrl} class="inline-flex items-center gap-2 text-blue-700 font-bold hover:text-blue-900 transition-colors group">
+          <a href={ethicsLinkUrl} class="inline-flex items-center gap-2 text-brand-blue font-bold hover:text-brand-blue-surface-tint transition-colors group">
             <span>{ethicsLinkText}</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />

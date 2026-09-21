@@ -62,10 +62,10 @@ const cardThemes = [
                 <p class="text-base text-on-surface-variant leading-relaxed" set:html={service.content} />
               </div>
               <div class="mt-8">
-                <button class={theme.btnColor + " font-bold flex items-center gap-2 group/btn py-2 px-4 -ml-4 rounded-lg hover:bg-brand-blue/5 transition-colors"}>
+                <a href={`/services/${service.slug}`} class={theme.btnColor + " font-bold flex items-center gap-2 group/btn py-2 px-4 -ml-4 rounded-lg hover:bg-brand-blue/5 transition-colors"}>
                   More Info
                   <span class="material-symbols-outlined group-hover/btn:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
-                </button>
+                </a>
               </div>
             </div>
           );

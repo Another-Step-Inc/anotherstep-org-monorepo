@@ -55,15 +55,15 @@ const cleanPhone = (phone: string) => phone.replace(/\D/g, '');
     {/* PRIMARY SECTION COLUMN */}
     <div class="space-y-4">
       {primaryTitle && (
-        <h3 class="font-bold text-blue-900 uppercase text-sm tracking-widest" set:html={primaryTitle} />
+        <h3 class="font-bold text-brand-blue uppercase text-sm tracking-widest" set:html={primaryTitle} />
       )}
 
       {primaryDescription && (
-        <div class="text-slate-600 text-sm leading-relaxed" set:html={primaryDescription} />
+        <div class="text-on-surface text-sm leading-relaxed" set:html={primaryDescription} />
       )}
 
       {/* Dynamic Address & Field Details Stack */}
-      <div class="text-slate-800 text-sm font-medium space-y-0.5">
+      <div class="text-on-surface text-sm font-medium space-y-0.5">
         {primaryFieldValue1 && (
           <p class="font-bold">
             {primaryFieldValue1}, {primaryFieldValue2 && <span>{primaryFieldValue2}</span>}
@@ -76,13 +76,13 @@ const cleanPhone = (phone: string) => phone.replace(/\D/g, '');
     </div>
     {/* SECONDARY SECTION COLUMN */}
     {!showSecondarySection && (
-      <div class="bg-blue-900 text-white p-8 rounded-3xl flex flex-col justify-center">
+      <div class="bg-brand-blue text-white p-8 rounded-3xl flex flex-col justify-center">
         {secondaryTitle && (
           <h3 class="font-bold mb-2 text-xl" set:html={secondaryTitle} />
         )}
 
         {secondaryDescription && (
-          <div class="text-blue-100 text-sm mb-4 leading-relaxed" set:html={secondaryDescription} />
+          <div class="text-on-brand-blue-container text-sm mb-4 leading-relaxed" set:html={secondaryDescription} />
         )}
 
         {/* Dynamic Action Detail (Phone or Generic Detail) */}
@@ -91,12 +91,12 @@ const cleanPhone = (phone: string) => phone.replace(/\D/g, '');
             {cleanPhone(secondaryFieldValue1).length >= 7 ? (
               <a 
                 href={`tel:${cleanPhone(secondaryFieldValue1)}`} 
-                class="text-2xl font-bold text-yellow-400 hover:text-yellow-300 transition-colors inline-block"
+                class="text-2xl font-bold text-brand-yellow hover:text-brand-dark-yellow transition-colors inline-block"
               >
                 {secondaryFieldValue1}
               </a>
             ) : (
-              <div class="text-xl font-bold text-yellow-400">
+              <div class="text-xl font-bold text-brand-yellow">
                 {secondaryFieldValue1}
               </div>
             )}

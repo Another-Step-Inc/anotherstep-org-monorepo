@@ -170,7 +170,7 @@ const isExternal = (url: string) => /^https?:\/\//.test(url);
             ) : (
                 <Image src={logoReg} alt="Another Step Logo" class="h-12 w-auto" />
             )}
-            <h2 class="text-[#004E8B] text-xl font-black">{brand.companyName}</h2>
+            <h2 class="text-brand-blue-surface-tint text-xl font-black">{brand.companyName}</h2>
         </div>
         <p id="info-description" class="text-[#4E535D] font-semibold">
             {brand.description}
@@ -181,7 +181,7 @@ const isExternal = (url: string) => /^https?:\/\//.test(url);
     </div>
 
     <div id="quick-links-col" class="w-full sm:w-[45%] lg:w-[15%] flex flex-col items-center lg:items-start">
-      <h3 id="quick-links-heading" class="text-[#004E8B] text-md font-black pb-5">Quick Links</h3>
+      <h3 id="quick-links-heading" class="text-brand-blue-surface-tint text-md font-black pb-5">Quick Links</h3>
       <ul class="flex flex-col gap-4">
         {quickLinks.length > 0 ? (
           quickLinks.map((item) => {
@@ -243,7 +243,7 @@ const isExternal = (url: string) => /^https?:\/\//.test(url);
     </div>
 
     <div id="services-col" class="w-full sm:w-[45%] lg:w-[20%] flex flex-col items-center lg:items-start">
-      <h3 id="services-heading" class="text-[#004E8B] text-md font-black pb-5">Our Services</h3>
+      <h3 id="services-heading" class="text-brand-blue-surface-tint text-md font-black pb-5">Our Services</h3>
       <ul class="flex flex-col gap-4">
         {ourServices.length > 0 ? (
           ourServices.map((item) => (
@@ -262,7 +262,7 @@ const isExternal = (url: string) => /^https?:\/\//.test(url);
     </div>
 
     <div id="contact-col" class="w-full lg:w-[25%] flex flex-col items-center lg:items-start">
-      <h3 id="contact-heading" class="text-[#004E8B] text-md font-black pb-5">Get In Touch</h3>
+      <h3 id="contact-heading" class="text-brand-blue-surface-tint text-md font-black pb-5">Get In Touch</h3>
       <div class="flex flex-col gap-10 w-full">
         {offices.map((office, idx) => (
           <div id={`office-${idx + 1}`} class="flex flex-col gap-3">
@@ -316,14 +316,14 @@ const isExternal = (url: string) => /^https?:\/\//.test(url);
       <button 
         type="button"
         aria-label="Share page"
-        class="open-share-btn bg-[#E2E2E5] hover:bg-slate-300 transition-colors rounded-full h-10 w-10 text-[#004E8B] flex items-center justify-center"
+        class="open-share-btn bg-[#E2E2E5] hover:bg-slate-300 transition-colors rounded-full h-10 w-10 text-brand-blue flex items-center justify-center"
       >
         <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
       </button>
       <button 
         type="button" 
         aria-label="Open Accessibility Tools"
-        class="open-a11y-btn flex items-center justify-center bg-[#E2E2E5] hover:bg-slate-300 transition-colors rounded-full h-10 w-10 text-[#004E8B]"
+        class="open-a11y-btn flex items-center justify-center bg-[#E2E2E5] hover:bg-slate-300 transition-colors rounded-full h-10 w-10 text-brand-blue"
       >
         <div class="h-6 w-6 pointer-events-none" aria-hidden="true">
           <Fragment set:html={accessibilityIcon} />

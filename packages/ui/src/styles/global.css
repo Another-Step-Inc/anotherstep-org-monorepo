@@ -117,6 +117,7 @@
   --color-on-brand-red: var(--color-on-brand-color);
   --color-on-brand-yellow: var(--color-on-brand-color);
   --color-on-brand-blue-container: var(--color-on-blue-container);
+  --color-brand-blue-surface-tint: var(--color-surface-tint);
 
   --font-sans: var(--font-lexend);
   --radius-brand: 2.5rem;

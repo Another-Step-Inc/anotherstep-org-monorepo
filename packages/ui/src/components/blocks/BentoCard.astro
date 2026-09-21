@@ -23,7 +23,17 @@ const colorClass = (value: string, prefix: string) =>
   value.startsWith(`${prefix}-`) ? value : `${prefix}-${value}`;
 const textClass = colorClass(textColor, 'text');
 const iconClass = colorClass(iconColor, 'text');
-const cardClasses = `${colSpan} ${cardBgStyle} ${textClass} p-8 md:p-10 rounded-[2rem] flex flex-col justify-between transition-transform hover:scale-[1.01]`;
+const colSpanClasses: Record<string, string> = {
+  '1': 'md:col-span-1',
+  '2': 'md:col-span-2',
+  '3': 'md:col-span-3',
+  '4': 'md:col-span-4',
+  '5': 'md:col-span-5',
+  '6': 'md:col-span-6',
+};
+const spanValue = colSpan.replace(/^md:col-span-/, '').replace(/^col-span-/, '');
+const normalizedColSpan = colSpanClasses[spanValue] || 'md:col-span-1';
+const cardClasses = `${normalizedColSpan} ${cardBgStyle} ${textClass} p-8 md:p-10 rounded-[2rem] flex flex-col justify-between transition-transform hover:scale-[1.01]`;
 ---
 
 <div class={cardClasses}>

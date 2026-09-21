@@ -32,6 +32,8 @@ const {
     phoneDetails,
     meetingId,
 } = Astro.props;
+
+const resolvedZoomUrl = zoomUrl?.match(/<a\b[^>]*\bhref=["']([^"']+)["']/i)?.[1] || zoomUrl;
 ---
 
 <section id="self-advocacy" class="py-24 bg-surface">
@@ -82,11 +84,11 @@ const {
                     <div class="space-y-4">
                         <a 
                             class="bg-brand-blue text-on-brand-blue rounded-full px-6 py-3 font-bold text-center block hover:bg-brand-blue-container transition-colors" 
-                            href={zoomUrl} 
+                            href={resolvedZoomUrl} 
                             target="_blank"
                             rel="noopener noreferrer"
                             set:html={zoomButtonText}
-                        />
+                        ></a>
                         <div class="text-xs text-on-surface-variant">
                             <p class="font-bold mb-1" set:html={phoneText} />
                             <p set:html={phoneDetails} />

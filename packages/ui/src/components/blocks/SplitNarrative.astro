@@ -75,22 +75,22 @@ const cleanHtml = (htmlString: string = "") => {
                 {card1Title && (
                 <div class="bg-white p-8 rounded-2xl flex flex-col gap-4 shadow-sm">
                     {card1Icon && (
-                    <span class={`material-symbols-outlined text-${card1IconColor} text-4xl`} data-icon={card1Icon}>
+                    <span class={`material-symbols-outlined ${card1IconColor} text-4xl`} data-icon={card1Icon}>
                         {card1Icon}
                     </span>
                     )}
-                    <h3 class={`text-xl font-bold text-${card1IconColor}`}>{card1Title}</h3>
+                    <h3 class={`text-xl font-bold ${card1IconColor}`}>{card1Title}</h3>
                     {card1Text && <p class="text-on-surface-variant">{card1Text}</p>}
                 </div>
                 )}
                 {card2Title && (
                 <div class="bg-white p-8 rounded-2xl flex flex-col gap-4 shadow-sm">
                     {card2Icon && (
-                    <span class={`material-symbols-outlined text-${card2IconColor} text-4xl`} data-icon={card2Icon}>
+                    <span class={`material-symbols-outlined ${card2IconColor} text-4xl`} data-icon={card2Icon}>
                         {card2Icon}
                     </span>
                     )}
-                    <h3 class={`text-xl font-bold text-${card2IconColor}`}>{card2Title}</h3>
+                    <h3 class={`text-xl font-bold ${card2IconColor}`}>{card2Title}</h3>
                     {card2Text && <p class="text-on-surface-variant">{card2Text}</p>}
                 </div>
                 )}
