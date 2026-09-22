@@ -25,7 +25,8 @@ import {
     DonationGridSectionFragment
 } from '../lib/fragments.js';
 
-const WP_URL = import.meta.env.PUBLIC_WORDPRESS_API_URL;
+const WP_BASE_URL = (import.meta.env.PUBLIC_WORDPRESS_API_URL || "http://localhost:8050").replace(/\/+$/, "");
+const WP_GRAPHQL_URL = `${WP_BASE_URL}/graphql/`;
 
 // Reusable Editor Blocks Fragment
 export const EDITOR_BLOCKS_FRAGMENT = `
@@ -65,7 +66,7 @@ export const EDITOR_BLOCKS_FRAGMENT = `
  */
 export async function wpFetch(query, variables = {}) {
     try {
-        const response = await fetch(WP_URL, {
+        const response = await fetch(WP_GRAPHQL_URL, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({query, variables}),
