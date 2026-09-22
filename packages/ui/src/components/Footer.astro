@@ -32,7 +32,8 @@ interface BrandSettings {
   copyrightText: string;
 }
 
-const WP_URL = import.meta.env.WP_GRAPHQL_URL || 'http://host.docker.internal:8050/graphql';
+const wpBaseUrl = (import.meta.env.PUBLIC_WORDPRESS_API_URL || 'http://localhost:8050').replace(/\/+$/, '');
+const WP_URL = import.meta.env.WP_GRAPHQL_URL || `${wpBaseUrl}/graphql`;
 
 // Fallback office details in case CMS values aren't returned
 const defaultOffices: OfficeInfo[] = [

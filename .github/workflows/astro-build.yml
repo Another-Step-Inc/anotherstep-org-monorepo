@@ -15,7 +15,7 @@ jobs:
           npm ci
           npm run build
         env:
-          WORDPRESS_API_URL: ${{ secrets.WORDPRESS_API_URL }}
+          PUBLIC_WORDPRESS_API_URL: ${{ secrets.WORDPRESS_API_URL }}
       - name: Deploy to Server
         uses: cloudflare/wrangler-action@v3
         with:
