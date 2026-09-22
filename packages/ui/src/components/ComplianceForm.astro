@@ -1,0 +1,278 @@
+---
+// packages/ui/src/components/ComplianceForm.astro
+interface Props {
+  endpoint?: string;
+}
+
+const { endpoint = '/api/compliance' } = Astro.props;
+---
+
+<div class="compliance-form-wrapper">
+  <h2>Compliance Form</h2>
+  <p class="form-description">Please complete this form to report compliance concerns. All reports are handled with strict confidentiality.</p>
+
+  <form id="complianceForm" action={endpoint} method="POST" novalidate>
+    <div class="form-group">
+      <label for="reporterName">Your Name <span class="optional">(optional)</span></label>
+      <input type="text" id="reporterName" name="reporterName" placeholder="Leave blank to remain anonymous" />
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="dateOfOccurrence">Date of Occurrence <span class="required">*</span></label>
+        <input type="date" id="dateOfOccurrence" name="dateOfOccurrence" required />
+      </div>
+
+      <div class="form-group">
+        <label for="location">Where did this happen? <span class="required">*</span></label>
+        <input type="text" id="location" name="location" placeholder="Site, facility, or department" required />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="details">What occurred? (Please provide complete details) <span class="required">*</span></label>
+      <textarea id="details" name="details" rows="5" required placeholder="Describe the event, circumstances, and context..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="personsInvolved">Please list the names of all persons involved <span class="required">*</span></label>
+      <textarea id="personsInvolved" name="personsInvolved" rows="3" required placeholder="Names and roles if known"></textarea>
+    </div>
+
+    <fieldset class="form-fieldset">
+      <legend>Did you discuss this situation with your supervisor and/or others within the Agency? <span class="required">*</span></legend>
+      <div class="radio-group">
+        <label><input type="radio" name="discussedInternal" value="Yes" required /> Yes</label>
+        <label><input type="radio" name="discussedInternal" value="No" required /> No</label>
+      </div>
+    </fieldset>
+
+    <div class="form-group" id="internalContactsGroup">
+      <label for="internalContacts">If yes, please list their names (if no, type NA below)</label>
+      <input type="text" id="internalContacts" name="internalContacts" value="NA" />
+    </div>
+
+    <fieldset class="form-fieldset">
+      <legend>Did you discuss this situation with anyone outside of the Agency? <span class="required">*</span></legend>
+      <div class="radio-group">
+        <label><input type="radio" name="discussedExternal" value="Yes" required /> Yes</label>
+        <label><input type="radio" name="discussedExternal" value="No" required /> No</label>
+      </div>
+    </fieldset>
+
+    <div class="form-group" id="externalContactsGroup">
+      <label for="externalContacts">If yes, please list names and contact information (if no, type NA below)</label>
+      <textarea id="externalContacts" name="externalContacts" rows="2">NA</textarea>
+    </div>
+
+    <button type="submit" id="submitBtn">Submit Report</button>
+    <div id="statusMessage" class="status-message" aria-live="polite"></div>
+  </form>
+</div>
+
+<script>
+  const form = document.getElementById('complianceForm') as HTMLFormElement | null;
+  const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement | null;
+  const statusMessage = document.getElementById('statusMessage') as HTMLDivElement | null;
+
+  // Auto-fill/clear "NA" based on radio choice
+  const setupConditionalNA = (radioName: string, targetInputId: string) => {
+    const radios = document.querySelectorAll<HTMLInputElement>(`input[name="${radioName}"]`);
+    const targetInput = document.getElementById(targetInputId) as HTMLInputElement | HTMLTextAreaElement | null;
+
+    if (!targetInput) return;
+
+    radios.forEach((radio) => {
+      radio.addEventListener('change', (e) => {
+        const val = (e.target as HTMLInputElement).value;
+        if (val === 'No' && !targetInput.value) {
+          targetInput.value = 'NA';
+        } else if (val === 'Yes' && targetInput.value === 'NA') {
+          targetInput.value = '';
+          targetInput.focus();
+        }
+      });
+    });
+  };
+
+  setupConditionalNA('discussedInternal', 'internalContacts');
+  setupConditionalNA('discussedExternal', 'externalContacts');
+
+  // Submit Handler
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!submitBtn || !statusMessage) return;
+
+    statusMessage.textContent = '';
+    statusMessage.className = 'status-message';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+
+    const formData = new FormData(form);
+    const targetEndpoint = form.action || '/api/compliance';
+
+    try {
+      const response = await fetch(targetEndpoint, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        statusMessage.textContent = result.message || 'Report submitted successfully.';
+        statusMessage.classList.add('success');
+        form.reset();
+        
+        // Reset default inputs
+        const internalField = document.getElementById('internalContacts') as HTMLInputElement | null;
+        const externalField = document.getElementById('externalContacts') as HTMLTextAreaElement | null;
+        if (internalField) internalField.value = 'NA';
+        if (externalField) externalField.value = 'NA';
+
+        // Automatically close slide-over drawer after success delay
+        setTimeout(() => {
+          const overlay = document.getElementById('complianceDrawerOverlay');
+          if (overlay) {
+            overlay.classList.remove('is-open');
+            overlay.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            statusMessage.textContent = '';
+            statusMessage.className = 'status-message';
+          }
+        }, 2200);
+
+      } else {
+        statusMessage.textContent = result.error || 'Submission failed.';
+        statusMessage.classList.add('error');
+      }
+    } catch (err) {
+      statusMessage.textContent = 'Network error. Please try again.';
+      statusMessage.classList.add('error');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Report';
+    }
+  });
+</script>
+
+<style>
+  .compliance-form-wrapper {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 1rem 0;
+  }
+
+  .form-description {
+    color: #4b5563;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .form-group, .form-fieldset {
+    margin-bottom: 1.25rem;
+    border: none;
+    padding: 0;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 600px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  label, legend {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: #1f2937;
+    font-size: 0.95rem;
+  }
+
+  .required { color: #dc2626; }
+  .optional { font-weight: normal; color: #6b7280; font-size: 0.85em; }
+
+  input[type="text"],
+  input[type="date"],
+  textarea {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    background-color: #fff;
+    color: #111827;
+  }
+
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
+
+  .radio-group {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 0.25rem;
+  }
+
+  .radio-group label {
+    font-weight: normal;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  button[type="submit"] {
+    background-color: #2563eb;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 1rem;
+    transition: background-color 0.2s ease;
+  }
+
+  button[type="submit"]:hover {
+    background-color: #1d4ed8;
+  }
+
+  button[type="submit"]:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+  }
+
+  .status-message {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    display: none;
+  }
+
+  .status-message.success {
+    display: block;
+    background-color: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+  }
+
+  .status-message.error {
+    display: block;
+    background-color: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+  }
+</style>

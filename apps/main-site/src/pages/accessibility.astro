@@ -1,0 +1,40 @@
+---
+import MainLayout from "src/layouts/MainLayout.astro";
+import BlockResolver from "@anothersteporg/ui/components/BlockResolver.astro";
+
+import "src/styles/global.css";
+
+import { wpFetch, EDITOR_BLOCKS_FRAGMENT } from '@anothersteporg/ui/lib/wp.js';
+
+const data = await wpFetch(`
+  query GetPageByUri {
+    page(id: "accessibility", idType: URI) {
+      title
+      date
+      ${EDITOR_BLOCKS_FRAGMENT}
+    }
+  }
+`);
+
+const page = data?.page || {};
+const blocks = page.editorBlocks || [];
+
+// Format date if available, or fall back to default
+const formattedDate = page.date 
+  ? new Date(page.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+  : 'September 2026';
+---
+
+<MainLayout 
+  title="Accessibility Statement" 
+  description="Accessibility Statement for Another Step, Inc. Our commitment to digital inclusion and WCAG standards."
+>
+  <main class="flex-1 py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
+    <header class="border-b border-slate-200 pb-6 mb-8">
+      <h1 class="text-3xl font-black text-[#004E8B] mb-2">{page.title || "Accessibility Statement"}</h1>
+      <p class="text-sm text-slate-500">Updated: {formattedDate}</p>
+    </header>
+
+    <BlockResolver blocks={blocks} />
+  </main>
+</MainLayout>

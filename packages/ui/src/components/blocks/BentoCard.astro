@@ -1,0 +1,117 @@
+---
+interface Props {
+  colSpan?: string;
+  cardBgStyle?: string;
+  textColor?: string;
+  icon?: string;
+  iconColor?: string;
+  title?: string;
+  description?: string;
+}
+
+const {
+  colSpan = 'md:col-span-1',
+  cardBgStyle = 'bg-surface-container-lowest',
+  textColor = 'text-on-surface',
+  icon = '',
+  iconColor = 'text-brand-blue',
+  title = '',
+  description = '',
+} = Astro.props;
+
+const colorClass = (value: string, prefix: string) =>
+  value.startsWith(`${prefix}-`) ? value : `${prefix}-${value}`;
+const textClass = colorClass(textColor, 'text');
+const iconClass = colorClass(iconColor, 'text');
+const colSpanClasses: Record<string, string> = {
+  '1': 'md:col-span-1',
+  '2': 'md:col-span-2',
+  '3': 'md:col-span-3',
+  '4': 'md:col-span-4',
+  '5': 'md:col-span-5',
+  '6': 'md:col-span-6',
+};
+const spanValue = colSpan.replace(/^md:col-span-/, '').replace(/^col-span-/, '');
+const normalizedColSpan = colSpanClasses[spanValue] || 'md:col-span-1';
+const cardClasses = `${normalizedColSpan} ${cardBgStyle} ${textClass} p-8 md:p-10 rounded-[2rem] flex flex-col justify-between transition-transform hover:scale-[1.01]`;
+---
+
+<div class={cardClasses}>
+  <div>
+    {icon && (
+      <span class={`material-symbols-outlined text-4xl md:text-5xl mb-6 ${iconClass}`} data-icon={icon}>
+        {icon}
+      </span>
+    )}
+
+    {title && (
+      <h3 class={`text-2xl md:text-3xl font-bold mb-4 ${textClass}`}>
+        {title}
+      </h3>
+    )}
+
+    {description && (
+      <p class={`text-lg opacity-90 mb-6 ${textClass}`}>
+        {description}
+      </p>
+    )}
+  </div>
+
+  <div class="mt-auto bento-card-content">
+    <slot />
+  </div>
+</div>
+<style is:global>
+  .bento-card-content {
+    /* Hide Gutenberg editor fallback containers */
+    :global(.wp-fallback),
+    :global(.wp-block-buttons__fallback) {
+      display: none !important;
+    }
+
+    /* Target ANY list with the is-style-checkmark-list class */
+    :global(ul.is-style-checkmark-list),
+    :global(.is-style-checkmark-list) {
+      list-style-type: none !important;
+      padding-left: 0 !important;
+      margin-left: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 1rem !important; /* space-y-4 */
+      font-size: 1.125rem !important; /* text-lg */
+      line-height: 1.75rem !important;
+      opacity: 0.9;
+    }
+
+    /* Target the list items directly */
+    :global(ul.is-style-checkmark-list li),
+    :global(.is-style-checkmark-list li) {
+      display: flex !important;
+      align-items: flex-start !important;
+      gap: 0.75rem !important; /* gap-3 */
+      position: relative !important;
+      margin-bottom: 0 !important;
+      list-style: none !important;
+    }
+
+    /* Insert the Material Icon Checkmark before each list item */
+    :global(ul.is-style-checkmark-list li::before),
+    :global(.is-style-checkmark-list li::before) {
+      content: "check_circle" !important;
+      font-family: 'Material Symbols Outlined' !important;
+      font-weight: normal !important;
+      font-style: normal !important;
+      font-size: 1.5rem !important;
+      line-height: 1 !important;
+      letter-spacing: normal !important;
+      text-transform: none !important;
+      display: inline-block !important;
+      white-space: nowrap !important;
+      direction: ltr !important;
+      -webkit-font-smoothing: antialiased !important;
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+      color: #002f6c !important; /* Replace with your desired checkmark color */
+      flex-shrink: 0 !important;
+    }
+  }
+</style>

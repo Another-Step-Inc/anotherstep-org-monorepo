@@ -1,0 +1,76 @@
+---
+import MainLayout from "src/layouts/MainLayout.astro";
+import BlockResolver from "@anothersteporg/ui/components/BlockResolver.astro";
+
+import "src/styles/global.css";
+import { wpFetch, EDITOR_BLOCKS_FRAGMENT } from "@anothersteporg/ui/lib/wp";
+import { SERVICES_ARCHIVE_QUERY } from "@anothersteporg/ui/lib/queries";
+
+const data = await wpFetch(`
+  query GetPageByUri {
+    page(id: "services", idType: URI) {
+      title
+      ${EDITOR_BLOCKS_FRAGMENT}
+    }
+  }
+`)
+
+const serviceData = await wpFetch(SERVICES_ARCHIVE_QUERY);
+
+const blocks = data?.page?.editorBlocks || [];
+const services = serviceData?.services?.nodes || [];
+
+const cardThemes = [
+  {
+    // Index % 3 === 0 (Column 1: Blue)
+    iconBg: "bg-brand-blue text-on-brand-blue",
+    titleColor: "text-brand-blue",
+    btnColor: "text-brand-blue hover:bg-brand-blue/5",
+  },
+  {
+    // Index % 3 === 1 (Column 2: Red)
+    iconBg: "bg-brand-dark-red text-on-brand-red",
+    titleColor: "text-brand-dark-red",
+    btnColor: "text-brand-dark-red hover:bg-brand-dark-red/5",
+  },
+  {
+    // Index % 3 === 2 (Column 3: Yellow)
+    iconBg: "bg-brand-dark-yellow text-on-brand-dark-yellow",
+    titleColor: "text-brand-dark-yellow",
+    btnColor: "text-brand-dark-yellow hover:bg-brand-dark-yellow/5",
+  }
+];
+---
+
+<MainLayout title={data?.page?.title}>
+  <BlockResolver blocks={blocks} />
+  <div class="max-w-7xl mx-auto px-8 py-16 md:py-24">
+    <section>
+      {/* Dynamic Grid Column Matrix */}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-32 gap-8">
+        {services.map((service, index) => {
+          const theme = cardThemes[index % 3];
+          return (
+            <div class="group bg-surface-container-low p-10 rounded-[2.5rem] flex flex-col justify-between hover:bg-surface-container-lowest transition-all duration-300 shadow-[0_32px_64px_-24px_rgba(0,0,0,0.06)] min-h-[420px]">
+              <div>
+                <div class={theme.iconBg + " w-16 h-16 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300"}>
+                  <span class="material-symbols-outlined text-3xl" data-icon="home_work" style="font-variation-settings: 'FILL' 1;">home_work</span>
+                </div>
+                <h3 class={"text-2xl font-black " + theme.titleColor + " mb-4 tracking-tight leading-tight"}>
+                  {service.title}
+                </h3>
+                <p class="text-base text-on-surface-variant leading-relaxed" set:html={service.content} />
+              </div>
+              <div class="mt-8">
+                <a href={`/services/${service.slug}`} class={theme.btnColor + " font-bold flex items-center gap-2 group/btn py-2 px-4 -ml-4 rounded-lg hover:bg-brand-blue/5 transition-colors"}>
+                  More Info
+                  <span class="material-symbols-outlined group-hover/btn:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+                </a>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  </div>
+</MainLayout>

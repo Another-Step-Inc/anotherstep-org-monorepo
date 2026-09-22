@@ -1,0 +1,236 @@
+---
+// src/pages/news/index.astro
+import type { Page } from "astro";
+import MainLayout from "src/layouts/MainLayout.astro";
+import BlockResolver from "@anothersteporg/ui/components/BlockResolver.astro";
+
+import { wpFetch, EDITOR_BLOCKS_FRAGMENT } from "@anothersteporg/ui/lib/wp.js";
+import "src/styles/global.css";
+
+// 1. Define your Post interface
+interface Post {
+  slug: string;
+  date: string;
+  title: { rendered: string };
+  excerpt: { rendered: string };
+  _embedded?: {
+    "wp:term"?: Array<Array<{ name: string; slug: string }>>;
+  };
+}
+
+// 2. Explicitly type Astro.props
+interface Props {
+  page: Page<Post>;
+}
+
+export async function getStaticPaths({ paginate }: { paginate: Function}) {
+  // Implementation for generating static paths
+  // define WordPress API
+  const WP_API_URL = "http://host.docker.internal:8050/wp-json/wp/v2";
+
+  // 1. Fetch total pages from WordPress headers to determine how many posts exist
+  const countResponse = await fetch(`${WP_API_URL}/posts?per_page=1`);
+  const totalPosts = parseInt(countResponse.headers.get("X-WP-Total") || "0", 10);
+  const totalPages = Math.ceil(totalPosts / 10);
+
+  // 2. Fetch all posts up to total count (or in batches if using many posts)
+  const postsResponse = await fetch(`${WP_API_URL}/posts?_embed&per_page=${totalPosts || 100}`);
+  const allPosts = await postsResponse.json();
+
+  // 3. Return paginated paths (e.g., 5 posts per page)
+  return paginate(allPosts, { pageSize: 5 });
+}
+
+
+// Access paginated data passed via props
+const { page } = Astro.props;
+const posts = page.data;
+
+const data = await wpFetch(`
+  query GetPageByUri {
+    page(id: "news", idType: URI) {
+      title
+      ${EDITOR_BLOCKS_FRAGMENT}
+    }
+  }
+`)
+
+const blocks = data?.page?.editorBlocks || [];
+---
+
+<MainLayout title={data?.page?.title}>
+  <!-- Hero Section -->
+  <section class="bg-surface-container-low py-20 px-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="max-w-2xl">
+        <h1
+          class="text-[3.5rem] leading-[1.1] font-display font-extrabold text-brand-blue mb-6 tracking-tight"
+        >
+          Sector News
+        </h1>
+        <p
+          class="text-body-lg text-on-surface-variant leading-relaxed opacity-90"
+        >
+          Stay informed on the latest developments in disability services,
+          community initiatives, and the policies that shape an inclusive future
+          for everyone.
+        </p>
+      </div>
+    </div>
+  </section>
+  <!-- Archive Grid -->
+  <section class="py-20 px-8 max-w-7xl mx-auto">
+    <div class="flex flex-col gap-12">
+      <!-- News Card -->
+      {
+        posts.map((post: Post) => {
+          const category = post._embedded?.["wp:term"]?.[0]?.[0];
+          const categorySlug = category?.slug || "default";
+          const categoryName = category?.name || "News";
+
+          const categoryStyles = {
+            "policy-and-advocacy":
+              "bg-brand-blue-fixed text-on-brand-blue-fixed-variant",
+            "agency-updates":
+              "bg-brand-red-fixed text-on-brand-red-fixed-variant text-label-md",
+            "community-stories":
+              "bg-brand-yellow-fixed text-on-brand-yellow-fixed-variant",
+            "resource-and-tools":
+              "bg-brand-green-fixed text-on-brand-green-fixed-variant",
+            "the-without-walls-perspective":
+              "bg-brand-purple-fixed text-on-brand-purple-fixed-variant",
+            welcome: "bg-brand-orange-fixed text-on-brand-orange-fixed-variant",
+            default:
+              "bg-brand-sky-blue-fixed text-on-brand-sky-blue-fixed-variant",
+          };
+
+          const badgeClass =
+            categoryStyles[categorySlug] || categoryStyles["default"];
+
+          const formattedDate = new Date(post.date).toLocaleDateString(
+            "en-US",
+            {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            },
+          );
+          return (
+            <article class="group flex flex-col md:flex-row bg-surface-container-lowest rounded-xl overflow-hidden editorial-shadow transition-transform duration-300 hover:-translate-y-1">
+              <div class="aspect-video md:aspect-[4/3] md:w-2/5 bg-surface-container-high overflow-hidden shrink-0">
+                <img
+                  class="w-full h-full object-cover"
+                  data-alt="A professional, bright meeting room where community leaders are discussing disability policy."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0Nf7er-6T3q3pftbhBR0ya0yWjOnatkJvqUTx4QaXzJQhmViZ0ymvLrWplsBCd7i6RVs7t-oSgipPd_C3LkdEGH5yWFv4F2yOMZN6i3iUjhPfkmOYInF_kA_g8HnGjOug8P2bhTcAxmKELKuowS43iaYLCxIQ5Ao7SltMdzFLPT23-wSErr3U0zbnnfGZxnF9PJJzKmV7CvLcgcI8J1rTdOYqj7XJ9QK8ho640VfIaeQN-XlZM4hUSZ0m2AFblN7NVmaPPxWM62Y"
+                />
+              </div>
+              <div class="p-8 md:p-10 flex flex-col justify-center flex-grow">
+                {post._embedded?.["wp:term"]?.[0]?.[0] && (
+                  <span
+                    class={`inline-block px-3 py-1 text-label-md font-bold rounded-full w-fit mb-4 uppercase tracking-wider ${badgeClass}`}
+                  >
+                    {categoryName}
+                  </span>
+                )}
+                <h2 class="text-headline-sm font-headline font-bold text-on-surface mb-3 group-hover:text-primary transition-colors">
+                  <a
+                    href={`/news/${post.slug}`}
+                    class="hover:text-brand-blue"
+                    set:html={post.title.rendered}
+                  />
+                </h2>
+                <time class="text-label-md text-outline font-medium mb-4 block">
+                  {formattedDate}
+                </time>
+                <p
+                  class="text-body-lg text-on-surface-variant line-clamp-3 mb-6 max-w-2xl"
+                  set:html={post.excerpt.rendered}
+                />
+                <div class="mt-auto">
+                  <a
+                    class="inline-flex items-center gap-2 text-brand-blue font-bold group-hover:gap-4 transition-all"
+                    href={`/news/${post.slug}`}
+                  >
+                    Read Article
+                    <span class="material-symbols-outlined text-[20px]">
+                      chevron_right
+                    </span>
+                  </a>
+                </div>
+              </div>
+            </article>
+          );
+        })
+      }
+    </div>
+    <!-- Dynamic Pagination Navigation -->
+    <nav
+      class="mt-20 flex justify-between items-center border-t border-outline-variant/30 pt-10"
+    >
+      {/* Previous Page Link */}
+      {
+        page.url.prev ? (
+          <a
+            class="flex items-center gap-3 text-body-lg font-bold text-brand-blue hover:text-brand-container transition-colors group"
+            href={page.url.prev}
+          >
+            <span class="material-symbols-outlined transition-transform group-hover:-translate-x-1">
+              arrow_back
+            </span>
+            Newer Posts
+          </a>
+        ) : (
+          <span class="flex items-center gap-3 text-body-lg font-bold text-outline opacity-50 cursor-not-allowed">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Newer Posts
+          </span>
+        )
+      }
+
+      {/* Page Numbers */}
+      <div class="hidden sm:flex gap-4">
+        {
+          Array.from({ length: page.lastPage }, (_, i) => i + 1).map((pageNum) => {
+            const pageUrl = pageNum === 1 ? "/news" : `/news/${pageNum}`;
+            const isCurrent = pageNum === page.currentPage;
+
+            return isCurrent ? (
+              <span class="w-10 h-10 rounded-full bg-brand-blue text-on-brand-blue flex items-center justify-center font-bold">
+                {pageNum}
+              </span>
+            ) : (
+              <a
+                class="w-10 h-10 rounded-full hover:bg-surface-container-high flex items-center justify-center font-bold text-on-surface-variant transition-colors"
+                href={pageUrl}
+              >
+                {pageNum}
+              </a>
+            );
+          })
+        }
+      </div>
+
+      {/* Next Page Link */}
+      {
+        page.url.next ? (
+          <a
+            class="flex items-center gap-3 text-body-lg font-bold text-brand-blue hover:text-brand-container transition-colors group"
+            href={page.url.next}
+          >
+            Older Posts
+            <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">
+              arrow_forward
+            </span>
+          </a>
+        ) : (
+          <span class="flex items-center gap-3 text-body-lg font-bold text-outline opacity-50 cursor-not-allowed">
+            Older Posts
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </span>
+        )
+      }
+    </nav>
+  </section>
+  
+  <BlockResolver blocks={blocks} />
+</MainLayout>

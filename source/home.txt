@@ -1,0 +1,21 @@
+<!-- <Hero 
+			title='Partnering with People to Create the Lives They Choose'
+			subtitle='Another Step, Inc. is dedicated to supporting people with developmental disabilities 
+          in fulfilling their potential and exercising control over their lives within their 
+          own communities.'
+			buttonText='Support Our Mission'
+			buttonLink='/donation'
+			bgImage='/images/front-page-hero.jpg'
+		/> -->
+
+Who We Are
+
+The Originator of the <span class="text-brand-blue">"Without Walls"</span> Service Model
+
+Our Reach & Impact
+
+100% Community Based
+Serving Rockland & Westchester Counties without the use of restrictive facilities.
+
+Residential Opportunities
+Including five supervised residences (IRAs) and independent rental subsidies.

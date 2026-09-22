@@ -1,0 +1,52 @@
+<!-- Hero Section -->
+<!--   <section class="relative min-h-[85vh] flex items-center overflow-hidden">
+    <div class="absolute inset-0 z-0">
+      <img
+        alt=""
+        class="w-full h-full object-cover"
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLgv_VaEzZoo5BJZmBcaXFxYVWxLZZtrB7wKAJYF7JDnVbirgJ-sWrA8AM4DB24qmtmUIm6wl3zVoc1IUI91d_mHIv4a67U8g6zjMPf2NJRu48HRDEqKXEskFPW9C0v3_djp5T5dkcD-ssIs4wAx_V7s1-m3MgsyQ5UqXS6jh1gmmXxq194gCTeMl7XaqUzfS4RyEj0xjg6_vK6mCJgNvL_jFWMUPbVSFsPOpVvzZCi2TjhohwVsWvqYeix8lRR7r_duQ7adQ3ZKo"
+      />
+      <div
+        class="absolute inset-0 bg-gradient-to-r from-surface via-surface/60 to-transparent"
+      >
+      </div>
+    </div>
+    <div
+      class="relative z-10 max-w-7xl mx-auto px-8 grid grid-cols-1 md:grid-cols-2 gap-12 items-center"
+    >
+      <div class="max-w-xl">
+        <span
+          class="inline-block bg-brand-dark-yellow text-on-brand-dark-yellow px-4 py-1 rounded-full text-label-md font-bold mb-6 tracking-wide"
+          >FUNDRAISER EVENT</span
+        >
+        <h1
+          class="text-display-lg font-black text-brand-blue leading-[1.1] mb-6 tracking-tight"
+          style="font-size: 3.5rem;"
+        >
+          Support Another Step with Crayola Flowers
+        </h1>
+        <p
+          class="text-body-lg text-on-surface-variant mb-10 leading-relaxed font-medium"
+        >
+          Brighten someone's day while empowering independence. Every bouquet
+          purchased helps fund our community programs and advocacy work.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a
+            class="bg-brand-blue text-on-brand-blue px-10 py-5 rounded-full font-bold text-lg flex items-center gap-3 hover:bg-brand-blue-container transition-all active:scale-95 shadow-lg shadow-brand-blue/20"
+            href="https://www.crayolaflowers.com"
+            target="_blank"
+          >
+            Shop the Collection
+            <span class="material-symbols-outlined text-xl">open_in_new</span>
+          </a>
+          <a
+            class="px-10 py-5 rounded-full font-bold text-lg text-brand-blue hover:bg-brand-blue-container/10 transition-all border-2 border-brand-blue/20"
+            href="#how-it-works"
+          >
+            Learn More
+          </a>
+        </div>
+      </div>
+    </div>
+  </section> -->

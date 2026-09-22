@@ -1,0 +1,319 @@
+---
+// src/components/CustomGridSection.astro
+interface CardAttribute {
+  title?: string;
+  content?: string;
+  icon?: string;
+  theme?: string;
+  linkUrl?: string;
+  linkText?: string;
+}
+
+interface Props {
+    headline?: string;
+    description?: string;
+    bgStyle?: string;
+    textAlignment?: string;
+    styleVariant?: string;
+    useQuery?: boolean;
+    postType?: string;
+    postsPerPage?: number;
+    renderedHtml?: string; // Fallback container to automatically load manual inner cards
+    innerBlocks?: { attributes: CardAttribute }[];
+    dynamicCards?: CardAttribute[];
+}
+
+const { 
+    headline, 
+    description, 
+    bgStyle = 'bg-surface-container-low', 
+    textAlignment = 'text-center', 
+    styleVariant = 'standard',
+    useQuery = false,
+    innerBlocks = [],
+    dynamicCards = [] 
+} = Astro.props;
+
+const bgClass = bgStyle || 'bg-surface-container-low';
+const alignmentClass = textAlignment || 'text-center';
+const isHomepageVariant = styleVariant === 'accent-line';
+const isMinimalSpaced = styleVariant === 'minimal-spaced';
+const isBottomAccent = styleVariant === 'bottom-accent';
+const isHorizontalIcon = styleVariant === 'horizontal-icon';
+const isEditorialHover = styleVariant === 'editorial-hover';
+
+// Choose which dataset to loop through based on your inspector toggle
+const cardsToRender = useQuery ? dynamicCards : innerBlocks.map(block => block.attributes);
+---
+<section class={`py-16 px-4 md:px-8 ${bgClass} custom-grid-section`}>
+  <div class="max-w-7xl mx-auto">
+    
+    <!-- Section Header Block Mapping Area -->
+    {(headline || description) && (
+      <div class={`mb-12 ${alignmentClass}`}>
+        {isHorizontalIcon ? (
+          /* "horizontal-icon" commitment header variant */
+          <div class="mb-16 text-center max-w-3xl mx-auto">
+            {headline && (
+              <h2 class="font-display text-headline-lg font-extrabold text-brand-blue mb-4">
+                {headline}
+              </h2>
+            )}
+            {description && (
+              <p class="font-body text-body-lg text-on-surface-variant">
+                {description}
+              </p>
+            )}
+          </div>
+        ) : isHomepageVariant ? (
+          /* "accent-line" -> Bold title with decorative yellow line & italicized description */
+          <>
+            {headline && (
+              <h2 class="text-3xl md:text-4xl font-bold text-brand-blue mb-4">
+                {headline}
+              </h2>
+            )}
+            <div class="w-24 h-1 bg-brand-yellow mx-auto rounded-full mb-6"></div>
+            {description && (
+              <p class="text-lg text-on-brand-dark-yellow max-w-3xl mx-auto italic">
+                "{description}"
+              </p>
+            )}
+          </>
+        ) : styleVariant === 'minimal-spaced' || 'bottom-accent' || 'editorial-hover' ? (
+          /* "minimal-spaced" or "bottom-accent" or "editorial-hover" */
+          <>
+            {headline && (
+              <h2 class="text-headline-lg font-bold text-on-surface mb-12 text-center">
+                {headline}
+              </h2>
+            )}
+            {description && (
+              <p class="text-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed -mt-6 mb-8">
+                {description}
+              </p>
+            )}
+          </>
+        ) : (
+          /* "standard" -> Default Simple Layout */
+          <>
+            {headline && (
+              <h2 class="text-3xl md:text-4xl font-bold mb-4 text-brand-blue">
+                {headline}
+              </h2>
+            )}
+            {description && (
+              <p class="text-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
+                {description}
+              </p>
+            )}
+          </>
+        )}
+      </div>
+    )}
+
+    <!-- Clean Layout Loop -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {cardsToRender.map((card) => {
+        const theme = (card.theme || '').toLowerCase();
+        const strippedContent = card.content ? card.content.replace(/<p\b[^>]*>(.*?)<\/p>/gis, '$1') : '';
+
+        if (isEditorialHover) {
+          let iconBg = 'bg-brand-blue/10 text-brand-blue group-hover:bg-brand-blue group-hover:text-on-brand-blue';
+          let titleColor = 'text-brand-blue';
+
+          if (theme.includes('red') || theme.includes('dark-red')) {
+            iconBg = 'bg-brand-red/10 text-brand-red group-hover:bg-brand-red group-hover:text-on-brand-red';
+            titleColor = 'text-brand-red';
+          } else if (theme.includes('yellow') || theme.includes('dark-yellow')) {
+            iconBg = 'bg-brand-yellow/20 text-brand-dark-yellow group-hover:bg-brand-dark-yellow group-hover:text-on-brand-yellow';
+            titleColor = 'text-brand-dark-yellow';
+          }
+
+          return (
+            /* Editorial Hover Card */
+            <div class="bg-surface-container-lowest p-8 rounded-xl editorial-shadow hover:bg-surface-bright transition-colors group">
+              {card.icon && (
+                <div class={`w-14 h-14 rounded-full flex items-center justify-center mb-6 transition-all ${iconBg}`}>
+                  <span class="material-symbols-outlined text-[2rem]" data-weight="fill">
+                    {card.icon}
+                  </span>
+                </div>
+              )}
+              {card.title && (
+                <h3 class={`text-title-lg font-bold mb-3 ${titleColor}`}>
+                  {card.title}
+                </h3>
+              )}
+              {card.content && (
+                <div class="text-on-surface-variant leading-relaxed [&>p]:mb-4 last:[&>p]:mb-0">
+                  <p class="text-lg text-on-surface-variant" set:html={strippedContent} />
+                </div>
+              )}
+              {card.linkUrl && (
+                <a href={card.linkUrl} class="text-brand-blue hover:underline font-bold mt-4 inline-block">
+                  {card.linkText || 'Learn More'}
+                </a>
+              )}
+            </div>
+          );
+        }
+
+        if (isHorizontalIcon) {
+          return (
+            /* Horizontal Icon */
+            <div class="group p-8 rounded-3xl bg-surface hover:bg-surface-container-highest transition-all duration-300 border border-outline-variant/20 hover:border-transparent">
+              <div class="flex items-start gap-4">
+                {card.icon && (
+                  <span 
+                    class="material-symbols-outlined text-brand-blue text-3xl shrink-0" 
+                    style="font-variation-settings: 'FILL' 1;"
+                  >
+                    {card.icon}
+                  </span>
+                )}
+                <div>
+                  {card.title && (
+                    <h4 class="font-bold text-lg mb-2 text-brand-blue">
+                      {card.title}
+                    </h4>
+                  )}
+                  {card.content && (
+                    <div class="text-on-surface-variant leading-relaxed [&>p]:mb-4 last:[&>p]:mb-0">
+                      <p class="text-lg text-on-surface-variant" set:html={strippedContent} />
+                    </div>
+                  )}
+                  {card.linkUrl && (
+                    <a href={card.linkUrl} class="text-brand-blue hover:underline font-bold mt-2 inline-block">
+                      {card.linkText || 'Learn More'}
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        if (isBottomAccent) {
+          let borderClass = 'border-brand-blue';
+          let iconBgClass = 'bg-brand-blue-fixed';
+          let iconTextClass = 'text-brand-blue';
+
+          if (theme.includes('red') || theme.includes('dark-red')) {
+            borderClass = `border-brand-red`;
+            iconBgClass = `bg-brand-red-fixed`;
+            iconTextClass = 'text-brand-red';
+          } else if (theme.includes('yellow') || theme.includes('dark-yellow')) {
+            borderClass = `border-brand-yellow`;
+            iconBgClass = `bg-brand-yellow-fixed`;
+            iconTextClass = 'text-brand-dark-yellow';
+          }
+          
+          return (
+            /* Bottom-Accent Card Variant */
+            <div class={`bg-surface-container-lowest p-10 rounded-xl shadow-[0_16px_32px_rgba(0,0,0,0.04)] hover:-translate-y-2 transition-transform border-b-8 duration-300 ${borderClass}`}>
+              {card.icon && (
+                <div class={`w-16 h-16 rounded-full flex items-center justify-center mb-8 ${iconBgClass}`}>
+                  <span class={`material-symbols-outlined text-3xl ${iconTextClass}`}>{card.icon}</span>
+                </div>
+              )}
+
+              {card.title && (
+                <h3 class="text-title-lg font-bold text-on-surface mb-4">
+                  {card.title}
+                </h3>
+              )}
+
+              {card.content && (
+                <div class="text-body-lg text-on-surface-variant leading-relaxed [&>p]:mb-4 last:[&>p]:mb-0">
+                  <p class="text-lg text-on-surface-variant" set:html={strippedContent} />
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        if (isMinimalSpaced) {
+          /* Minimal Spaced Card Variant */
+          return (
+            <div 
+              class={`group bg-surface-container-low hover:bg-surface-container-lowest transition-colors p-8 rounded-[2rem] border border-transparent hover:border-brand-blue/20 hover:shadow-xl duration-300`}
+            >
+              {card.icon && (
+                <span 
+                  class={`material-symbols-outlined text-4xl mb-6 block text-brand-${card.theme}`} 
+                  style="font-variation-settings: 'FILL' 0;"
+                >
+                  {card.icon}
+                </span>
+              )}
+
+              {card.title && (
+                <h4 class="text-title-lg font-bold mb-4 text-slate-900">
+                  {card.title}
+                </h4>
+              )}
+              
+              {card.content && (
+                <div class="text-on-surface-variant leading-relaxed mb-6 text-sm md:text-base [&>p]:mb-4 last:[&>p]:mb-0">
+                  <p class="text-lg text-on-surface-variant" set:html={strippedContent} />
+                </div>
+              )}
+
+              {card.linkUrl && (
+                <a 
+                  class="text-brand-blue font-bold inline-flex items-center gap-2 group-hover:gap-4 transition-all" 
+                  href={card.linkUrl}
+                >
+                  {card.linkText || 'Learn More'} 
+                  <span class="material-symbols-outlined">arrow_forward</span>
+                </a>
+              )}
+            </div>
+          );
+        }
+
+        /* Default & Accent-Line Card Variant */
+        return (
+          <div 
+            class={`custom-grid-card p-8 rounded-[2rem] border border-slate-100 bg-white ${
+              isHomepageVariant 
+                ? 'shadow-sm transition-shadow duration-300 hover:shadow-md' 
+                : 'transition-all duration-300 hover:shadow-md'
+            } ${card.theme || ''}`}
+          >
+            {card.icon && (
+              <div class="w-14 h-14 bg-blue-50 text-blue-900 rounded-2xl flex items-center justify-center mb-6">
+                <span class="material-symbols-outlined text-3xl">{card.icon}</span>
+              </div>
+            )}
+
+            {card.title && <h3 class="text-xl font-bold text-slate-900 mb-4">{card.title}</h3>}
+            
+            {card.content && (
+              <div class="text-slate-600 leading-relaxed text-sm md:text-base [&>p]:mb-4 last:[&>p]:mb-0">
+                <p class="text-lg text-on-surface-variant" set:html={strippedContent} />
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+
+  </div>
+</section>
+
+<style is:global>
+  /* Global animation mappings for card layouts */
+  .custom-grid-section .custom-grid-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+  
+  .custom-grid-section .custom-grid-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .editorial-shadow {
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.04);
+  }
+</style>

@@ -1,38 +1,779 @@
 ---
 // src/components/BlockResolver.astro
-import Hero from './Hero.astro';
-import TextBlock from './TextBlock.astro';
-import ImageGallery from './ImageGallery.astro';
-import TwoColumns from './TwoColumns.astro';
+import Hero from './blocks/Hero.astro';
+import TextBlock from './blocks/TextBlock.astro';
+import ImageGallery from './blocks/ImageGallery.astro';
+import GallerySection from './blocks/GallerySection.astro';
+import VideoSection from './blocks/VideoSection.astro';
+import TwoColumnCardSection from './blocks/TwoColumnCardSection.astro';
+import DynamicLegalInfoCard from './blocks/DynamicLegalInfoCard.astro';
+import ThreeColumns from './blocks/ThreeColumns.astro';
+import OneColumnCard from './blocks/OneColumnCard.astro';
+import SplitFeature from './blocks/SplitFeature.astro';
+import SplitNarrative from './blocks/SplitNarrative.astro';
+import CustomGridSection from './blocks/CustomGridSection.astro';
+import BentoGridSection from './blocks/BentoGridSection.astro';
+import BentoCard from './blocks/BentoCard.astro';
+import JourneyForwardSection from './blocks/JourneyForwardSection.astro';
+import CtaContactCardSection from './blocks/CtaContactCardSection.astro';
+import CtaSection from './blocks/CtaSection.astro';
+import ImportantNotice from './blocks/ImportantNotice.astro';
+import InclusionAndSupport from "./blocks/InclusionAndSupport.astro";
+import UpcomingEvents from "./blocks/UpcomingEvents.astro";
+import ContactGridSection from './blocks/ContactGridSection.astro';
+import DonationGridSection from './blocks/DonationGridSection.astro';
 
-const { blocks = [] } = Astro.props
-const allBlocks = blocks || [];
+import { wpFetch, EDITOR_BLOCKS_FRAGMENT } from '../lib/wp.js';
+import { VALUES_ARCHIVE_QUERY } from "../lib/queries";
 
-if (!blocks || blocks.length === 0) return null;
+// 1. Dynamic Block Component Map for standard blocks
+const STANDARD_BLOCKS: Record<string, any> = {
+    'anotherstep/page-hero-section': Hero,
+    'anotherstep/gallery-placeholder': GallerySection,
+    'anotherstep/video-placeholder': VideoSection,
+    'anotherstep/two-column-card-section': TwoColumnCardSection,
+    'anotherstep/homepage-ethics-section': OneColumnCard,
+    'anotherstep/split-feature-section': SplitFeature,
+    'anotherstep/split-narrative-section': SplitNarrative,
+    'anotherstep/dynamic-info-section': DynamicLegalInfoCard,
+    'anotherstep/cta-contact-card-section': CtaContactCardSection,
+    'anotherstep/page-cta-section': CtaSection,
+    'anotherstep/journey-forward-section': JourneyForwardSection,
+    'anotherstep/important-notice': ImportantNotice,
+    'anotherstep/inclusion-and-support': InclusionAndSupport,
+    'anotherstep/upcoming-events': UpcomingEvents,
+    'anotherstep/contact-grid-section': ContactGridSection,
+    'anotherstep/donation-grid-section': DonationGridSection
+};
+
+const { blocks = [], galleryData, videoData } = Astro.props;
+
+// 2. Helper to extract and normalize attributes
+const getBlockProps = (block: any) => {
+    let attrs = block.attributes || {};
+    if (block.attributesJSON && typeof block.attributesJSON === 'string') {
+        try {
+            attrs = { ...attrs, ...JSON.parse(block.attributesJSON) };
+        } catch (e) {
+            console.error(`Error parsing attributesJSON for ${block.name}`, e);
+        }
+    }
+
+    // Remap specific attributes where prop names differ from GraphQL field names
+    return {
+        ...attrs,
+        title: attrs.heroTitle || attrs.title,
+        paragraph: attrs.heroDescription,
+        imageSrc: attrs.heroImageUrl,
+        headline: attrs.ethicsHeadline || attrs.headline,
+        heading: attrs.heading,
+        noticeText: attrs.noticeText,
+        innerBlocks: block.innerBlocks || [],
+        content: block.renderedHtml
+    };
+};
+
+// 3. Helper to resolve inner block attributes safely
+const resolveInnerBlocks = (innerBlocks: any[] = []) => {
+    return innerBlocks.map((child: any) => {
+        let childAttrs = child.attributes || {};
+        if (child.attributesJSON) {
+            try {
+                childAttrs = { ...childAttrs, ...JSON.parse(child.attributesJSON) };
+            } catch (e) {
+                console.error("Failed to parse inner block JSON", e);
+            }
+        }
+        return {
+            ...child,
+            attributes: childAttrs
+        };
+    });
+};
+
+const isRenderedBlockMarkup = (value: unknown) =>
+    typeof value === 'string' && /<(?:div|section|svg|h[1-6]|p|img)\b/i.test(value);
+
+const extractCtaAttribute = (html: string, pattern: RegExp) =>
+    html.match(pattern)?.[1]?.trim() || '';
+
+const resolveCtaAttributes = (block: any, attrs: Record<string, any>) => {
+    const renderedMarkup = block.renderedHtml || attrs.directorName || '';
+
+    if (!isRenderedBlockMarkup(attrs.directorName)) return attrs;
+
+    return {
+        ...attrs,
+        directorName: extractCtaAttribute(renderedMarkup, /<h4\b[^>]*>([\s\S]*?)<\/h4>/i),
+        directorTitle: extractCtaAttribute(renderedMarkup, /<p\b[^>]*text-brand-red[^>]*>([\s\S]*?)<\/p>/i),
+        directorRegions: extractCtaAttribute(renderedMarkup, /<span\b[^>]*>location_on<\/span>\s*<span>([\s\S]*?)<\/span>/i),
+        directorPhone: extractCtaAttribute(renderedMarkup, /<span\b[^>]*>call<\/span>\s*<span\b[^>]*>([\s\S]*?)<\/span>/i)
+    };
+};
+
+// 4. Recursive nested ID collection
+const getNestedClientIds = (blockList: any[] = []): Set<string> => {
+    const ids = new Set<string>();
+
+    const visit = (list: any[] = []) => {
+        if (!Array.isArray(list)) return;
+
+        for (const block of list) {
+            const children = Array.isArray(block?.innerBlocks)
+                ? block.innerBlocks
+                : [];
+
+            for (const child of children) {
+                if (child.clientId) ids.add(child.clientId);
+                visit([child]);
+            }
+        }
+    };
+
+    visit(blockList);
+    return ids;
+};
+
+const normalizeBlockHtml = (html: string = '') =>
+    html
+        .replace(/\sclass=(['"]).*?\1/gi, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+const getNestedBlockKeys = (blockList: any[] = []): Set<string> => {
+    const keys = new Set<string>();
+
+    const visit = (list: any[] = []) => {
+        if (!Array.isArray(list)) return;
+
+        for (const block of list) {
+            const children = Array.isArray(block?.innerBlocks)
+                ? block.innerBlocks
+                : [];
+
+            for (const child of children) {
+                if (child.name && child.renderedHtml?.trim()) {
+                    keys.add(`${child.name}:${normalizeBlockHtml(child.renderedHtml)}`);
+                }
+                visit([child]);
+            }
+        }
+    };
+
+    visit(blockList);
+    return keys;
+};
+
+const nestedClientIds = getNestedClientIds(blocks);
+const nestedBlockKeys = getNestedBlockKeys(blocks);
+const quoteBlockTypes = new Set(['core/quote', 'core/pullquote']);
+const splitNarrativeHasQuote = blocks.some((block: any) =>
+    block.name === 'anotherstep/split-narrative-section' &&
+    block.innerBlocks?.some((child: any) => quoteBlockTypes.has(child.name))
+);
+
+// 5. Root blocks filter
+const CHILD_BLOCK_TYPES = new Set([
+    'anotherstep/custom-grid-card',
+    'anotherstep/bento-card',
+    'anotherstep/contact-info-card',
+    'anotherstep/contact-hours-card',
+    'anotherstep/contact-form',
+    'anotherstep/donor-perfect-form',
+    'anotherstep/sidebar-trust-card',
+    'core/list-item',
+    'core/button',
+]);
+
+const uniqueBlocks = blocks.filter((block: any) => {
+    const nestedByClientId = Boolean(block.clientId && nestedClientIds.has(block.clientId));
+    const nestedByRenderedHtml = Boolean(
+        block.name &&
+        block.renderedHtml?.trim() &&
+        nestedBlockKeys.has(`${block.name}:${normalizeBlockHtml(block.renderedHtml)}`)
+    );
+
+    if (nestedByClientId) {
+        return false;
+    }
+
+    if (nestedByRenderedHtml) return false;
+
+    if (splitNarrativeHasQuote && quoteBlockTypes.has(block.name)) {
+        return false;
+    }
+
+    return !CHILD_BLOCK_TYPES.has(block.name);
+});
+
+// 6. Dynamic Values Fetching
+const valuesResponse = await wpFetch(VALUES_ARCHIVE_QUERY);
+const dynamicCardsData = (valuesResponse && 'values' in valuesResponse)
+  ? valuesResponse.values?.nodes?.map((node: any) => ({
+      title: node.title || '',
+      content: node.content || node.excerpt || '',
+      icon: node.cardIcon || '',  // Matches the field registered to the Value type
+      theme: node.cardTheme || '' // Matches the field registered to the Value type
+    })) || []
+  : [];
 ---
 
-{allBlocks.map((block: any) => {
+{uniqueBlocks.map((block: any) => {
     if (!block) return null;
+    if (
+        block.name === 'anotherstep/custom-grid-card' || 
+        block.name === 'anotherstep/bento-card' ||
+        block.name === 'anotherstep/contact-info-card' ||
+        block.name === 'anotherstep/contact-hours-card' ||
+        block.name === 'anotherstep/contact-form' ||
+        block.name === 'anotherstep/donor-perfect-form' ||
+        block.name === 'anotherstep/sidebar-trust-card' ||
+        block.name === 'core/list-item'
+    ) return false;
+
+    let attrs;
+
+    console.log('Incoming block name:', block?.name);
 
     switch (block.name) {
         case 'core/paragraph':
+            if (!block.renderedHtml?.trim()) return null;
+
+            return (
+                <div
+                    class="leading-relaxed mb-3"
+                    set:html={block.renderedHtml}
+                />
+            );
+
         case 'core/heading':
-            return <TextBlock content={block.renderedHtml} />
+            if (!block.renderedHtml) return null;
+            attrs = block.attributes || {};
+            return (
+                <div
+                    class="text-xl font-bold text-brand-blue mb-3"
+                    set:html={block.renderedHtml}
+                />
+            );
+
+        case 'core/list':
+            if (!block.renderedHtml) return null;
+
+            let html = block.renderedHtml;
+
+            // Ensure <ul> has list-style and padding even if Tailwind CSS reset strips it
+            html = html
+                .replace(/<ul([^>]*)>/gi, '<ul$1 class="list-disc pl-6 my-4 space-y-2 text-slate-700" style="list-style-type: disc !important; padding-left: 1.5rem !important;">')
+                .replace(/<ol([^>]*)>/gi, '<ol$1 class="list-decimal pl-6 my-4 space-y-2 text-slate-700" style="list-style-type: decimal !important; padding-left: 1.5rem !important;">');
+
+            return <div class="wp-block-list-wrapper" set:html={html} />;
+        
+        case 'core/list-item':
+            return null;
+
+        case 'core/group':
+            const groupAttrs = block.attributes || {};
+            const innerBlocks = Array.isArray(block.innerBlocks)
+                ? block.innerBlocks
+                : [];
+
+            return (
+                <section
+                    class:list={[
+                        'bg-slate-100 p-6 rounded-lg border border-slate-200 my-6',
+                        groupAttrs.className
+                    ]}
+                >
+                    <Astro.self
+                        blocks={innerBlocks}
+                        galleryData={galleryData}
+                        videoData={videoData}
+                    />
+                </section>
+            );
 
         case 'core/image':
         case 'core/gallery':
             // The attributesJson contains the URL and alt text from WP
-            const attrs = block.attributesJSON ? JSON.parse(block.attributesJSON) : {};
+            const imageAttrs = block.attributesJSON ? JSON.parse(block.attributesJSON) : {};
             return <ImageGallery url={block.attributes?.url} alt={block.attributes?.alt} />;
-        
-        case 'anotherstep/page-hero-section':
-            return <Hero content={block.renderedHtml} />
 
-        case 'anotherstep/homepage-about-section':
-            return <TwoColumns content={block.renderedHtml} />
+        case 'anotherstep/gallery-placeholder':
+            return <GallerySection data={galleryData} />;
+
+        case 'anotherstep/video-placeholder':
+            return <VideoSection data={videoData} />
         
+        case 'anotherstep/page-hero-section': {
+            // Parse block attributes out of JSON string
+            attrs = block.attributes || {};
+            return (
+                <Hero 
+                    content={block.renderedHtml}
+                    layoutType={attrs.layoutType}
+                    imageDecoration={attrs.imageDecoration}
+                    hasBadge={attrs.hasBadge}
+                    badgeText={attrs.badgeText}
+                    badgeStyle={attrs.badgeStyle}
+                    quoteText={attrs.quoteText}
+                    statsNumber={attrs.statsNumber}
+                    statsText={attrs.statsText}
+                    statsBgColor={attrs.statsBgColor}
+                    statsTextColor={attrs.statsTextColor}
+                    isImageLarge={attrs.isImageLarge}
+                    isStatsRotated={attrs.isStatsRotated}
+                    hasExtraTextDiv={attrs.hasExtraTextDiv}
+                    extraDivText={attrs.extraDivText}
+                    extraDivIcon={attrs.extraDivIcon}
+                    extraDivIconColor={attrs.extraDivIconColor}
+                    extraDivBgColor={attrs.extraDivBgColor}
+                    title={attrs.heroTitle}
+                    paragraph={attrs.heroDescription}
+                    imageSrc={attrs.heroImageUrl}
+                    btn1Text={attrs.btn1Text}
+                    btn1Url={attrs.btn1Url}
+                    btn2Text={attrs.btn2Text}
+                    btn2Url={attrs.btn2Url}
+                />
+            );
+        }
+        case 'anotherstep/two-column-card-section':
+            attrs = block.attributes || {};
+
+            const resolvedCustomInnerBlocks = resolveInnerBlocks(block.innerBlocks);
+
+            return <TwoColumnCardSection 
+                aboutHeadline={attrs.aboutHeadline}
+                aboutSubHeadline={attrs.aboutSubHeadline}
+                aboutImpactHeadline={attrs.aboutImpactHeadline}
+                aboutImpactTitle1={attrs.aboutImpactTitle1}
+                aboutImpactParagraph1={attrs.aboutImpactParagraph1}
+                aboutImpactIcon1={attrs.aboutImpactIcon1}
+                aboutImpactTitle2={attrs.aboutImpactTitle2}
+                aboutImpactParagraph2={attrs.aboutImpactParagraph2}
+                aboutImpactIcon2={attrs.aboutImpactIcon2}
+                innerBlocks={resolvedCustomInnerBlocks}
+            />
+
+        case 'anotherstep/custom-grid-section':
+            attrs = block.attributes || {};
+
+            const resolvedInnerBlocks = (block.innerBlocks || []).map((child: any) => {
+                if (child.attributesJSON) {
+                    try {
+                        return { attributes: JSON.parse(child.attributesJSON) };
+                    } catch (e) {
+                        console.error("Failed to parse inner block JSON", e);
+                    }
+                }
+                return child; // Fallback to raw attributes if already an object
+            });
+
+            return <CustomGridSection 
+                headline={attrs.headline}
+                description={attrs.description}
+                bgStyle={attrs.bgStyle}
+                textAlignment={attrs.textAlignment}
+                styleVariant={attrs.styleVariant}
+                useQuery={attrs.useQuery}
+                postType={attrs.postType}
+                postsPerPage={attrs.postsPerPage}
+                renderedHtml={block.renderedHtml}
+                innerBlocks={resolvedInnerBlocks} 
+                dynamicCards={dynamicCardsData}
+            />
+
+        case 'anotherstep/bento-grid-section': {
+            attrs = block.attributes || {};
+            
+            // Parse JSON attributes if attributes object is empty
+            if (block.attributesJSON && typeof block.attributesJSON === 'string') {
+                try {
+                    attrs = { ...attrs, ...JSON.parse(block.attributesJSON) };
+                } catch (e) {
+                    console.error('Error parsing BentoGridSection attributesJSON', e);
+                }
+            }
+
+            const cards = block.innerBlocks || [];
+
+            return (
+                <BentoGridSection
+                    title={attrs.title}
+                    subtitle={attrs.subtitle}
+                    hasUnderline={attrs.hasUnderline}
+                    underlineColor={attrs.underlineColor}
+                    backgroundColor={attrs.backgroundColor}
+                    columns={Number(attrs.columns) || 3}
+                >
+                {cards.map((childBlock: any) => {
+                    let childAttrs = childBlock.attributes || {};
+                    
+                    if (childBlock.attributesJSON && typeof childBlock.attributesJSON === 'string') {
+                        try {
+                            childAttrs = { ...childAttrs, ...JSON.parse(childBlock.attributesJSON) };
+                        } catch (e) {
+                            console.error('Error parsing BentoCard attributesJSON', e);
+                        }
+                    }
+
+                    const subInnerBlocks = childBlock.innerBlocks || [];
+                    const imageBlocks = subInnerBlocks.filter((subBlock: any) => subBlock.name === 'core/image');
+
+                    return (
+                        <BentoCard
+                            colSpan={childAttrs.colSpan}
+                            cardBgStyle={childAttrs.cardBgStyle}
+                            textColor={childAttrs.textColor}
+                            icon={childAttrs.icon}
+                            iconColor={childAttrs.iconColor}
+                            title={childAttrs.title}
+                            description={childAttrs.description}
+                        >
+                            {subInnerBlocks.length > 0 && subInnerBlocks.map((subBlock: any) => {
+                                if (!subBlock.renderedHtml) return null;
+
+                                let html = subBlock.renderedHtml;
+
+                                if (subBlock.name === 'core/image') {
+                                    const imageIndex = imageBlocks.indexOf(subBlock);
+
+                                    if (imageBlocks.length > 1) {
+                                        if (imageIndex !== 0) return null;
+
+                                        return (
+                                            <div class="mt-auto flex -space-x-4">
+                                                {imageBlocks.map((imageBlock: any, index: number) => {
+                                                    let imageHtml = imageBlock.renderedHtml;
+                                                    imageHtml = imageHtml.replace(/(<img\b[^>]*\bclass=")([^"]*)("[^>]*>)/i, '$1$2 w-full h-full object-cover$3');
+                                                    if (!/\bclass=/i.test(imageHtml)) {
+                                                        imageHtml = imageHtml.replace(/<img\b([^>]*)>/i, '<img$1 class="w-full h-full object-cover">');
+                                                    }
+
+                                                    const avatarBackground = ['bg-slate-300', 'bg-slate-400', 'bg-slate-500'][index % 3];
+
+                                                    return (
+                                                        <div class={`w-12 h-12 rounded-full border-4 border-brand-dark-yellow ${avatarBackground} overflow-hidden`} set:html={imageHtml} />
+                                                    );
+                                                })}
+                                            </div>
+                                        );
+                                    }
+
+                                    html = html.replace(/(<img\b[^>]*\bclass=")([^"]*)("[^>]*>)/i, '$1$2 w-full h-full object-cover$3');
+                                    if (!/\bclass=/i.test(html)) {
+                                        html = html.replace(/<img\b([^>]*)>/i, '<img$1 class="w-full h-full object-cover">');
+                                    }
+                                    return <div class="mt-auto h-32 w-full rounded-xl overflow-hidden" set:html={html} />;
+                                }
+
+                                // 1. Remove rogue <br> tags at the start of <li> tags
+                                html = html.replace(/<li>\s*<br\s*\/?>/gi, '<li>');
+
+                                // 2. Target checkmark lists and inject Material Symbol icons directly into <li> elements
+                                if (html.includes('is-style-checkmark-list')) {
+                                    html = html.replace(
+                                        /(<ul\b[^>]*\bclass=")([^"]*)("[^>]*>)/i,
+                                        '$1$2 space-y-4 text-lg opacity-90$3'
+                                    );
+                                    if (!/<ul\b[^>]*\bclass=/i.test(html)) {
+                                        html = html.replace(/<ul\b([^>]*)>/i, '<ul$1 class="space-y-4 text-lg opacity-90">');
+                                    }
+                                    html = html.replace(
+                                        /(<li\b[^>]*\bclass=")([^"]*)("[^>]*>)/gi,
+                                        '$1$2 flex items-start gap-3$3'
+                                    ).replace(
+                                        /<li\b(?![^>]*\bclass=)([^>]*)>/gi,
+                                        '<li$1 class="flex items-start gap-3">'
+                                    ).replace(
+                                        /<li([^>]*)>/gi,
+                                        `<li$1><span class="material-symbols-outlined text-brand-dark-yellow shrink-0" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span> <span>`
+                                    ).replace(/<\/li>/gi, '</span></li>');
+                                }
+
+                                return <Fragment set:html={html} />;
+                            })}
+                        </BentoCard>
+                    );
+                })}
+                </BentoGridSection>
+            );
+        }
+
+        case 'anotherstep/homepage-ethics-section':
+            attrs = block.attributes || {};
+            return (
+                <OneColumnCard 
+                    headline={attrs.ethicsHeadline} 
+                    ethicsLinkText={attrs.ethicsLinkText}
+                    ethicsLinkUrl={attrs.ethicsLinkUrl}
+                    innerBlocks={block.innerBlocks} 
+                />
+            );
+        
+        case 'anotherstep/dynamic-info-section':
+            attrs = block.attributes || {};
+            return (
+                <DynamicLegalInfoCard 
+                    primaryTitle={attrs.primaryTitle}
+                    primaryDescription={attrs.primaryDescription}
+                    primaryFieldValue1={attrs.primaryFieldValue1}
+                    primaryFieldLabel1={attrs.primaryFieldLabel1}
+                    primaryFieldValue2={attrs.primaryFieldValue2}
+                    primaryFieldValue3={attrs.primaryFieldValue3}
+                    primaryFieldValue4={attrs.primaryFieldValue4}
+                    primaryFieldValue5={attrs.primaryFieldValue5}
+                    primaryFieldValue6={attrs.primaryFieldValue6}
+                    primaryFieldValue7={attrs.primaryFieldValue7}
+                    secondaryTitle={attrs.secondaryTitle}
+                    secondaryDescription={attrs.secondaryDescription}
+                    secondaryFieldValue1={attrs.secondaryFieldValue1}
+                    layoutType={attrs.layoutType}
+                />
+            );
+
+        case 'anotherstep/split-feature-section':
+            // Parse block attributes out of JSON string
+            attrs = block.attributes || {};
+            return (
+                <SplitFeature 
+                    imageAlignment={attrs.imageAlignment}
+                    backgroundColor={attrs.backgroundColor}
+                    eyebrowText={attrs.eyebrowText}
+                    underlineAccent={attrs.underlineAccent}
+                    mediaUrl={attrs.mediaUrl}
+                    mediaAlt={attrs.mediaAlt}
+                    secondaryMediaUrl={attrs.secondaryMediaUrl}
+                    metricNumber={attrs.metricNumber}
+                    metricLabel={attrs.metricLabel}
+                    iconName={attrs.iconName}
+                    iconTitle={attrs.iconTitle}
+                    splitTitle={attrs.splitTitle}
+                    splitDescription={attrs.splitDescription}
+                    innerBlocks={block.innerBlocks || []}
+                />
+            );
+
+        case 'anotherstep/split-narrative-section':
+            // Parse block attributes out of JSON string
+            attrs = block.attributes || {};
+            return (
+                <SplitNarrative
+                    title={attrs.title}
+                    hasUnderline={attrs.hasUnderline}
+                    headline={attrs.headline}
+                    backgroundColor={attrs.backgroundColor}
+                    card1Icon={attrs.card1Icon}
+                    card1IconColor={attrs.card1IconColor}
+                    card1Title={attrs.card1Title}
+                    card1Text={attrs.card1Text}
+                    card2Icon={attrs.card2Icon}
+                    card2IconColor={attrs.card2IconColor}
+                    card2Title={attrs.card2Title}
+                    card2Text={attrs.card2Text}
+                    innerBlocks={block.innerBlocks || []}
+                />
+            );
+
+        case 'anotherstep/cta-contact-card-section':
+            attrs = block.attributes || {};
+
+            if (block.attributesJSON && typeof block.attributesJSON === 'string') {
+                try {
+                    attrs = { ...attrs, ...JSON.parse(block.attributesJSON) };
+                } catch (e) {
+                    console.error('Error parsing CtaContactCardSection attributesJSON', e);
+                }
+            }
+
+            attrs = resolveCtaAttributes(block, attrs);
+
+            return (
+                <CtaContactCardSection 
+                    headline={attrs.headline}
+                    description={attrs.description}
+                    btn1Text={attrs.btn1Text}
+                    btn1Url={attrs.btn1Url}
+                    btn2Text={attrs.btn2Text}
+                    btn2Url={attrs.btn2Url}
+                    directorName={attrs.directorName}
+                    directorTitle={attrs.directorTitle}
+                    directorRegions={attrs.directorRegions}
+                    directorPhone={attrs.directorPhone}
+                    directorImageUrl={attrs.directorImageUrl}
+                    directorImageId={attrs.directorImageId}
+                />
+            );
+
+        case 'anotherstep/important-notice':
+            attrs = block.attributes || {};
+            
+            // Safe JSON attribute fallback parsing
+            if (block.attributesJSON && typeof block.attributesJSON === 'string') {
+                try {
+                    attrs = { ...attrs, ...JSON.parse(block.attributesJSON) };
+                } catch (e) {
+                    console.error('Error parsing ImportantNotice attributesJSON', e);
+                }
+            }
+
+            return (
+                <ImportantNotice 
+                    heading={attrs.heading}
+                    noticeText={attrs.noticeText}
+                />
+            );
+
+        case 'anotherstep/inclusion-and-support':
+            attrs = block.attributes || {};
+            
+            // Safe JSON attribute fallback parsing (matching your codebase pattern)
+            if (block.attributesJSON && typeof block.attributesJSON === 'string') {
+                try {
+                    attrs = { ...attrs, ...JSON.parse(block.attributesJSON) };
+                } catch (e) {
+                    console.error('Error parsing InclusionAndSupport attributesJSON', e);
+                }
+            }
+
+            return (
+                <InclusionAndSupport 
+                    title={attrs.title}
+                    resourceTitle={attrs.resourceTitle}
+                    resourceDescription={attrs.resourceDescription}
+                    helplineTitle={attrs.helplineTitle}
+                    helplineNumber={attrs.helplineNumber}
+                    helplineDescription={attrs.helplineDescription}
+                    innerBlocks={block.innerBlocks || []}
+                />
+            );
+
+        case 'anotherstep/upcoming-events':
+            attrs = block.attributes || {};
+
+            if (block.attributesJSON && typeof block.attributesJSON === 'string') {
+                try {
+                    attrs = { ...attrs, ...JSON.parse(block.attributesJSON) };
+                } catch (e) {
+                    console.error('Error parsing UpcomingEvents attributesJSON', e);
+                }
+            }
+
+            return (
+                <UpcomingEvents 
+                    sectionTitle={attrs.sectionTitle}
+                    sideTitle={attrs.sideTitle}
+                    sideDescription={attrs.sideDescription}
+                    saveTheDateText={attrs.saveTheDateText}
+                    meetingTitle={attrs.meetingTitle}
+                    meetingDescription={attrs.meetingDescription}
+                    inPersonTitle={attrs.inPersonTitle}
+                    inPersonDetails={attrs.inPersonDetails}
+                    digitalTitle={attrs.digitalTitle}
+                    zoomUrl={attrs.zoomUrl}
+                    zoomButtonText={attrs.zoomButtonText}
+                    phoneText={attrs.phoneText}
+                    phoneDetails={attrs.phoneDetails}
+                    meetingId={attrs.meetingId}
+                />
+            );
+
+        case 'anotherstep/journey-forward-section':
+            attrs = block.attributes || {};
+            if (block.attributesJSON && typeof block.attributesJSON === 'string') {
+                try {
+                    attrs = { ...attrs, ...JSON.parse(block.attributesJSON) };
+                } catch (e) {
+                    console.error('Error parsing JourneyForwardSection attributesJSON', e);
+                }
+            }
+            return (
+                <JourneyForwardSection 
+                    sectionTitle={attrs.sectionTitle}
+                    step1Number={attrs.step1Number}
+                    step1Label={attrs.step1Label}
+                    step2Number={attrs.step2Number}
+                    step2Label={attrs.step2Label}
+                    step3Number={attrs.step3Number}
+                    step3Label={attrs.step3Label}
+                />
+            );
+
+        case 'anotherstep/page-cta-section':
+            attrs = block.attributes || {};
+            return (
+                <CtaSection 
+                    ctaTitle={attrs.ctaTitle}
+                    ctaDescription={attrs.ctaDescription}
+                    ctaStyle={attrs.ctaStyle}
+                    btn1Text={attrs.btn1Text}
+                    btn1Url={attrs.btn1Url}
+                    btn1Style={attrs.btn1Style}
+                    btn2Text={attrs.btn2Text}
+                    btn2Url={attrs.btn2Url}
+                    hasSteps={attrs.hasSteps}
+                    step1Text={attrs.step1Text}
+                    step2Text={attrs.step2Text}
+                    step3Text={attrs.step3Text}
+                    hasCard={attrs.hasCard}
+                    cardTitle={attrs.cardTitle}
+                    cardDescription={attrs.cardDescription}
+                    cardBtnText={attrs.cardBtnText}
+                    cardBtnUrl={attrs.cardBtnUrl}
+                    hasStats={attrs.hasStats}
+                    stat1Number={attrs.stat1Number}
+                    stat1Label={attrs.stat1Label}
+                    stat2Number={attrs.stat2Number}
+                    stat2Label={attrs.stat2Label}
+                />
+            );
+
+        case 'anotherstep/contact-grid':
+            attrs = block.attributes || {};
+            
+            if (block.attributesJSON && typeof block.attributesJSON === 'string') {
+                try {
+                    attrs = { ...attrs, ...JSON.parse(block.attributesJSON) };
+                } catch (e) {
+                    console.error('Error parsing ContactGrid attributesJSON', e);
+                }
+            }
+
+            return (
+                <ContactGridSection 
+                    innerBlocks={block.innerBlocks || []} 
+                />
+            );
+        
+        case 'anotherstep/donation-grid-section': {
+            attrs = block.attributes || {};
+            
+            if (block.attributesJSON && typeof block.attributesJSON === 'string') {
+                try {
+                    attrs = { ...attrs, ...JSON.parse(block.attributesJSON) };
+                } catch (e) {
+                    console.error('Error parsing DonationGridSection attributesJSON', e);
+                }
+            }
+
+            const resolvedInnerBlocks = resolveInnerBlocks(block.innerBlocks || []);
+
+            return (
+                <DonationGridSection
+                    formColumnSpan={attrs.formColumnSpan}
+                    sidebarColumnSpan={attrs.sidebarColumnSpan}
+                    innerBlocks={resolvedInnerBlocks}
+                />
+            );
+        }
+
         default:
-            // Fallback for blocks there are no components built yet
+            if (CHILD_BLOCK_TYPES.has(block.name) || block.name === 'core/freeform') {
+                return null;
+            }
+
+            if (!block.renderedHtml) return null;
+
             return <div class="wp-block-fallback"set:html={block.renderedHtml} />;
     }
 })}

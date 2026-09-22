@@ -1,0 +1,129 @@
+---
+interface Props {
+    aboutHeadline?: string;
+    aboutSubHeadline?: string;
+    aboutImpactHeadline?: string;
+    aboutImpactTitle1?: string;
+    aboutImpactParagraph1?: string;
+    aboutImpactIcon1?: string;
+    aboutImpactTitle2?: string;
+    aboutImpactParagraph2?: string;
+    aboutImpactIcon2?: string;
+    innerBlocks?: any[];
+}
+
+const { 
+  aboutHeadline, 
+  aboutSubHeadline, 
+  aboutImpactHeadline,
+  aboutImpactTitle1, 
+  aboutImpactParagraph1,
+  aboutImpactIcon1,
+  aboutImpactTitle2,
+  aboutImpactParagraph2,
+  aboutImpactIcon2,
+  innerBlocks = []
+} = Astro.props;
+
+
+
+const getIconClass = (iconName: any, fallback: string) => {
+  if (!iconName) return fallback;
+  if (iconName.startsWith('fa-')) return iconName;
+  // Fallback map if WordPress sends old HeroIcon strings like "MapPinIcon"
+  const legacyMap: Record<string, string> = {
+    MapPinIcon: "fa-solid fa-location-dot",
+    HomeIcon: "fa-solid fa-house",
+    StarIcon: "fa-solid fa-star",
+    UserGroupIcon: "fa-solid fa-users",
+  };
+  return legacyMap[iconName] || fallback;
+};
+
+const iconClass1 = getIconClass(aboutImpactIcon1, "fa-solid fa-location-dot");
+const iconClass2 = getIconClass(aboutImpactIcon2, "fa-solid fa-house");
+---
+<section class="relative overflow-hidden py-16 px-4 md:px-8">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid lg:grid-cols-2 gap-12 items-center">
+      {/* LEFT COLUMN: HEADINGS & DESCRIPTION */}
+      <div class="space-y-6">
+        {aboutSubHeadline && (
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-blue/10 text-blue-900 text-sm font-bold uppercase tracking-wider">
+            <div class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-blue"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-blue-fixed-dim"></span>
+            </div>
+            {aboutSubHeadline}
+          </div>
+        )}
+
+        {aboutHeadline && (
+          <h2 class="text-3xl md:text-4xl font-bold text-on-background leading-tight" set:html={aboutHeadline} />
+        )}
+
+        {innerBlocks && innerBlocks.length > 0 ? (
+          <div class="prose prose-lg space-y-4">
+
+            {innerBlocks.map((child: any) => {
+              const cleanedContent = child.renderedHtml || child.attributes?.value;
+              const strippedContent = cleanedContent.replace(/<p\b[^>]*>(.*?)<\/p>/gis, '$1'); // Strip <p> tags if present
+              return <p class="text-lg text-on-surface-variant" set:html={strippedContent} />;
+            })}
+          </div>
+        ) : null}
+      </div>
+
+      {/* RIGHT COLUMN: IMAPCT CARDS */}
+      <div class="relative">
+        <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-xl border border-slate-100 relative z-10">
+          
+          {aboutImpactHeadline && (
+            <h3 class="text-2xl font-bold text-brand-blue mb-6">{aboutImpactHeadline}</h3>
+          )}
+
+          <div class="space-y-8">
+            {/* IMPACT CARD 1 */}
+            {(aboutImpactTitle1 || aboutImpactParagraph1) && (
+              <div class="flex items-start gap-4">
+                  <div class="w-12 h-12 rounded-xl bg-brand-blue/40 text-brand-blue flex items-center justify-center text-xl">
+                    <i class={iconClass1}></i>
+                  </div>
+                <div>
+                  {aboutImpactTitle1 && <h4 class="font-bold text-on-background">{aboutImpactTitle1}</h4>}
+                  {aboutImpactParagraph1 && (
+                    <div class="text-on-brackground text-sm" set:html={aboutImpactParagraph1} />
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* IMPACT CARD 2 */}
+            {(aboutImpactTitle2 || aboutImpactParagraph2) && (
+              <div class="flex items-start gap-4">
+                <div class="w-12 h-12 rounded-xl bg-brand-blue/40 text-brand-blue flex items-center justify-center text-xl">
+                  <i class={iconClass2}></i>
+                </div>
+                <div>
+                  {aboutImpactTitle2 && <h4 class="font-bold text-on-background">{aboutImpactTitle2}</h4>}
+                  {aboutImpactParagraph2 && (
+                    <div class="text-on-background text-sm" set:html={aboutImpactParagraph2} />
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* BACKGROUND BLUR ACCENT */}
+      <div class="absolute -bottom-6 -right-6 w-64 h-64 bg-brand-yellow/20 rounded-full blur-3xl opacity-50 -z-0"></div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+    /* This ensures WordPress classes like .has-text-align-center work */
+    .prose .has-text-align-center { text-align: center; }
+    .prose .has-text-align-right { text-align: right; }
+</style>

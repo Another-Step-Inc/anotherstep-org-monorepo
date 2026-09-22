@@ -1,0 +1,22 @@
+---
+import MainLayout from "src/layouts/MainLayout.astro";
+import BlockResolver from "@anothersteporg/ui/components/BlockResolver.astro";
+
+import "src/styles/global.css";
+import { wpFetch, EDITOR_BLOCKS_FRAGMENT } from '@anothersteporg/ui/lib/wp.js';
+
+const data = await wpFetch(`
+  query GetPageByUri {
+    page(id: "/contact-us/contact-human-resources", idType: URI) {
+      title
+      ${EDITOR_BLOCKS_FRAGMENT}
+    }
+  }
+`)
+
+const blocks = data?.page?.editorBlocks || [];
+---
+
+<MainLayout title={data?.page?.title}>
+    <BlockResolver blocks={blocks} />
+</MainLayout>

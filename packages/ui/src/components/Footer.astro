@@ -1,118 +1,610 @@
 ---
-// components/Footer.astro
 import { Image } from 'astro:assets';
 import logoReg from '../assets/another_step_logo.png';
-import accessibilityIcon from '../assets/accessibility-svgrepo-com.svg?raw'
-const date = new Date;
-const year = date.getFullYear();
-console.log(date);
+import accessibilityIcon from '../assets/accessibility-svgrepo-com.svg?raw';
+import ComplianceForm from './ComplianceForm.astro';
+import IncidentForm from './IncidentForm.astro';
+
+interface MenuItem {
+  label: string;
+  path: string;
+}
+
+interface OfficeInfo {
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
+}
+
+interface FooterData {
+  quickLinks: MenuItem[];
+  ourServices: MenuItem[];
+  legalLinks: MenuItem[];
+  offices: OfficeInfo[];
+  brand: BrandSettings;
+}
+
+interface BrandSettings {
+  logoUrl?: string;
+  companyName: string;
+  description: string;
+  copyrightText: string;
+}
+
+const WP_URL = import.meta.env.WP_GRAPHQL_URL || 'http://host.docker.internal:8050/graphql';
+
+// Fallback office details in case CMS values aren't returned
+const defaultOffices: OfficeInfo[] = [
+  {
+    name: 'Rockland Office',
+    address: '30 Ramland Rd.<br />Suite 202<br />Orangeburg, NY 10962',
+    phone: '(845) 268-8200',
+    email: 'info@anotherstep.org',
+  },
+  {
+    name: 'Westchester Office',
+    address: '175 Clearbrook Rd.<br />Suite 161<br />Elmsford, NY 10523',
+    phone: '(914) 946-2288',
+    email: 'westchester@anotherstep.org',
+  },
+];
+
+async function fetchFooterData(): Promise<FooterData> {
+  const year = new Date().getFullYear();
+  const defaultBrand: BrandSettings = {
+    companyName: 'Another Step',
+    description: 'Supporting independent living with clarity, care, and community for everyone.',
+    copyrightText: `© ${year} Another Step. All rights reserved.`,
+  };
+
+  try {
+    const response = await fetch(WP_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: `
+          query GetFooterData {
+            quickLinks: menu(id: "quick-links", idType: SLUG) {
+              menuItems(first: 100) {
+                nodes { label path parentId }
+              }
+            }
+            ourServices: menu(id: "our-services", idType: SLUG) {
+              menuItems(first: 100) {
+                nodes { label path parentId }
+              }
+            }
+            legalLinks: menu(id: "legal-links", idType: SLUG) {
+              menuItems(first: 10) {
+                nodes { label path parentId }
+              }
+            }
+            footerSettings {
+              officeDetails {
+                companyName
+                description
+                copyrightText
+                logo {
+                  node {
+                    sourceUrl
+                    altText
+                  }
+                }
+                offices {
+                  name
+                  address
+                  phone
+                  email
+                }
+              }
+            }
+          }
+        `,
+      }),
+    });
+
+    const json = await response.json();
+    if (json.errors) console.error('GraphQL Errors:', json.errors);
+
+    const data = json.data;
+
+    const isExternal = (url: string) => /^https?:\/\//.test(url);
+
+    const formatMenu = (menuData: any, stripParent = false): MenuItem[] =>
+      menuData?.menuItems?.nodes
+        ?.filter((item: any) => !item.parentId)
+        .map((item: any) => {
+          let path = item.path;
+
+          if (stripParent && !isExternal(path)) {
+            const segments = path.split('/').filter(Boolean);
+            path = segments.length > 0 ? `/${segments.pop()}/` : path;
+          }
+
+          return {
+            label: item.label,
+            path,
+          };
+        }) || [];
+
+    const officeDetails = data?.footerSettings?.officeDetails;
+    const fetchedOffices = officeDetails?.offices;
+
+    return {
+      quickLinks: formatMenu(data?.quickLinks, true),
+      ourServices: formatMenu(data?.ourServices),
+      legalLinks: formatMenu(data?.legalLinks),
+      offices: Array.isArray(fetchedOffices) && fetchedOffices.length > 0 ? fetchedOffices : defaultOffices,
+      brand: {
+        logoUrl: officeDetails?.logo?.node?.sourceUrl,
+        companyName: officeDetails?.companyName || defaultBrand.companyName,
+        description: officeDetails?.description || defaultBrand.description,
+        copyrightText: (officeDetails?.copyrightText || defaultBrand.copyrightText).replace('{year}', year.toString()),
+      },
+    };
+  } catch (error) {
+    console.error('Failed to fetch footer data from WordPress:', error);
+    return {
+      quickLinks: [],
+      ourServices: [],
+      legalLinks: [],
+      offices: defaultOffices,
+      brand: defaultBrand,
+    };
+  }
+}
+
+const { quickLinks, ourServices, legalLinks, offices, brand } = await fetchFooterData();
+
+const isExternal = (url: string) => /^https?:\/\//.test(url);
 ---
+
 <footer class="bg-[#F3F3F6] py-16">
-    <div id="top-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap justify-between gap-8">
-        <div id="info-col" class="w-full lg:w-[25%] flex flex-col items-center gap-6 lg:items-start">
-            <div id="info-heading" class="flex flex-row items-center justify-center gap-3">
+  <div id="top-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap justify-between gap-8">
+    
+    <div id="info-col" class="w-full lg:w-[25%] flex flex-col items-center gap-6 lg:items-start">
+        <div id="info-heading" class="flex flex-row items-center justify-center gap-3">
+            {brand.logoUrl ? (
+                <img src={brand.logoUrl} alt={brand.companyName} class="h-12 w-auto" />
+            ) : (
                 <Image src={logoReg} alt="Another Step Logo" class="h-12 w-auto" />
-                <h2 class="text-[#004E8B] text-xl font-black">Another Step</h2>
-            </div>
-            <p id="info-description" class="text-[#4E535D] font-semibold">
-                Supporting independent living with clarity, care, and community for everyone.
-            </p>
-            <p id="info-copyright" class="text-[#717782]">
-                &copy; {year} Another Step. All rights reserved.
-            </p>
+            )}
+            <h2 class="text-brand-blue-surface-tint text-xl font-black">{brand.companyName}</h2>
         </div>
-        <div id="quick-links-col" class="w-full sm:w-[45%] lg:w-[15%] flex flex-col items-center lg:items-start">
-            <h3 id="quick-links-heading" class="text-[#004E8B] text-md font-black pb-5">Quick Links</h3>
-            <ul class="flex flex-col gap-4">
-                <li><a href="#">Career</a></li>
-                <li><a href="#">Contact HR</a></li>
-                <li><a href="#">Compliance Form</a></li>
-                <li><a href="#">Incident Reporting</a></li>
-                <li><a href="#">OPWDD Statement</a></li>
-            </ul>
-        </div>
-        <div id="services-col" class="w-full sm:w-[45%] lg:w-[20%] flex flex-col items-center lg:items-start">
-            <h3 id="services-heading" class="text-[#004E8B] text-md font-black pb-5">Our Services</h3>
-            <ul class="flex flex-col gap-4">
-                <li><a href="#">Com Hab</a></li>
-                <li><a href="#">Day Hab</a></li>
-                <li><a href="#">Supported Employment</a></li>
-                <li><a href="#">Respite</a></li>
-                <li><a href="#">Residential</a></li>
-            </ul>
-        </div>
-        <div id="contact-col" class="w-full lg:w-[25%] flex flex-col items-center lg:items-start">
-            <h3 id="contact-heading" class="text-[#004E8B] text-md font-black pb-5">Get In Touch</h3>
-            <div class="flex flex-col gap-10 w-full">
-                <div id="office-1" class="flex flex-col gap-3">
-                    <span class="font-black text-brand-dark text-[10px] uppercase tracking-widest ml-7 lg:ml-8">Rockland Office</span>
-                    
-                    <div class="flex items-start gap-3 lg:gap-4">
-                        <i class="fa-solid fa-location-dot text-brand-blue mt-1 w-4 text-center"></i>
-                        <address class="not-italic text-[#4E535D] text-sm font-semibold leading-snug">
-                            30 Ramland Rd.<br />
-                            Suite 202<br />
-                            Orangeburg, NY 10962
-                        </address>
-                    </div>
-
-                    <div class="flex items-center gap-3 lg:gap-4">
-                        <i class="fa-solid fa-phone text-brand-blue w-4 text-center"></i>
-                        <a href="tel:8452688200" class="text-brand-blue text-xs font-bold hover:underline underline-offset-4">
-                            (845) 268-8200
-                        </a>
-                    </div>
-
-                    <div class="flex items-center gap-3 lg:gap-4">
-                        <i class="fa-solid fa-envelope text-brand-blue w-4 text-center"></i>
-                        <a href="mailto:info@anotherstep.org" class="text-[#4E535D] text-xs font-medium hover:text-brand-blue transition-colors">
-                            info@anotherstep.org
-                        </a>
-                    </div>
-                </div>
-
-                <div id="office-2" class="flex flex-col gap-3">
-                    <span class="font-black text-brand-dark text-[10px] uppercase tracking-widest ml-7 lg:ml-8">Westchester Office</span>
-                    
-                    <div class="flex items-start gap-3 lg:gap-4">
-                        <i class="fa-solid fa-location-dot text-brand-blue mt-1 w-4 text-center"></i>
-                        <address class="not-italic text-[#4E535D] text-sm font-semibold leading-snug">
-                            175 Clearbrook Rd.<br />
-                            Suite 161<br />
-                            Elmsford, NY 10523
-                        </address>
-                    </div>
-
-                    <div class="flex items-center gap-3 lg:gap-4">
-                        <i class="fa-solid fa-phone text-brand-blue w-4 text-center"></i>
-                        <a href="tel:9149562288" class="text-brand-blue text-xs font-bold hover:underline underline-offset-4">
-                            (914) 946-2288
-                        </a>
-                    </div>
-
-                    <div class="flex items-center gap-3 lg:gap-4">
-                        <i class="fa-solid fa-envelope text-brand-blue w-4 text-center"></i>
-                        <a href="mailto:westchester@anotherstep.org" class="text-[#4E535D] text-xs font-medium hover:text-brand-blue transition-colors">
-                            westchester@anotherstep.org
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <p id="info-description" class="text-[#4E535D] font-semibold">
+            {brand.description}
+        </p>
+        <p id="info-copyright" class="text-[#717782]">
+            {brand.copyrightText}
+        </p>
     </div>
-    <div id="bottom-section" class="flex flex-row justify-between items-center max-w-7xl mx-auto px-4 mt-12 border-t border-gray-200 pt-8 text-[#717782] tracking-normal">
-        <div id="legal-links" class="flex flex-row justify-between items-cneter gap-8">
-            <a class="underline underline-offset-5 decoration-2 font-bold font-sm" href="">Privacy Policy</a>
-            <a class="underline underline-offset-5 decoration-2 font-bold font-sm" href="">Terms of Service</a>
-            <a class="underline underline-offset-5 decoration-2 font-bold font-sm" href="">Accessibility Statement</a>
+
+    <div id="quick-links-col" class="w-full sm:w-[45%] lg:w-[15%] flex flex-col items-center lg:items-start">
+      <h3 id="quick-links-heading" class="text-brand-blue-surface-tint text-md font-black pb-5">Quick Links</h3>
+      <ul class="flex flex-col gap-4">
+        {quickLinks.length > 0 ? (
+          quickLinks.map((item) => {
+            const external = isExternal(item.path);
+            const labelLower = item.label.toLowerCase();
+            const isCompliance = labelLower.includes('compliance');
+            const isIncident = labelLower.includes('incident');
+
+            if (isCompliance) {
+              return (
+<li>
+                  <button type="button" class="open-compliance-btn text-left">
+                    {item.label}
+                  </button>
+                </li>
+              );
+            }
+
+            if (isIncident) {
+              return (
+                <li>
+                  <button type="button" class="open-incident-btn text-left">
+                    {item.label}
+                  </button>
+                </li>
+              )
+            }
+
+            return (
+              <li>
+                <a 
+                  href={item.path}
+                  target={external ? "_blank" : undefined}
+                  rel={external ? "noopener noreferrer" : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            );
+          })
+        ) : (
+          <>
+            <li><a href="#">Career</a></li>
+            <li><a href="#">Contact HR</a></li>
+            <li>
+              <button type="button" id="openComplianceDrawer" class="text-left hover:underline">
+                Compliance Form
+              </button>
+            </li>
+            <li>
+              <button type="button" class="open-incident-btn text-left hover:underline">
+                Incident Reporting
+              </button>
+            </li>
+            <li><a href="#">OPWDD Statement</a></li>
+          </>
+        )}
+      </ul>
+    </div>
+
+    <div id="services-col" class="w-full sm:w-[45%] lg:w-[20%] flex flex-col items-center lg:items-start">
+      <h3 id="services-heading" class="text-brand-blue-surface-tint text-md font-black pb-5">Our Services</h3>
+      <ul class="flex flex-col gap-4">
+        {ourServices.length > 0 ? (
+          ourServices.map((item) => (
+            <li><a href={item.path}>{item.label}</a></li>
+          ))
+        ) : (
+          <>
+            <li><a href="#">Com Hab</a></li>
+            <li><a href="#">Day Hab</a></li>
+            <li><a href="#">Supported Employment</a></li>
+            <li><a href="#">Respite</a></li>
+            <li><a href="#">Residential</a></li>
+          </>
+        )}
+      </ul>
+    </div>
+
+    <div id="contact-col" class="w-full lg:w-[25%] flex flex-col items-center lg:items-start">
+      <h3 id="contact-heading" class="text-brand-blue-surface-tint text-md font-black pb-5">Get In Touch</h3>
+      <div class="flex flex-col gap-10 w-full">
+        {offices.map((office, idx) => (
+          <div id={`office-${idx + 1}`} class="flex flex-col gap-3">
+            <span class="font-black text-brand-dark text-[10px] uppercase tracking-widest ml-7 lg:ml-8">
+              {office.name}
+            </span>
+
+            <div class="flex items-start gap-3 lg:gap-4">
+              <i class="fa-solid fa-location-dot text-brand-blue mt-1 w-4 text-center"></i>
+              <address class="not-italic text-[#4E535D] text-sm font-semibold leading-snug" set:html={office.address} />
+            </div>
+
+            <div class="flex items-center gap-3 lg:gap-4">
+              <i class="fa-solid fa-phone text-brand-blue w-4 text-center"></i>
+              <a href={`tel:${office.phone.replace(/\D/g, '')}`} class="text-brand-blue text-xs font-bold hover:underline underline-offset-4">
+                {office.phone}
+              </a>
+            </div>
+
+            <div class="flex items-center gap-3 lg:gap-4">
+              <i class="fa-solid fa-envelope text-brand-blue w-4 text-center"></i>
+              <a href={`mailto:${office.email}`} class="text-[#4E535D] text-xs font-medium hover:text-brand-blue transition-colors">
+                {office.email}
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+  </div>
+
+  <div id="bottom-section" class="flex flex-row justify-between items-center max-w-7xl mx-auto px-4 mt-12 border-t border-gray-200 pt-8 text-[#717782] tracking-normal">
+    <div id="legal-links" class="flex flex-row justify-between items-center gap-8">
+      {legalLinks.length > 0 ? (
+        legalLinks.map((item) => (
+          <a class="underline underline-offset-5 decoration-2 font-bold font-sm" href={item.path}>
+            {item.label}
+          </a>
+        ))
+      ) : (
+        <>
+          <a class="underline underline-offset-5 decoration-2 font-bold font-sm" href="/privacy-policy">Privacy Policy</a>
+          <a class="underline underline-offset-5 decoration-2 font-bold font-sm" href="/terms-of-service">Terms of Service</a>
+          <a class="underline underline-offset-5 decoration-2 font-bold font-sm" href="/accessibility">Accessibility Statement</a>
+        </>
+      )}
+    </div>
+    
+    <div id="legal-btns" class="flex flex-row justify-between gap-4">
+      <button 
+        type="button"
+        aria-label="Share page"
+        class="open-share-btn bg-[#E2E2E5] hover:bg-slate-300 transition-colors rounded-full h-10 w-10 text-brand-blue flex items-center justify-center"
+      >
+        <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
+      </button>
+      <button 
+        type="button" 
+        aria-label="Open Accessibility Tools"
+        class="open-a11y-btn flex items-center justify-center bg-[#E2E2E5] hover:bg-slate-300 transition-colors rounded-full h-10 w-10 text-brand-blue"
+      >
+        <div class="h-6 w-6 pointer-events-none" aria-hidden="true">
+          <Fragment set:html={accessibilityIcon} />
         </div>
-        <div id="legal-btns" class="flex flex-row justify-between gap-4">
-            <button class="bg-[#E2E2E5] rounded-full h-10 w-10 text-[#004E8B] fill-current"><i class="fa-solid fa-share-nodes"></i></button>
-            <button class="flex items-center justify-center bg-[#E2E2E5] rounded-full h-10 w-10 text-[#004E8B] fill-current">
-                <div class="h-6 w-6">
-                    <Fragment set:html={accessibilityIcon} />
-                </div>
+      </button>
+    </div>
+  </div>
+
+<!-- Compliance Drawer Overlay -->
+  <div id="complianceDrawerOverlay" class="drawer-overlay" aria-hidden="true">
+    <div id="complianceDrawerBackdrop" class="drawer-backdrop"></div>
+    <div class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="complianceTitle">
+      <div class="drawer-header">
+        <h2 id="complianceTitle">Agency Compliance</h2>
+        <button type="button" id="closeComplianceDrawer" class="close-btn" aria-label="Close drawer">
+          &times;
+        </button>
+      </div>
+      <div class="drawer-body">
+        <ComplianceForm />
+      </div>
+    </div>
+  </div>
+
+  <!-- Incident Drawer Overlay -->
+  <div id="incidentDrawerOverlay" class="drawer-overlay" aria-hidden="true">
+    <div id="incidentDrawerBackdrop" class="drawer-backdrop"></div>
+    <div class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="incidentTitle">
+      <div class="drawer-header">
+        <h2 id="incidentTitle">Incident Reporting</h2>
+        <button type="button" id="closeIncidentDrawer" class="close-btn" aria-label="Close drawer">
+          &times;
+        </button>
+      </div>
+      <div class="drawer-body">
+        <IncidentForm />
+      </div>
+    </div>
+  </div>
+
+  <!-- Accessibility Tools Drawer Overlay -->
+  <div id="a11yDrawerOverlay" class="drawer-overlay" aria-hidden="true">
+    <div id="a11yDrawerBackdrop" class="drawer-backdrop"></div>
+    <div class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="a11yTitle">
+      <div class="drawer-header">
+        <h2 id="a11yTitle" class="text-[#004E8B] font-bold">Accessibility Tools</h2>
+        <button type="button" id="closeA11yDrawer" class="close-btn" aria-label="Close drawer">
+          &times;
+        </button>
+      </div>
+      <div class="drawer-body flex flex-col gap-6">
+        <p class="text-sm text-slate-600">
+          Customize your viewing preferences for better readability.
+        </p>
+
+        <!-- Quick Preferences Controls -->
+        <div class="flex flex-col gap-4">
+          <div class="flex items-center justify-between border-b pb-3">
+            <span class="font-semibold text-slate-800">High Contrast</span>
+            <button type="button" id="toggle-contrast" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded text-sm font-bold text-[#004E8B]">
+              Toggle
             </button>
+          </div>
+
+          <div class="flex items-center justify-between border-b pb-3">
+            <span class="font-semibold text-slate-800">Text Size</span>
+            <div class="flex gap-2">
+              <button type="button" id="decrease-text" class="px-3 py-1 bg-slate-200 hover:bg-slate-300 rounded font-bold">-</button>
+              <button type="button" id="reset-text" class="px-3 py-1 bg-slate-200 hover:bg-slate-300 rounded text-xs font-bold flex items-center">Reset</button>
+              <button type="button" id="increase-text" class="px-3 py-1 bg-slate-200 hover:bg-slate-300 rounded font-bold">+</button>
+            </div>
+          </div>
         </div>
+
+        <div class="mt-auto pt-4 border-t">
+          <a href="/accessibility" class="text-sm font-bold text-[#004E8B] underline underline-offset-4">
+            Read our Full Accessibility Statement &rarr;
+          </a>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- Share Modal Dialog -->
+  <dialog id="shareModal" class="p-6 rounded-xl shadow-2xl backdrop:bg-black/50 max-w-md w-full border-0">
+    <div class="flex justify-between items-center pb-4 border-b">
+      <h3 class="text-lg font-bold text-[#004E8B]">Share This Page</h3>
+      <button type="button" id="closeShareModal" class="text-slate-400 hover:text-slate-700 text-2xl font-bold leading-none" aria-label="Close modal">&times;</button>
+    </div>
+    <div class="py-4 space-y-4">
+      <p class="text-sm text-slate-600">Copy the URL below to share this page:</p>
+      <div class="flex gap-2">
+        <input 
+          type="text" 
+          id="shareUrlInput" 
+          readonly 
+          class="flex-1 bg-slate-100 border border-slate-300 rounded-md px-3 py-2 text-sm text-slate-700 select-all" 
+        />
+        <button 
+          type="button" 
+          id="copyShareUrlBtn" 
+          class="bg-[#004E8B] hover:bg-blue-900 text-white font-bold px-4 py-2 rounded-md text-sm transition-colors"
+        >
+          Copy
+        </button>
+      </div>
+      <p id="shareFeedback" class="text-xs font-semibold text-green-600 hidden">Link copied to clipboard!</p>
+    </div>
+  </dialog>
 </footer>
+<script>
+  // Helper to attach drawer listeners
+  const setupDrawer = (openSelector: string, overlayId: string, closeBtnId: string, backdropId: string) => {
+    const overlay = document.getElementById(overlayId);
+    const closeBtn = document.getElementById(closeBtnId);
+    const backdrop = document.getElementById(backdropId);
+
+    const openDrawer = () => {
+      overlay?.classList.add('is-open');
+      overlay?.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closeDrawer = () => {
+      overlay?.classList.remove('is-open');
+      overlay?.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    };
+
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target && target.closest(openSelector)) {
+        e.preventDefault();
+        openDrawer();
+      }
+    });
+
+    closeBtn?.addEventListener('click', closeDrawer);
+    backdrop?.addEventListener('click', closeDrawer);
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && overlay?.classList.contains('is-open')) {
+        closeDrawer();
+      }
+    });
+  };
+
+  const setupShare = () => {
+    const shareBtns = document.querySelectorAll('.open-share-btn');
+    const modal = document.getElementById('shareModal') as HTMLDialogElement;
+    const closeBtn = document.getElementById('closeShareModal');
+    const copyBtn = document.getElementById('copyShareUrlBtn');
+    const input = document.getElementById('shareUrlInput') as HTMLInputElement;
+    const feedback = document.getElementById('shareFeedback');
+
+    shareBtns.forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const currentUrl = window.location.href;
+
+        // Native Share API if supported
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: document.title,
+              url: currentUrl,
+            });
+            return;
+          } catch (err) {
+            // User cancelled share or failed; fall back to dialog
+          }
+        }
+
+        // Fallback Dialog
+        if (input) input.value = currentUrl;
+        if (feedback) feedback.classList.add('hidden');
+        modal?.showModal();
+      });
+
+      closeBtn?.addEventListener('click', () => modal?.close());
+
+      // Close dialog when clicking backdrop
+      modal?.addEventListener('click', (e) => {
+        if (e.target === modal) modal.close();
+      });
+
+      copyBtn?.addEventListener('click', () => {
+        if (input) {
+          navigator.clipboard.writeText(input.value);
+          if (feedback) {
+            feedback.classList.remove('hidden');
+            setTimeout(() => feedback.classList.add('hidden'), 3000);
+          }
+        }
+      });
+    });
+  };
+
+  // Initialize drawers
+  setupDrawer('.open-compliance-btn', 'complianceDrawerOverlay', 'closeComplianceDrawer', 'complianceDrawerBackdrop');
+  setupDrawer('.open-incident-btn', 'incidentDrawerOverlay', 'closeIncidentDrawer', 'incidentDrawerBackdrop');
+  setupDrawer('.open-a11y-btn', 'a11yDrawerOverlay', 'closeA11yDrawer', 'a11yDrawerBackdrop');
+  setupShare();
+</script>
+<style>
+  .drawer-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    visibility: hidden;
+    pointer-events: none;
+    transition: visibility 0.3s ease;
+  }
+
+  .drawer-overlay.is-open {
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .drawer-backdrop {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .drawer-overlay.is-open .drawer-backdrop {
+    opacity: 1;
+  }
+
+  .drawer-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 580px;
+    background-color: #ffffff;
+    color: #1a202c;
+    box-shadow: -4px 0 25px rgba(0, 0, 0, 0.15);
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .drawer-overlay.is-open .drawer-panel {
+    transform: translateX(0);
+  }
+
+  .drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .drawer-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.75rem;
+    cursor: pointer;
+    color: #718096;
+    line-height: 1;
+  }
+
+  .close-btn:hover {
+    color: #1a202c;
+  }
+
+  .drawer-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+  }
+</style>

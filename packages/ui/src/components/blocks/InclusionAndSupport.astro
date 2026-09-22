@@ -1,0 +1,63 @@
+---
+interface Props {
+  title?: string;
+  resourceTitle?: string;
+  resourceDescription?: string;
+  helplineTitle?: string;
+  helplineNumber?: string;
+  helplineDescription?: string;
+  innerBlocks?: any[];
+}
+
+const {
+  title = "Diversity & Inclusion Statement",
+  resourceTitle = "Support Resources",
+  resourceDescription = "Another Step, Inc. cares about the needs of our staff and families. If you are feeling overwhelmed, please reach out to the resources available. You do not need to go through this alone.",
+  helplineTitle = "Mental Health Helpline",
+  helplineNumber = "1-844-863-9314",
+  helplineDescription = "The New York State Mental Health Helpline is staffed by trained volunteers who are there to listen and provide support when you need it most.",
+  innerBlocks = [],
+} = Astro.props;
+---
+
+<section class="bg-surface-container-low py-20 px-8">
+  <div class="max-w-4xl mx-auto space-y-16">
+    <!-- Diversity & Inclusion Statement -->
+    <div class="space-y-6 text-center md:text-left">
+      <h2 class="text-[2.5rem] font-display font-extrabold text-brand-blue leading-tight" set:html={title} />
+      
+      <!-- InnerBlocks Paragraphs Container -->
+      <div class="space-y-4">
+        {
+          innerBlocks && innerBlocks.length > 0 ? (
+            innerBlocks.map((child: any) => {
+              if (child.renderedHtml) {
+                return <Fragment set:html={child.renderedHtml} />;
+              }
+              const content = child.attributes?.content || "";
+              return content ? <p class="text-body-lg text-on-surface-variant leading-relaxed" set:html={content} /> : null;
+            })
+          ) : null
+        }
+      </div>
+    </div>
+
+    <!-- Support Resources -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 pt-12 border-t border-outline-variant/30">
+      <div class="space-y-4">
+        <h3 class="text-headline-md font-display font-bold text-on-surface" set:html={resourceTitle} />
+        <p class="text-body-lg text-on-surface-variant leading-relaxed" set:html={resourceDescription} />
+      </div>
+
+      <!-- Helpline Call-out -->
+      <div class="bg-brand-blue text-on-brand-blue p-8 rounded-xl editorial-shadow">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="material-symbols-outlined text-3xl">health_and_safety</span>
+          <h4 class="text-title-lg font-bold" set:html={helplineTitle} />
+        </div>
+        <p class="text-[1.75rem] font-display font-black mb-4" set:html={helplineNumber} />
+        <p class="text-on-brand-blue/90 text-label-lg leading-relaxed" set:html={helplineDescription} />
+      </div>
+    </div>
+  </div>
+</section>

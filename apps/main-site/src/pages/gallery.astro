@@ -1,0 +1,39 @@
+---
+import MainLayout from "src/layouts/MainLayout.astro";
+
+import "src/styles/global.css";
+import { getGalleryPageData } from "@anothersteporg/ui/lib/wp";
+import BlockResolver from "@anothersteporg/ui/components/BlockResolver.astro";
+
+const data = await getGalleryPageData();
+
+const blocks = data?.pageBy?.editorBlocks || [];
+
+// 3. Log extracted blocks count and names
+console.log('--- DEBUG: Parsed Blocks ---', blocks.map((b: any) => b.name));
+
+const galleryData = data?.pageBy?.galleryItems || [];
+const videoData = data?.pageBy?.featuredVideo || null;
+---
+
+<MainLayout title={data?.pageBy?.title}>
+  <!-- Dynamic Blocks from WordPress -->
+  <BlockResolver blocks={blocks} galleryData={galleryData} videoData={videoData} />
+</MainLayout>
+<style>
+    .masonry-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        grid-auto-rows: 250px;
+        gap: 1.5rem;
+    }
+    .masonry-item-tall { grid-row: span 2; }
+    .masonry-item-wide { grid-column: span 2; }
+    @media (max-width: 768px) {
+        .masonry-item-wide { grid-column: span 1; }
+    }
+    .glass-nav {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+    }
+</style>

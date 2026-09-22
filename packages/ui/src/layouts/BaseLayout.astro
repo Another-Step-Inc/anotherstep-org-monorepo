@@ -20,15 +20,15 @@ const { title, description = "Another Step, Inc. - Partnering with People to Cre
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <!-- Material Symbols Outlined -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
         <meta name="generator" content={Astro.generator} />
         <title>{title} | Another Step, Inc.</title>
         <meta name="description" content={description} />
     </head>
     <body class:list={["min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans", { "is-store-view": isStore }]}>
         <Header isStore={isStore} />
-        <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <slot />
-        </main>
+        <slot />
         <Footer />
         <PointerTrail />    
     </body>

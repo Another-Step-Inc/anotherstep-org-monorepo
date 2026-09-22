@@ -1,0 +1,67 @@
+<!--   <section class="bg-surface-container-low py-20 px-8">
+    <div class="max-w-4xl mx-auto space-y-16">
+      Diversity & Inclusion Statement
+      <div class="space-y-6 text-center md:text-left">
+        <h2
+          class="text-[2.5rem] font-display font-extrabold text-brand-blue leading-tight"
+        >
+          Diversity &amp; Inclusion Statement
+        </h2>
+        <div class="space-y-4">
+          <p class="text-body-lg text-on-surface-variant leading-relaxed">
+            Consistent with our mission to partner with developmentally disabled
+            individuals to create the lives they choose, we partner with black,
+            indigenous, and people of all colors in the fight against systemic
+            racism and social injustice. Our organization has a proud history of
+            employing and servicing people of various races and cultural
+            backgrounds.
+          </p>
+          <p
+            class="text-body-lg text-on-surface-variant leading-relaxed font-semibold"
+          >
+            We are committed to a society that is diverse, inclusive, tolerant,
+            and respectful. Another Step will continue to consciously work
+            together to support one another and our developmentally disabled
+            community, especially in times when it is needed most.
+          </p>
+          <p
+            class="text-headline-sm font-bold text-brand-blue italic uppercase tracking-wide"
+          >
+            We stand against racism! We stand for inclusion!
+          </p>
+        </div>
+      </div>
+      Support Resources
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 gap-12 pt-12 border-t border-outline-variant/30"
+      >
+        <div class="space-y-4">
+          <h3 class="text-headline-md font-display font-bold text-on-surface">
+            Support Resources
+          </h3>
+          <p class="text-body-lg text-on-surface-variant leading-relaxed">
+            Another Step, Inc. cares about the needs of our staff and families.
+            If you are feeling overwhelmed, please reach out to the resources
+            available. You do not need to go through this alone.
+          </p>
+        </div>
+        Helpline Call-out
+        <div class="bg-brand-blue text-on-brand-blue p-8 rounded-xl editorial-shadow">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="material-symbols-outlined text-3xl"
+              >health_and_safety</span
+            >
+            <h4 class="text-title-lg font-bold">Mental Health Helpline</h4>
+          </div>
+          <p class="text-[1.75rem] font-display font-black mb-4">
+            1-844-863-9314
+          </p>
+          <p class="text-on-brand-blue/90 text-label-lg leading-relaxed">
+            The New York State Mental Health Helpline is staffed by trained
+            volunteers who are there to listen and provide support when you need
+            it most.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section> -->

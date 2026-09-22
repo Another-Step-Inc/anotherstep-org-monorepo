@@ -1,0 +1,54 @@
+---
+interface Props {
+  title?: string;
+  subtitle?: string;
+  hasUnderline?: boolean;
+  underlineColor?: string;
+  backgroundColor?: string;
+  columns?: number;
+}
+
+const {
+  title = '',
+  subtitle = '',
+  hasUnderline = false,
+  underlineColor = 'bg-brand-dark-red',
+  backgroundColor = 'bg-transparent',
+  columns = 3,
+} = Astro.props;
+
+const gridColsClass = columns === 6 ? 'md:grid-cols-6' : 'md:grid-cols-3';
+const containerClass = backgroundColor === 'bg-surface-container-low' ? 'max-w-screen-2xl' : 'max-w-7xl';
+---
+
+<section class={`py-24 ${backgroundColor}`}>
+  <div class={`${containerClass} mx-auto px-8`}>
+    {(title || subtitle) && (
+      <div class="mb-16">
+        {(title && !hasUnderline) ? (
+          <h2 class="text-4xl font-bold text-on-surface mb-4">
+            {title}
+          </h2>
+        ) : (
+        <h2 class="text-4xl font-bold text-brand-blue mb-4">
+            {title}
+          </h2>            
+        )}
+
+        {hasUnderline && (
+          <div class={`h-2 w-32 ${underlineColor} rounded-full mb-4`}></div>
+        )}
+
+        {subtitle && (
+          <p class="text-lg text-on-surface-variant max-w-2xl">
+            {subtitle}
+          </p>
+        )}
+      </div>
+    )}
+
+    <div class={`grid grid-cols-1 ${gridColsClass} gap-6`}>
+      <slot />
+    </div>
+  </div>
+</section>

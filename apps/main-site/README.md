@@ -1,4 +1,12 @@
-# Astro Starter Kit: Minimal
+# Another Step Main Site
+
+## Newsletter signup
+
+Set `PUBLIC_NEWSLETTER_SIGNUP_URL` to the hosted signup form action supplied by the mailing-list provider. The news article signup form posts the visitor's email as the `email` field directly to that URL.
+
+For Mailchimp, use the form action URL from the provider's embedded form code and ensure the audience form accepts the `email` field. The value is public by design; do not put an API key in `PUBLIC_*` variables.
+
+## Astro Starter Kit: Minimal
 
 ```sh
 npm create astro@latest -- --template minimal

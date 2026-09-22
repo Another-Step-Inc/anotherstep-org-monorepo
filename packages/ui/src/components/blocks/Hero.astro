@@ -1,0 +1,199 @@
+---
+const { 
+  content, 
+  layoutType, 
+  imageDecoration, 
+  hasBadge, 
+  badgeText,
+  badgeStyle, 
+  quoteText, 
+  statsNumber, 
+  statsText,
+  statsBgColor,
+  statsTextColor,
+  isImageLarge,
+  isStatsRotated,
+  hasExtraTextDiv, 
+  extraDivText,
+  extraDivIcon,
+  extraDivIconColor,
+  extraDivBgColor,
+  title,
+  paragraph,
+  imageSrc,
+  btn1Text,
+  btn1Url,
+  btn2Text,
+  btn2Url  
+} = Astro.props;
+
+const badgeStyles = {
+  'pill-yellow': 'inline-block bg-brand-dark-yellow text-on-brand-dark-yellow px-4 py-1 rounded-full text-label-md font-bold mb-6 tracking-wide uppercase',
+  'text-blue': 'block text-brand-blue mb-4 tracking-widest uppercase',
+  'pill-blue': 'inline-block px-4 py-1 rounded-full bg-brand-blue-fixed text-on-brand-blue-fixed text-label-md font-bold mb-6'
+}
+
+const activeBadgeClass = badgeStyles[badgeStyle];
+
+const isExternalLink = (url: string) => {
+  if (!url) return false;
+  // Matches URLS staring with http:// or https://
+  return /^https?:\/\//i.test(url);
+};
+---
+
+<section class={`relative overflow-hidden ${layoutType === 'background' ? 'min-h-[85vh] flex items-center py-12' : 'py-24 md:py-32'}`}>
+  {/*Quote bubble decorative element -->*/}
+  {imageDecoration === 'quote-bubble' && quoteText && (
+    <div class="absolute top-0 right-0 w-1/3 h-full bg-brand-blue-container/5 -skew-x-12 transform translate-x-1/2"></div>
+  )}
+
+    {/* If Background layout style, render the following */}
+    {layoutType === 'background' && (
+      <div class="absolute inset-0 z-0">
+        <img
+          alt=""
+          class="w-full h-full object-cover"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLgv_VaEzZoo5BJZmBcaXFxYVWxLZZtrB7wKAJYF7JDnVbirgJ-sWrA8AM4DB24qmtmUIm6wl3zVoc1IUI91d_mHIv4a67U8g6zjMPf2NJRu48HRDEqKXEskFPW9C0v3_djp5T5dkcD-ssIs4wAx_V7s1-m3MgsyQ5UqXS6jh1gmmXxq194gCTeMl7XaqUzfS4RyEj0xjg6_vK6mCJgNvL_jFWMUPbVSFsPOpVvzZCi2TjhohwVsWvqYeix8lRR7r_duQ7adQ3ZKo"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-r from-surface via-surface/60 to-transparent"
+        >
+        </div>
+      </div>
+    )}  
+  <div class="max-w-full mx-auto relative z-10">
+    <div class={`${layoutType === 'background' ? 'relative z-10 md:grid-cols-2' : 'lg:grid-cols-12'} max-w-7xl mx-auto grid grid-cols-1 gap-12 items-center`}>
+      <div class={layoutType === 'background' ? 'max-w-xl' : 'lg:col-span-7 space-y-8'}>
+          {hasBadge && badgeText && (
+            <span class={`${activeBadgeClass} text-sm font-bold`}>
+              {badgeText}
+            </span>
+          )}
+
+          {title && (
+            <h1 class={`${badgeStyle === 'text-blue' ? 'text-on-surface mb-8' : 'text-brand-blue'} text-[42pt] font-black leading-tight tracking-tight`} set:html={title} />
+          )}
+
+          {paragraph && (
+            <p class="text-2xl text-on-surface-variant font-normal leading-relaxed" set:html={paragraph} />
+          )}
+
+          {(btn1Text || btn2Text) && (
+            <div class="flex flex-wrap gap-4 pt-2">
+              
+              {btn1Text && (
+                <a 
+                  href={btn1Url || '#'} 
+                  target={isExternalLink(btn1Url) ? '_blank' : undefined}
+                  rel={isExternalLink(btn1Url) ? 'noopener noreferrer' : undefined}
+                  class="bg-brand-blue text-on-brand-blue px-10 py-5 rounded-full font-bold text-lg flex items-center justify-center gap-3 hover:bg-brand-blue-container transition-all active:scale-95 shadow-lg shadow-brand-blue/20"
+                >
+                  <span set:html={btn1Text} />
+                  {isExternalLink(btn1Url) ? (
+                    <span class="material-symbols-outlined text-xl">open_in_new</span>
+                  ) : null}
+                </a>
+              )}
+
+              {btn2Text && (
+                <a 
+                  href={btn2Url || '#'} 
+                  target={isExternalLink(btn2Url) ? '_blank' : undefined}
+                  rel={isExternalLink(btn2Url) ? 'noopener noreferrer' : undefined}
+                  class={`px-10 py-5 rounded-full font-bold text-lg flex items-center justify-center transition-all border-2 active:scale-95
+                    ${layoutType === 'background' 
+                      ? 'text-brand-blue border-brand-blue/30 hover:bg-brand-blue/10' 
+                      : 'text-brand-blue border-brand-blue/20 hover:bg-brand-blue-container/10'
+                    }`}
+                >
+                  <span set:html={btn2Text} />
+                  {isExternalLink(btn2Url) ? (
+                    <span class="material-symbols-outlined text-xl">open_in_new</span>
+                  ) : null}
+                </a>
+              )}
+              
+            </div>
+          )}
+
+          {hasExtraTextDiv && extraDivText && (
+            <div class="flex flex-wrap gap-4 pt-4">
+              <div class={`bg-${extraDivBgColor} text-on-surface px-6 py-4 rounded-xl flex items-center gap-3`}>
+                <span 
+                  class={`material-symbols-outlined text-3xl text-${extraDivIconColor}`} 
+                  style="font-variation-settings: 'FILL' 1;"
+                >
+                  {extraDivIcon}
+                </span>
+                <p class={`text-body-lg tracking-wider ${extraDivText.length < 25 ? 'font-bold uppercase' : 'font-medium'}`}>
+                  {extraDivText}
+                </p>
+              </div>
+            </div>
+          )}
+      </div>
+
+    {/* Split Layout Only */}
+    {layoutType !== 'background' && imageSrc && (
+      <div class="lg:col-span-5 relative group">
+        {/* Underlay structural backgrounds */}
+        {imageDecoration === 'hover-frame' && <div class="absolute -inset-4 bg-brand-blue/10 rounded-[2rem] -rotate-2 group-hover:rotate-0 transition-transform duration-500 z-0"></div>}
+        {imageDecoration === 'yellow-box' && <div class="absolute -bottom-6 -left-6 w-32 h-32 bg-brand-yellow rounded-xl -z-10"></div>}
+        {imageDecoration === 'extra-text-div' && <div class="absolute -inset-4 bg-brand-yellow/10 rounded-[2rem] -rotate-2 group-hover:rotate-0 transition-transform duration-500"></div>}
+
+        {/* Dynamic Canvas Image Layout Frame */}
+        <div class={`relative overflow-hidden shadow-2xl aspect-square transition-all duration-300 rounded-xl
+          ${isImageLarge ? 'w-120 h-120' : 'w-95 h-95'}
+          ${['bubble-text', 'yellow-box', 'extra-text-div'].includes(imageDecoration) ? 'transform rotate-3' : ''}
+          ${['quote-bubble'].includes(imageDecoration) ? 'organic-shadow transform rotate-3 scale-105 border-[8px] border-surface-container-lowest': ''}
+          ${['hover-frame', 'gradient-overlay', 'organic-blur', 'none'].includes(imageDecoration) ? '' : ''}`}
+        >
+          <img src={imageSrc} class="w-full h-full object-cover" alt={title} />
+
+          {/* Layout Aspect Mask Overlay Layer */}
+          {imageDecoration === 'gradient-overlay' && <div class="absolute inset-0 bg-gradient-to-t from-brand-blue/40 to-transparent pointer-events-none"></div>}
+        </div>
+
+        {/* 🌟 FIXED STATS BOX: Utilizing dynamic color mappings, sizing states, and rotation properties */}
+        {imageDecoration === 'bubble-text' && statsNumber && (
+          <div 
+            class={`absolute -bottom-6 p-8 rounded-2xl shadow-xl max-w-[240px] z-20 
+              ${isImageLarge ? '-left-10' : '-left-6 '}
+              ${isStatsRotated ? '-rotate-3' : 'rotate-0'} 
+              bg-${statsBgColor}`}
+          >
+            <span class={`text-${statsTextColor} text-3xl font-black block mb-2`}>{statsNumber}</span>
+            
+            {/* 🌟 Dynamic conditional text color based on statsBgColor */}
+            <p class={`text-sm font-medium opacity-90 leading-tight 
+              ${statsBgColor === 'white' ? 'text-on-surface-variant' : 'text-white'}`}
+            >
+              {statsText}
+            </p>
+          </div>
+        )}
+
+        {/* Quote bubble in corner of hero image */}
+        {imageDecoration === 'quote-bubble' && quoteText && (
+          <div class="absolute -bottom-6 -left-6 bg-brand-dark-yellow text-on-brand-yellow p-6 rounded-xl shadow-xl max-w-[240px] z-20">
+            <p class="font-bold text-base italic leading-snug">{quoteText}</p>
+          </div>
+        )}
+
+        {imageDecoration === 'organic-blur' && (
+          <>
+            <div class="absolute -bottom-8 -left-8 w-32 h-32 bg-purple-400 rounded-full mix-blend-multiply opacity-20 blur-xl -z-10"></div>
+            <div class="absolute -top-8 -right-8 w-48 h-48 bg-yellow-400 rounded-full mix-blend-multiply opacity-10 blur-2xl -z-10"></div>
+          </>
+        )}
+    </div>
+  )}
+  </div>
+</section>
+
+<style is:global>
+    /* This ensures WordPress classes like .has-text-align-center work */
+    .prose .has-text-align-center { text-align: center; }
+    .prose .has-text-align-right { text-align: right; }
+</style>
