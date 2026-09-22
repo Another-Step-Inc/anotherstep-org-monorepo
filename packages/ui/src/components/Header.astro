@@ -10,7 +10,8 @@ interface MenuItem {
 
 const MAIN_SITE_URL = import.meta.env.PUBLIC_MAIN_SITE_URL || 'http://localhost:4321';
 const STORE_SITE_URL = import.meta.env.PUBLIC_STORE_SITE_URL || 'http://localhost:4322';
-const WP_URL = import.meta.env.WP_GRAPHQL_URL || 'http://host.docker.internal:8050/graphql';
+const wpBaseUrl = (import.meta.env.PUBLIC_WORDPRESS_API_URL || 'http://localhost:8050').replace(/\/+$/, '');
+const WP_URL = import.meta.env.WP_GRAPHQL_URL || `${wpBaseUrl}/graphql`;
 
 function formatUrl(path: string, currentIsStore: boolean): string {
   const trimmedPath = path ? path.trim() : '';
