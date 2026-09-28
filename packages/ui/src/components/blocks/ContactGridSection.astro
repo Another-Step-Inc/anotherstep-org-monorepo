@@ -155,7 +155,7 @@ const formBlocks = resolvedInnerBlocks.filter(
       
       // Base WP URL without trailing slash
       const wpBase = (import.meta.env.PUBLIC_WORDPRESS_URL || 'http://localhost:8050').replace(/\/$/, '');
-      const endpoint = `${wpBase}/wp-json/wp/v2/contact`;
+      const endpoint = `${wpBase}/wp-json/anotherstep/v1/contact-form`;
 
       const targetUrl = form.action.startsWith('http')
         ? form.action
