@@ -4,9 +4,13 @@
   "description": "Monorepo for Another Step, Inc. and Storefront",
   "scripts": {
     "dev": "pnpm -r --parallel dev",
-    "build": "pnpm -r build"
+    "build": "pnpm -r build",
+    "test:e2e": "playwright test",
+    "test:e2e:main": "playwright test --project=main-site",
+    "test:e2e:store": "playwright test --project=store-site"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "fallow": "^2.54.3",
     "tailwindcss": "^4.2.4",
     "typescript": "^5.0.0"

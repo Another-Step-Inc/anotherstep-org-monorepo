@@ -6,11 +6,15 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "test:e2e": "playwright test",
     "astro": "astro"
   },
   "dependencies": {
     "@anothersteporg/ui": "workspace:*",
     "@tailwindcss/vite": "^4.2.1",
     "astro": "^5.17.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
   }
 }
