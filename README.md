@@ -31,3 +31,37 @@ Once in the container, start the dev server from /app which is the root working 
 ```
 pnpm dev --host 0.0.0.0
 ```
+
+### Testing with Playwright
+
+Run this command
+
+```
+docker run --rm -it `
+>>   -v "${PWD}:/app" `
+>>   -w /app `
+>>   mcr.microsoft.com/playwright:v1.63.0-noble `
+>>   sh -c "npm install -g pnpm && pnpm install && pnpm test:e2e"
+```
+
+```
+docker run --rm -it `
+  -v "${PWD}:/src" `
+  mcr.microsoft.com/playwright:v1.63.0-noble `
+  sh -c "
+    cp -R /src /workspace &&
+    cd /workspace &&
+    npm install -g pnpm &&
+    pnpm install &&
+    pnpm test:e2e
+  "
+```
+
+```
+docker run --rm -it `
+  -v "${PWD}:/app" `
+  -v anotherstep_node_modules:/app/node_modules `
+  -w /app `
+  mcr.microsoft.com/playwright:v1.63.0-noble `
+  sh -c "npm install -g pnpm && pnpm install && pnpm test:e2e"
+```

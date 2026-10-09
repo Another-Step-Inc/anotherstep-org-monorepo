@@ -25,7 +25,7 @@ import {
     DonationGridSectionFragment
 } from '../lib/fragments.js';
 
-const WP_BASE_URL = (import.meta.env.PUBLIC_WORDPRESS_API_URL || "http://localhost:8050").replace(/\/+$/, "");
+const WP_BASE_URL = (import.meta.env.PUBLIC_WORDPRESS_API_URL || "http://host.docker.internal:8050").replace(/\/+$/, "");
 const WP_GRAPHQL_URL = `${WP_BASE_URL}/graphql/`;
 
 // Reusable Editor Blocks Fragment

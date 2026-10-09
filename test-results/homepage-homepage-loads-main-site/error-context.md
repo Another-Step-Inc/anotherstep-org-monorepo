@@ -12,10 +12,32 @@
 # Error details
 
 ```
-Error: browserType.launch: Failed to launch: Error: spawn /root/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell ENOENT
-Call log:
-  - <launching> /root/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/tmp/playwright_chromiumdev_profile-FcpdED --remote-debugging-pipe --no-startup-window
-  - [pid=N/A] starting temporary directories cleanup
-  - [pid=N/A] finished temporary directories cleanup
+Error: expect(page).toHaveTitle(expected) failed
 
+Expected pattern: /.+/
+Received string:  ""
+Timeout: 5000ms
+
+Call log:
+  - Expect "toHaveTitle" with timeout 5000ms
+    12 × locator resolved to <html>…</html>
+       - unexpected value ""
+
+```
+
+```yaml
+- text: Upgrade Required
+```
+
+# Test source
+
+```ts
+  1 | import { test, expect } from '@playwright/test';
+  2 | 
+  3 | test('homepage loads', async ({page}) => {
+  4 |     await page.goto('/');
+  5 | 
+> 6 |     await expect(page).toHaveTitle(/.+/);
+    |                        ^ Error: expect(page).toHaveTitle(expected) failed
+  7 | });
 ```
