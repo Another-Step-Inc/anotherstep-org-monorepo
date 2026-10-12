@@ -1,5 +1,6 @@
 {
   "name": "anotherstep-monorepo",
+  "packageManager": "pnpm@12.11.2",
   "private": true,
   "description": "Monorepo for Another Step, Inc. and Storefront",
   "scripts": {
