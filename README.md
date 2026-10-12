@@ -65,3 +65,40 @@ docker run --rm -it `
   mcr.microsoft.com/playwright:v1.63.0-noble `
   sh -c "npm install -g pnpm && pnpm install && pnpm test:e2e"
 ```
+
+```
+docker run --rm -it `
+  -p 9323:9323 `
+  -v "${PWD}:/app" `
+  -v anotherstep_node_modules:/app/node_modules `
+  -w /app `
+  mcr.microsoft.com/playwright:v1.64.0-noble `
+  sh -c "npm install -g pnpm && pnpm install && pnpm exec playwright show-report --host 0.0.0.0 --port 9323"
+```
+
+```
+docker run --rm -it `
+  -p 9323:9323 `
+  -v "${PWD}:/app" `
+  -v anotherstep_node_modules:/app/node_modules `
+  -w /app `
+  mcr.microsoft.com/playwright:v1.63.0-noble `
+  sh -c "npm install -g pnpm && pnpm install && pnpm test:e2e && pnpm exec playwright show-report --host 0.0.0.0 --port 9323"
+```
+
+For Debugging:
+
+```
+docker run --rm -it `
+  -p 9323:9323 `
+  -v "${PWD}:/app" `
+  -w /app `
+  mcr.microsoft.com/playwright:v1.64.0-noble `
+  sh
+```
+
+```
+ls -la playwright-report
+
+pnpm exec playwright show-report --host 0.0.0.0 --port 9323
+```
