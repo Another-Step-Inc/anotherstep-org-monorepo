@@ -6,14 +6,14 @@ export default defineConfig({
       name: 'main-site',
       testDir: './apps/main-site/tests',
       use: {
-        baseURL: 'http://localhost:4321',
+        baseURL: 'http://host.docker.internal:4321',
       },
     },
     {
       name: 'store-site',
       testDir: './apps/store-site/tests',
       use: {
-        baseURL: 'http://localhost:4322',
+        baseURL: 'http://host.docker.internal:4322',
       },
     },
   ],
@@ -21,22 +21,26 @@ export default defineConfig({
   webServer: [
     {
       command: 'pnpm --filter main-site dev --host 0.0.0.0 --port 4321',
-      url: 'http://127.0.0.1:4321',
+      url: 'http://host.docker.internal:4321',
       reuseExistingServer: true,
       timeout: 120000,
     },
     {
       command: 'pnpm --filter store-site dev --host 0.0.0.0 --port 4322',
-      url: 'http://127.0.0.1:4322',
+      url: 'http://host.docker.internal:4322',
       reuseExistingServer: true,
       timeout: 120000,
     },
   ],
 
+  reporter: [
+    ['html'],
+  ],
+
   use: {
     headless: true,
-    screenshot: 'only-on-failure',
-    trace: 'on-first-retry',
-    video: 'retain-on-failure',
+    screenshot: 'on',
+    trace: 'on',
+    video: 'on',
   },
 });
