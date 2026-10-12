@@ -13,6 +13,9 @@ export default defineConfig({
       configFile: '../../packages/ui/tailwind.config.mjs',
     })],
     server: {
+      allowedHosts: [
+        'host.docker.internal',
+      ],
       hmr: {
         protocol: 'ws',      // Explicitly use non-secure websocket
         host: 'localhost',
