@@ -1,0 +1,27 @@
+services:
+  playwright-vnc:
+    image: mcr.microsoft.com/playwright:v1.64.0-noble
+
+    working_dir: /app
+
+    volumes:
+      - .:/app
+
+    ports:
+      - "6080:6080"
+      - "5900:5900"
+
+    shm_size: "2gb"
+
+    command: >
+      bash -c "
+      apt-get update &&
+      apt-get install -y xvfb x11vnc fluxbox novnc websockify &&
+      export DISPLAY=:99 &&
+      Xvfb :99 -screen 0 1920x1080x24 &
+      sleep 2 &&
+      fluxbox &
+      x11vnc -display :99 -forever -shared -nopw -rfbport 5900 &
+      websockify --web=/usr/share/novnc 6080 localhost:5900 &
+      tail -f /dev/null
+      "
