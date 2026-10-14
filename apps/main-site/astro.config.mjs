@@ -9,9 +9,7 @@ export default defineConfig({
     port: 4321,
   },
   vite: {
-    plugins: [tailwindcss({
-      configFile: '../../packages/ui/tailwind.config.mjs',
-    })],
+    plugins: [tailwindcss()],
     server: {
       allowedHosts: [
         'host.docker.internal',

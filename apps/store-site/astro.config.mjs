@@ -9,10 +9,11 @@ export default defineConfig({
     port: 4322,
   },
   vite: {
-    plugins: [tailwindcss({
-      configFile: '../../packages/ui/tailwind.config.mjs',
-    })],
+    plugins: [tailwindcss()],
     server: {
+      allowedHosts: [
+        'host.docker.internal',
+      ],
       hmr: {
         host: 'localhost',
         port: 4322,
