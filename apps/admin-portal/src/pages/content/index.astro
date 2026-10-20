@@ -1,0 +1,43 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { listPendingStagedPosts, WordPressApiError, WordPressConfigurationError } from '../../lib/wordpress';
+
+const user = Astro.locals.user!;
+if (user.role !== 'content_reviewer' && user.role !== 'content_author') return Astro.redirect('/');
+const isReviewer = user.role === 'content_reviewer';
+const error = Astro.url.searchParams.get('error');
+const notice = Astro.url.searchParams.get('notice');
+let submissions = [];
+let loadError: 'backend' | 'configuration' | false = false;
+if (isReviewer) {
+  try {
+    submissions = await listPendingStagedPosts();
+  } catch (error) {
+    if (error instanceof WordPressApiError) loadError = 'backend';
+    else if (error instanceof WordPressConfigurationError) loadError = 'configuration';
+    else throw error;
+  }
+}
+---
+<AdminLayout title="Content approvals" active="/content">
+  <div class="page-heading">
+    <div><h1>Content approvals</h1><p>{isReviewer ? 'Review WordPress content submissions before publication.' : 'Submit a WordPress draft for manager review.'}</p></div>
+    {user.role === 'content_author' && <a class="button button-primary" href="/content/new">Submit content</a>}
+  </div>
+  {error === 'backend-auth' && <div class="form-alert content-alert" role="alert">The WordPress backend rejected its configured Application Password or permissions. Check the portal backend account configuration.</div>}
+  {error === 'backend-config' && <div class="form-alert content-alert" role="alert">Configure WORDPRESS_API_URL, WORDPRESS_API_USERNAME, and WORDPRESS_API_APPLICATION_PASSWORD in the portal environment, then restart the dev container.</div>}
+  {error === 'backend-unavailable' && <div class="form-alert content-alert" role="alert">Could not reach WordPress. Check the backend URL and try again.</div>}
+  {error === 'backend-error' && <div class="form-alert content-alert" role="alert">WordPress could not complete the request. Check the backend logs and try again.</div>}
+  {error === 'review-load' && <div class="form-alert content-alert" role="alert">Could not reload the pending queue after that review. Refresh the page to check the latest status.</div>}
+  {notice === 'submitted' && <div class="content-success" role="status">Your content was submitted to WordPress for approval.</div>}
+  {notice === 'decided' && <div class="content-success" role="status">The review decision was sent to WordPress.</div>}
+  {isReviewer && (loadError
+    ? <div class="form-alert content-alert" role="alert">{loadError === 'configuration' ? 'Configure WORDPRESS_API_URL, WORDPRESS_API_USERNAME, and WORDPRESS_API_APPLICATION_PASSWORD in the portal environment, then restart the dev container.' : 'Could not load pending WordPress content. Check the backend URL and Application Password configuration.'}</div>
+    : <section class="request-grid">
+      {submissions.length ? submissions.map((item) => <a class="request-card" href={`/content/${item.id}`}>
+        <div class="request-card-head"><div><h2>{item.title}</h2><span class="content-byline">By {item.author.name}</span></div><span class="content-status content-status-pending">pending</span></div>
+        <div class="request-meta"><span>Submitted {item.submitted_at || 'date unavailable'}</span><span>WordPress post #{item.id}</span></div>
+      </a>) : <div class="panel empty-state"><strong>No pending submissions</strong>New WordPress content submissions will appear here.</div>}
+    </section>)}
+  {user.role === 'content_author' && <section class="panel empty-state"><strong>Submit a WordPress draft for review</strong>Enter its post ID and proposed title and content. Your submission will appear in the content reviewer’s pending queue.</section>}
+</AdminLayout>

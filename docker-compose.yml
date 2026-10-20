@@ -1,7 +1,25 @@
 services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-adminportal}
+      POSTGRES_USER: ${POSTGRES_USER:-adminportal}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-adminportal-local-password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - admin-portal-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
   dev:
     image: node:20-alpine
     user: "root"
+    depends_on:
+      postgres:
+        condition: service_healthy
     env_file:
       - .env
     volumes:
@@ -14,9 +32,23 @@ services:
     environment:
       - COREPACK_DEFAULT_TO_LATEST=0
       - CI=true
+      - DATABASE_URL=${ADMIN_PORTAL_DATABASE_URL:-postgres://adminportal:adminportal-local-password@postgres:5432/adminportal}
+      - WORDPRESS_API_URL=${WORDPRESS_API_URL_DOCKER:-http://host.docker.internal:8050}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@localhost}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-AdminPortal-Local-Only-123!}
+      - ADMIN_NAME=${ADMIN_NAME:-Portal Admin}
+      - ADMIN_PORTAL_HOST=${ADMIN_PORTAL_HOST:-localhost}
+      - SEED_LEAD_EMAIL=${SEED_LEAD_EMAIL:-lead@localhost}
+      - SEED_LEAD_PASSWORD=${SEED_LEAD_PASSWORD:-Lead-Local-Only-123!}
+      - SEED_LEAD_NAME=${SEED_LEAD_NAME:-Lead Reviewer}
+      - SEED_DEVELOPER_EMAIL=${SEED_DEVELOPER_EMAIL:-developer@localhost}
+      - SEED_DEVELOPER_PASSWORD=${SEED_DEVELOPER_PASSWORD:-Developer-Local-Only-123!}
+      - SEED_DEVELOPER_NAME=${SEED_DEVELOPER_NAME:-Developer User}
     ports:
       - 4321:4321
       - 4322:4322
-    command: sh -c "npm install -g pnpm && pnpm install && pnpm dev --host 0.0.0.0"
+      - 4323:4323
+    command: sh -c "npm install -g pnpm && pnpm install && pnpm db:migrate && pnpm db:seed && pnpm dev --host 0.0.0.0"
 volumes:
   pnpm-store:
+  admin-portal-postgres:

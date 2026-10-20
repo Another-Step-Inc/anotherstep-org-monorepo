@@ -1,0 +1,48 @@
+---
+import AdminLayout from '../layouts/AdminLayout.astro';
+import { db } from '../lib/db';
+const [summary, statusCounts, priorities, monthly] = await Promise.all([
+  db.query(`SELECT COUNT(*)::int AS total,
+    COUNT(*) FILTER (WHERE status = 'released')::int AS released,
+    COUNT(*) FILTER (WHERE status = 'rejected')::int AS rejected,
+    COUNT(*) FILTER (WHERE status NOT IN ('released', 'rejected'))::int AS in_progress
+    FROM change_requests`),
+  db.query(`SELECT status, COUNT(*)::int AS total FROM change_requests GROUP BY status ORDER BY total DESC`),
+  db.query(`SELECT priority, COUNT(*)::int AS total FROM change_requests GROUP BY priority
+    ORDER BY CASE priority WHEN 'urgent' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 ELSE 4 END`),
+  db.query(`SELECT date_trunc('month', created_at)::date AS month, COUNT(*)::int AS total
+    FROM change_requests WHERE created_at >= date_trunc('month', NOW()) - INTERVAL '5 months'
+    GROUP BY date_trunc('month', created_at) ORDER BY month`),
+]);
+const total = Number(summary.rows[0].total);
+const statusLabel = (value: string) => value.replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
+const width = (count: number) => `${total ? Math.max(3, Math.round(count / total * 100)) : 0}%`;
+---
+<AdminLayout title="Reports" active="/reports">
+  <div class="page-heading"><div><h1>Reports</h1><p>A high-level view of request volume and release progress.</p></div></div>
+  <section class="report-grid">
+    <article class="panel report-stat"><span>Total requests</span><strong>{summary.rows[0].total}</strong></article>
+    <article class="panel report-stat"><span>In progress</span><strong>{summary.rows[0].in_progress}</strong></article>
+    <article class="panel report-stat"><span>Released · {total ? Math.round(Number(summary.rows[0].released) / total * 100) : 0}%</span><strong>{summary.rows[0].released}</strong></article>
+  </section>
+  <div class="dashboard-grid">
+    <section class="panel">
+      <div class="panel-heading"><div><h2>Requests by workflow status</h2><p>Current distribution across the approval process</p></div></div>
+      <div class="bar-chart">{statusCounts.rows.length ? statusCounts.rows.map((row) =>
+        <div class="bar-row"><span>{statusLabel(row.status)}</span><div class="bar-track"><div class="bar-fill" style={`width:${width(Number(row.total))}`}></div></div><strong>{row.total}</strong></div>
+      ) : <div class="empty-state">No request data available yet.</div>}</div>
+    </section>
+    <section class="panel">
+      <div class="panel-heading"><div><h2>Requests by priority</h2><p>Distribution of submitted priorities</p></div></div>
+      <div class="bar-chart">{priorities.rows.length ? priorities.rows.map((row) =>
+        <div class="bar-row"><span>{statusLabel(row.priority)}</span><div class="bar-track"><div class="bar-fill" style={`width:${width(Number(row.total))}`}></div></div><strong>{row.total}</strong></div>
+      ) : <div class="empty-state">No request data available yet.</div>}</div>
+    </section>
+  </div>
+  <section class="panel workflow-panel">
+    <div class="panel-heading"><div><h2>Monthly request volume</h2><p>Requests created in the last six months</p></div></div>
+    <div class="bar-chart">{monthly.rows.length ? monthly.rows.map((row) =>
+      <div class="bar-row"><span>{new Date(`${row.month}T00:00:00`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span><div class="bar-track"><div class="bar-fill" style={`width:${Math.max(3, Number(row.total) / Math.max(...monthly.rows.map((item) => Number(item.total))) * 100)}%`}></div></div><strong>{row.total}</strong></div>
+    ) : <div class="empty-state">No request data available yet.</div>}</div>
+  </section>
+</AdminLayout>

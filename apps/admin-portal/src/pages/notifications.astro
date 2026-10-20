@@ -1,0 +1,29 @@
+---
+import AdminLayout from '../layouts/AdminLayout.astro';
+import Icon from '@anothersteporg/ui/components/admin/Icon.astro';
+import { db } from '../lib/db';
+const user = Astro.locals.user!;
+const notifications = await db.query(
+  `SELECT id, title, message, type, "read", created_at
+     FROM notifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT 100`,
+  [user.id],
+);
+const unreadCount = notifications.rows.filter((notification) => !notification.read).length;
+---
+<AdminLayout title="Notifications" active="/notifications">
+  <div class="page-heading">
+    <div><h1>Notifications</h1><p>Review workflow updates and requests that need your attention.</p></div>
+    {unreadCount > 0 && <form method="post" action="/api/notifications/read"><button class="button button-secondary" type="submit">Mark all as read</button></form>}
+  </div>
+  <section class="panel">
+    <div class="panel-heading"><div><h2>All notifications</h2><p>{unreadCount} unread</p></div></div>
+    {notifications.rows.length ? <div class="notification-list">{notifications.rows.map((notification) =>
+      <div class:list={['notification-item', !notification.read ? 'unread' : '']}>
+        {!notification.read && <span class="notification-dot"></span>}
+        <span class="activity-icon"><Icon name={notification.type === 'review' ? 'clock' : 'bell'} size={15} /></span>
+        <div style="flex:1"><strong>{notification.title}</strong><p>{notification.message}</p><time>{notification.created_at.toLocaleString()}</time></div>
+        {!notification.read && <form method="post" action="/api/notifications/read"><input type="hidden" name="notification_id" value={notification.id} /><button class="button button-secondary" type="submit">Mark read</button></form>}
+      </div>
+    )}</div> : <div class="empty-state"><strong>You're all caught up</strong>New review activity will appear here.</div>}
+  </section>
+</AdminLayout>

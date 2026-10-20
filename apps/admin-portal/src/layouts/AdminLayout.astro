@@ -1,0 +1,87 @@
+---
+import '@anothersteporg/ui/styles/admin-portal.css';
+import Icon from '@anothersteporg/ui/components/admin/Icon.astro';
+import { db } from '../lib/db';
+
+interface Props {
+  title: string;
+  active?: string;
+}
+const { title, active = '' } = Astro.props;
+const user = Astro.locals.user!;
+const unreadCount = Number((await db.query(
+  'SELECT COUNT(*)::int AS total FROM notifications WHERE user_id = $1 AND "read" = FALSE',
+  [user.id],
+)).rows[0].total);
+const navigation = [
+  { href: '/', label: 'Overview', icon: 'grid' },
+  ...(user.role === 'content_author' || user.role === 'content_reviewer'
+    ? [{ href: '/content', label: 'Content approvals', icon: 'file' }]
+    : []),
+  { href: '/change', label: 'Change requests', icon: 'git' },
+  { href: '/notifications', label: 'Notifications', icon: 'bell' },
+  { href: '/audit', label: 'Audit logs', icon: 'shield' },
+  { href: '/reports', label: 'Reports', icon: 'chart' },
+];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f7fa" />
+    <title>{title} · AdminPortal</title>
+    <script is:inline>
+      const savedTheme = localStorage.getItem('admin-theme');
+      if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+    </script>
+  </head>
+  <body>
+    <div class="portal-shell">
+      <aside class="sidebar" id="sidebar">
+        <a href="/" class="brand"><span class="brand-mark">A</span><span>Admin<span class="brand-light">Portal</span></span></a>
+        <div class="workspace-label">WORKSPACE</div>
+        <nav aria-label="Main navigation">
+          {navigation.map((item) => (
+            <a href={item.href} class:list={['nav-link', active === item.href ? 'active' : '']}>
+              <Icon name={item.icon} /><span>{item.label}</span>
+              {item.href === '/notifications' && unreadCount > 0 && <span class="nav-dot" aria-label={`${unreadCount} unread notifications`}></span>}
+            </a>
+          ))}
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="workflow-card">
+            <div class="workflow-card-icon"><Icon name="check" /></div>
+            <div><strong>Approval workflow</strong><p>4-stage release process</p></div>
+          </div>
+          <div class="sidebar-user">
+            <div class="avatar">{user.name.slice(0, 1).toUpperCase()}</div>
+            <div class="user-meta"><strong>{user.name}</strong><span>{user.role}</span></div>
+            <form method="post" action="/api/auth/logout"><button class="icon-button logout-button" aria-label="Sign out" title="Sign out"><Icon name="logout" /></button></form>
+          </div>
+        </div>
+      </aside>
+      <main class="main-area">
+        <header class="topbar">
+          <button class="icon-button mobile-menu" aria-label="Open navigation" id="menu-toggle"><Icon name="menu" /></button>
+          <div class="breadcrumb">Workspace <span>/</span> <strong>{title}</strong></div>
+          <div class="topbar-actions">
+            <button class="icon-button theme-toggle" aria-label="Toggle color theme" id="theme-toggle"><Icon name="sun" /></button>
+            <span class="topbar-avatar" title={user.name}>{user.name.slice(0, 1).toUpperCase()}</span>
+          </div>
+        </header>
+        <div class="page-content"><slot /></div>
+      </main>
+    </div>
+    <script is:inline>
+      document.getElementById('theme-toggle')?.addEventListener('click', () => {
+        const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        localStorage.setItem('admin-theme', next);
+      });
+      document.getElementById('menu-toggle')?.addEventListener('click', () => {
+        document.getElementById('sidebar')?.classList.toggle('sidebar-open');
+      });
+    </script>
+  </body>
+</html>

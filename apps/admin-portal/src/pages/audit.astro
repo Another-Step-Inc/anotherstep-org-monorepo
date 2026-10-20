@@ -1,0 +1,32 @@
+---
+import AdminLayout from '../layouts/AdminLayout.astro';
+import { db } from '../lib/db';
+const events = await db.query(
+  `SELECT a.id, a.entity_type, a.entity_id, a.action, a.details, a.created_at, u.name, u.email
+     FROM audit_logs a LEFT JOIN users u ON u.id = a.user_id
+    ORDER BY a.created_at DESC LIMIT 100`,
+);
+const label = (action: string) => ({
+  created: 'Created',
+  approved: 'Approved',
+  rejected: 'Rejected',
+  signed_in: 'Signed in',
+  signed_out: 'Signed out',
+}[action] ?? action.replaceAll('_', ' '));
+---
+<AdminLayout title="Audit logs" active="/audit">
+  <div class="page-heading"><div><h1>Audit logs</h1><p>Chronological record of sign-ins and change request decisions.</p></div></div>
+  <section class="panel">
+    <div class="panel-heading"><div><h2>Recent events</h2><p>Showing the latest 100 audit events</p></div></div>
+    {events.rows.length ? <div class="table-wrap"><table class="data-table">
+      <thead><tr><th>Event</th><th>User</th><th>Entity</th><th>Details</th><th>Date & time</th></tr></thead>
+      <tbody>{events.rows.map((event) => <tr>
+        <td><span class="table-primary">{label(event.action)}</span></td>
+        <td>{event.name ?? 'Former user'}<span class="table-sub">{event.email ?? ''}</span></td>
+        <td>{event.entity_type.replaceAll('_', ' ')}</td>
+        <td>{event.details?.request_number ?? event.details?.email ?? (event.details?.stage ? `${event.details.stage}${event.details.comments ? ` · ${event.details.comments}` : ''}` : '—')}</td>
+        <td>{event.created_at.toLocaleString()}</td>
+      </tr>)}</tbody>
+    </table></div> : <div class="empty-state"><strong>No audit events yet</strong>Activity will be recorded here as users sign in and process requests.</div>}
+  </section>
+</AdminLayout>

@@ -1,0 +1,26 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+
+if (Astro.locals.user?.role !== 'content_author') return Astro.redirect('/content');
+const error = Astro.url.searchParams.get('error');
+---
+<AdminLayout title="Submit content" active="/content">
+  <div class="page-heading"><div><h1>Submit content</h1><p>Stage a WordPress post for manager review.</p></div></div>
+  <section class="panel form-panel">
+    {error === 'invalid' && <div class="form-alert" role="alert">Enter a valid WordPress post ID, title, and content (up to 20,000 characters).</div>}
+    {error === 'backend-config' && <div class="form-alert" role="alert">Configure WORDPRESS_API_URL, WORDPRESS_API_USERNAME, and WORDPRESS_API_APPLICATION_PASSWORD in the portal environment, then restart the dev container.</div>}
+    {error === 'backend-auth' && <div class="form-alert" role="alert">WordPress rejected its configured Application Password or permissions. Contact the portal administrator.</div>}
+    {error === 'backend-unavailable' && <div class="form-alert" role="alert">Could not reach WordPress. Check the backend URL and try again.</div>}
+    {error === 'backend-error' && <div class="form-alert" role="alert">WordPress could not submit this content. Verify the post ID and that the configured account can edit it.</div>}
+    <p class="content-help">Create or edit the post in WordPress first. The post ID is in its editor URL. This form sends the proposed title and content to the staging endpoint; it does not publish the post.</p>
+    <form class="form-stack" method="post" action="/api/content">
+      <label for="post_id">WordPress post ID</label><input id="post_id" name="post_id" type="number" min="1" step="1" required />
+      <label for="title">Proposed title</label><input id="title" name="title" maxlength="180" required />
+      <label for="content">Proposed content</label><textarea id="content" name="content" maxlength="20000" required rows="16"></textarea>
+      <div class="form-actions">
+        <a class="button button-secondary" href="/content">Cancel</a>
+        <button class="button button-primary" type="submit">Submit for approval</button>
+      </div>
+    </form>
+  </section>
+</AdminLayout>

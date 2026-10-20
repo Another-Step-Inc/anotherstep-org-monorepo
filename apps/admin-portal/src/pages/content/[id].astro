@@ -1,0 +1,61 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { diffLines } from '../../lib/content-diff';
+import { listPendingStagedPosts, WordPressApiError, WordPressConfigurationError } from '../../lib/wordpress';
+
+if (Astro.locals.user?.role !== 'content_reviewer') return Astro.redirect('/content');
+const postId = Number(Astro.params.id);
+if (!Number.isSafeInteger(postId) || postId < 1) return Astro.redirect('/content');
+
+let item;
+try {
+  item = (await listPendingStagedPosts()).find((post) => post.id === postId);
+} catch (error) {
+  const code = error instanceof WordPressConfigurationError
+    ? 'backend-config'
+    : error instanceof WordPressApiError
+      ? error.status === 401 || error.status === 403
+        ? 'backend-auth'
+        : error.status === 503 ? 'backend-unavailable' : 'backend-error'
+      : undefined;
+  if (!code) throw error;
+  return Astro.redirect(`/content?error=${code}`);
+}
+if (!item) return Astro.redirect('/content?error=review-load');
+const diff = diffLines(item.diff.previous.content, item.diff.submitted.content);
+const titleChanged = item.diff.previous.title !== item.diff.submitted.title;
+const error = Astro.url.searchParams.get('error');
+---
+<AdminLayout title="Review content" active="/content">
+  <div class="page-heading">
+    <div><a class="request-id" href="/content">← Content approvals</a><h1 style="margin-top:9px">{item.diff.submitted.title}</h1><p>By {item.author.name} · Submitted {item.submitted_at || 'date unavailable'} · WordPress post #{item.id}</p></div>
+    <span class="content-status content-status-pending">pending</span>
+  </div>
+  {error === 'backend-auth' && <div class="form-alert content-alert" role="alert">WordPress rejected its configured Application Password or permissions.</div>}
+  {error === 'backend-config' && <div class="form-alert content-alert" role="alert">Configure WORDPRESS_API_URL, WORDPRESS_API_USERNAME, and WORDPRESS_API_APPLICATION_PASSWORD in the portal environment, then restart the dev container.</div>}
+  {error === 'backend-unavailable' && <div class="form-alert content-alert" role="alert">Could not reach WordPress. Check the backend URL and try again.</div>}
+  {error === 'backend-error' && <div class="form-alert content-alert" role="alert">WordPress could not record the review decision. Verify the post is still pending and try again.</div>}
+  <section class="panel diff-panel">
+    <div class="panel-heading"><div><h2>Diff from previous version</h2><p>Current WordPress post compared with the submitted content</p></div></div>
+    {titleChanged && <div class="title-diff">
+      <strong>Title</strong>
+      <div class="diff-line diff-removed"><span aria-hidden="true">−</span><code>{item.diff.previous.title}</code></div>
+      <div class="diff-line diff-added"><span aria-hidden="true">+</span><code>{item.diff.submitted.title}</code></div>
+    </div>}
+    <div class="content-diff" aria-label="Content changes">{diff.map((line) => <div class:list={['diff-line', `diff-${line.kind}`]}><span aria-hidden="true">{line.kind === 'added' ? '+' : line.kind === 'removed' ? '−' : ' '}</span><code>{line.text || ' '}</code></div>)}</div>
+    <div class="approval-form">
+      <form class="form-stack" method="post" action={`/api/content/${item.id}/review`}>
+        <label for="review-note">Review note</label><textarea id="review-note" name="note" maxlength="5000" placeholder="Required when requesting changes; otherwise optional"></textarea>
+        <div class="review-actions">
+          <button class="button button-primary" type="submit" name="decision" value="approve">Approve</button>
+          <button class="button button-danger" type="submit" name="decision" value="reject">Reject</button>
+          <button class="button button-secondary" type="submit" name="decision" value="request_changes">Request changes</button>
+        </div>
+      </form>
+    </div>
+  </section>
+  <section class="detail-grid content-preview">
+    <div class="panel detail-copy"><h2>Current WordPress post</h2><div class="content-rendered" set:html={item.diff.previous.content}></div></div>
+    <div class="panel detail-copy"><h2>Submitted version</h2><div class="content-rendered" set:html={item.diff.submitted.content}></div></div>
+  </section>
+</AdminLayout>

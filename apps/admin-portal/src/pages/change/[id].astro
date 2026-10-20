@@ -1,0 +1,65 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import StatusBadge from '@anothersteporg/ui/components/admin/StatusBadge.astro';
+import { approvalStages, db, isUuid } from '../../lib/db';
+const { id } = Astro.params;
+if (!isUuid(id)) return Astro.redirect('/change');
+const [requestResult, approvalsResult, prsResult] = await Promise.all([
+  db.query(`SELECT cr.*, u.name AS requester, u.email AS requester_email
+    FROM change_requests cr JOIN users u ON u.id = cr.created_by WHERE cr.id = $1`, [id]),
+  db.query(`SELECT a.*, u.name AS approver FROM change_request_approvals a
+    LEFT JOIN users u ON u.id = a.approver_id WHERE a.change_request_id = $1 ORDER BY a.approval_level`, [id]),
+  db.query('SELECT * FROM change_request_prs WHERE change_request_id = $1 ORDER BY created_at DESC', [id]),
+]);
+if (!requestResult.rows[0]) return Astro.redirect('/change');
+const request = requestResult.rows[0];
+const approvals = approvalsResult.rows;
+const currentStage = approvalStages.find((stage) => `pending_${stage.role === 'lead' ? 'lead_review' : stage.role}` === request.status);
+const user = Astro.locals.user!;
+const canApprove = !!currentStage && (user.role === currentStage.role || user.role === 'admin');
+const error = Astro.url.searchParams.get('error');
+---
+<AdminLayout title="Request details" active="/change">
+  <div class="page-heading">
+    <div><a class="request-id" href="/change">← Change requests</a><h1 style="margin-top:9px">{request.title}</h1><p>{request.request_number} · Submitted by {request.requester} · {request.created_at.toLocaleDateString()}</p></div>
+    <StatusBadge status={request.status} />
+  </div>
+  {error && <div class="form-alert" role="alert">{error === 'not-authorized' ? 'Your role cannot approve the current stage.' : error === 'pr' ? 'Enter a valid pull request number, repository, and HTTP(S) URL.' : 'This request must pass the preceding approval stage first.'}</div>}
+  <div class="detail-grid">
+    <div>
+      <section class="panel detail-copy">
+        <section><h2>Change description</h2><p>{request.description}</p></section>
+        <section><h2>Business justification</h2><p>{request.business_justification}</p></section>
+        <section><h2>Repository & branch</h2><p>{request.repository}<br />{request.branch_name}</p><div class="request-meta"><span>Priority: {request.priority}</span><span>Updated: {request.updated_at.toLocaleString()}</span></div></section>
+        {prsResult.rows.length > 0 && <section><h2>Pull requests</h2>{prsResult.rows.map((pr) => <p><a href={pr.pr_url} target="_blank" rel="noreferrer">{pr.repository} #{pr.pr_number} ↗</a></p>)}</section>}
+        <section>
+          <h2>Link a pull request</h2>
+          <form class="form-stack" method="post" action={`/api/change-requests/${request.id}/prs`}>
+            <label for="pr_number">PR number</label><input id="pr_number" name="pr_number" required placeholder="123" />
+            <label for="pr_repository">Repository</label><input id="pr_repository" name="repository" required value={request.repository} />
+            <label for="pr_url">Pull request URL</label><input id="pr_url" name="pr_url" type="url" required placeholder="https://github.com/org/repo/pull/123" />
+            <button class="button button-secondary" type="submit">Link pull request</button>
+          </form>
+        </section>
+      </section>
+    </div>
+    <aside class="panel">
+      <div class="panel-heading"><div><h2>Approval stages</h2><p>Sequential release checks</p></div></div>
+      <div class="approval-list">{approvals.map((approval) => {
+        const stage = approvalStages[approval.approval_level - 1];
+        return <div class:list={['approval-row', approval.status === 'approved' ? 'is-approved' : '']}>
+          <span class="approval-number">{approval.status === 'approved' ? '✓' : approval.approval_level}</span>
+          <div class="approval-info"><strong>{stage.label}</strong><span>{approval.status === 'approved' ? `Approved by ${approval.approver ?? 'reviewer'}` : approval.status === 'rejected' ? `Rejected by ${approval.approver ?? 'reviewer'}` : approval.approval_level === approvals.find((item) => item.status === 'pending')?.approval_level ? 'Awaiting review' : 'Not started'}</span>
+            {approval.comments && <span>{approval.comments}</span>}
+          </div>
+          <StatusBadge status={approval.status} />
+        </div>;
+      })}</div>
+      {canApprove && <form class="approval-form" method="post" action={`/api/change-requests/${request.id}/approval`}>
+        <label for="comments">Review notes</label><textarea id="comments" name="comments" placeholder="Add notes for the requester (optional)"></textarea>
+        <button class="button button-primary" type="submit" name="outcome" value="approved">Approve & continue</button>
+        <button class="button button-danger" type="submit" name="outcome" value="rejected">Reject request</button>
+      </form>}
+    </aside>
+  </div>
+</AdminLayout>

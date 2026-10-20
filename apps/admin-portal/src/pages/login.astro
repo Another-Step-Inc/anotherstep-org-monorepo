@@ -1,0 +1,29 @@
+---
+import '@anothersteporg/ui/styles/admin-portal.css';
+const error = Astro.url.searchParams.get('error');
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign in · AdminPortal</title>
+  </head>
+  <body class="login-page">
+    <main class="login-card">
+      <a href="/login" class="brand login-brand"><span class="brand-mark">A</span><span>Admin<span class="brand-light">Portal</span></span></a>
+      <div class="login-eyebrow">ADMIN WORKSPACE</div>
+      <h1>Welcome back</h1>
+      <p class="login-subtitle">Sign in to manage your team's change requests.</p>
+      {error && <div class="form-alert" role="alert">{error === 'credentials' ? 'Email or password was incorrect.' : 'Unable to sign in. Please try again.'}</div>}
+      <form method="post" action="/api/auth/login" class="form-stack">
+        <label for="email">Work email</label>
+        <input id="email" name="email" type="email" autocomplete="username" placeholder="you@company.com" required />
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required />
+        <button class="button button-primary button-full" type="submit">Sign in <span aria-hidden="true">→</span></button>
+      </form>
+      <p class="login-footnote">Local sign-in · Your organization can connect SSO later.</p>
+    </main>
+  </body>
+</html>

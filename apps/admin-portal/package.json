@@ -1,0 +1,26 @@
+{
+  "name": "admin-portal",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "node --env-file=../../.env ./node_modules/astro/astro.js dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "db:migrate": "node --env-file=../../.env scripts/migrate.mjs",
+    "db:seed": "node --env-file=../../.env scripts/seed.mjs",
+    "db:user": "node scripts/create-user.mjs"
+  },
+  "dependencies": {
+    "@anothersteporg/ui": "workspace:*",
+    "@astrojs/node": "^9.4.3",
+    "@tailwindcss/vite": "^4.2.1",
+    "astro": "^5.17.1",
+    "bcryptjs": "^3.0.2",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.15.5",
+    "tailwindcss": "^4.2.4"
+  }
+}

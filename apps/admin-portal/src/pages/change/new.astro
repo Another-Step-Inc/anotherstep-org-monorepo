@@ -1,0 +1,22 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import Icon from '@anothersteporg/ui/components/admin/Icon.astro';
+const error = Astro.url.searchParams.has('error');
+---
+<AdminLayout title="New change request" active="/change">
+  <div class="page-heading"><div><h1>New change request</h1><p>Provide the details reviewers need to assess and release this change.</p></div></div>
+  <section class="panel form-panel">
+    {error && <div class="form-alert" role="alert">Complete all required fields and choose a valid priority.</div>}
+    <form class="form-stack" method="post" action="/api/change-requests">
+      <div class="form-grid">
+        <div class="form-span"><label for="title">Request title *</label><input id="title" name="title" maxlength="180" required placeholder="e.g. Add member profile export" /></div>
+        <div><label for="repository">Repository *</label><input id="repository" name="repository" maxlength="160" required placeholder="organization/repository" /></div>
+        <div><label for="branch_name">Branch *</label><input id="branch_name" name="branch_name" maxlength="160" required placeholder="feature/member-export" /></div>
+        <div><label for="priority">Priority *</label><select id="priority" name="priority"><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option><option value="urgent">Urgent</option></select></div>
+        <div class="form-span"><label for="description">Change description *</label><textarea id="description" name="description" required placeholder="What code or behavior will change?"></textarea></div>
+        <div class="form-span"><label for="business_justification">Business justification *</label><textarea id="business_justification" name="business_justification" required placeholder="Why is this change needed?"></textarea></div>
+      </div>
+      <div class="form-actions"><a class="button button-secondary" href="/change">Cancel</a><button class="button button-primary" type="submit"><Icon name="plus" size={15} /> Submit for review</button></div>
+    </form>
+  </section>
+</AdminLayout>

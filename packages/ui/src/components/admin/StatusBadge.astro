@@ -1,0 +1,17 @@
+---
+interface Props {
+  status: string;
+}
+const { status } = Astro.props;
+const labels: Record<string, string> = {
+  pending_lead_review: 'Pending lead review',
+  pending_qa: 'Pending QA',
+  pending_security: 'Pending security',
+  pending_release: 'Pending release',
+  released: 'Released',
+  rejected: 'Rejected',
+  pending: 'Pending',
+  approved: 'Approved',
+};
+---
+<span class:list={['status-badge', `status-${status}`]}>{labels[status] ?? status.replaceAll('_', ' ')}</span>

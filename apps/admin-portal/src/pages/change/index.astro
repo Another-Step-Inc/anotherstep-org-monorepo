@@ -1,0 +1,40 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import StatusBadge from '@anothersteporg/ui/components/admin/StatusBadge.astro';
+import Icon from '@anothersteporg/ui/components/admin/Icon.astro';
+import { db } from '../../lib/db';
+const status = Astro.url.searchParams.get('status') ?? '';
+const search = Astro.url.searchParams.get('q')?.trim() ?? '';
+const requests = await db.query(
+  `SELECT cr.id, cr.request_number, cr.title, cr.description, cr.repository, cr.branch_name,
+          cr.status, cr.priority, cr.created_at, u.name AS requester
+     FROM change_requests cr JOIN users u ON u.id = cr.created_by
+    WHERE ($1 = '' OR cr.status = $1)
+      AND ($2 = '' OR cr.title ILIKE '%' || $2 || '%' OR cr.request_number ILIKE '%' || $2 || '%' OR cr.repository ILIKE '%' || $2 || '%')
+    ORDER BY cr.updated_at DESC`,
+  [status, search],
+);
+---
+<AdminLayout title="Change requests" active="/change">
+  <div class="page-heading">
+    <div><h1>Change requests</h1><p>Track code changes from proposal through production release.</p></div>
+    <a class="button button-primary" href="/change/new"><Icon name="plus" size={16} /> New request</a>
+  </div>
+  <form class="filter-row" method="get">
+    <input type="search" name="q" value={search} placeholder="Search by title, ID or repository" aria-label="Search change requests" />
+    <select name="status" aria-label="Filter by status">
+      <option value="" selected={status === ''}>All statuses</option>
+      {['pending_lead_review', 'pending_qa', 'pending_security', 'pending_release', 'released', 'rejected'].map((value) =>
+        <option value={value} selected={status === value}>{value.replaceAll('_', ' ')}</option>
+      )}
+    </select>
+    <button class="button button-secondary" type="submit">Filter</button>
+  </form>
+  <section class="request-grid">
+    {requests.rows.length ? requests.rows.map((request) => <a class="request-card" href={`/change/${request.id}`}>
+      <div class="request-card-head"><div><span class="request-id">{request.request_number}</span><h2>{request.title}</h2></div><StatusBadge status={request.status} /></div>
+      <p>{request.description.length > 200 ? `${request.description.slice(0, 200)}…` : request.description}</p>
+      <div class="request-meta"><span>{request.repository} · {request.branch_name}</span><span>By {request.requester}</span><span>Priority: {request.priority}</span><span>{request.created_at.toLocaleDateString()}</span></div>
+    </a>) : <div class="panel empty-state"><strong>No matching change requests</strong>Try changing the filters or create a request.</div>}
+  </section>
+</AdminLayout>

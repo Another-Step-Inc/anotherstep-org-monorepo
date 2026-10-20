@@ -1,0 +1,68 @@
+---
+import AdminLayout from '../layouts/AdminLayout.astro';
+import StatCard from '@anothersteporg/ui/components/admin/StatCard.astro';
+import StatusBadge from '@anothersteporg/ui/components/admin/StatusBadge.astro';
+import Icon from '@anothersteporg/ui/components/admin/Icon.astro';
+import { db, escapeHtml } from '../lib/db';
+const [counts, recentRequests, activity] = await Promise.all([
+  db.query(`SELECT
+    COUNT(*) FILTER (WHERE status NOT IN ('released', 'rejected'))::int AS open,
+    COUNT(*) FILTER (WHERE status = 'pending_lead_review')::int AS lead,
+    COUNT(*) FILTER (WHERE status = 'pending_qa')::int AS qa,
+    COUNT(*) FILTER (WHERE status = 'pending_security')::int AS security,
+    COUNT(*) FILTER (WHERE status = 'pending_release')::int AS release,
+    COUNT(*) FILTER (WHERE released_at >= date_trunc('month', NOW()))::int AS released
+    FROM change_requests`),
+  db.query(`SELECT cr.id, cr.request_number, cr.title, cr.repository, cr.status, cr.priority, cr.updated_at, u.name AS requester
+    FROM change_requests cr JOIN users u ON u.id = cr.created_by
+    ORDER BY cr.updated_at DESC LIMIT 6`),
+  db.query(`SELECT a.action, a.entity_type, a.details, a.created_at, u.name
+    FROM audit_logs a LEFT JOIN users u ON u.id = a.user_id
+    ORDER BY a.created_at DESC LIMIT 5`),
+]);
+const stats = counts.rows[0];
+const actionLabels: Record<string, string> = { created: 'created a change request', approved: 'approved a change request', rejected: 'rejected a change request', signed_in: 'signed in', signed_out: 'signed out' };
+---
+<AdminLayout title="Overview" active="/">
+  <div class="page-heading">
+    <div><h1>Good to see you, {Astro.locals.user!.name.split(' ')[0]}</h1><p>Here's what's happening across your change requests.</p></div>
+    <a class="button button-primary" href="/change/new"><Icon name="plus" size={16} /> New request</a>
+  </div>
+  <section class="stats-grid" aria-label="Change request summary">
+    <StatCard label="Open change requests" value={stats.open} detail="Requests moving through workflow" icon="git" tone="blue" />
+    <StatCard label="Pending lead review" value={stats.lead} detail="Stage 1 · Lead code review" icon="search" tone="violet" />
+    <StatCard label="Pending QA" value={stats.qa} detail="Stage 2 · QA & responsive test" icon="check" tone="amber" />
+    <StatCard label="Pending security" value={stats.security} detail="Stage 3 · Security & API audit" icon="shield" tone="rose" />
+    <StatCard label="Pending release" value={stats.release} detail="Stage 4 · Release sign-off" icon="clock" tone="blue" />
+    <StatCard label="Released this month" value={stats.released} detail="Production releases this month" icon="chart" tone="green" />
+  </section>
+  <div class="dashboard-grid">
+    <section class="panel">
+      <div class="panel-heading"><div><h2>Recent change requests</h2><p>Latest updates from your team</p></div><a class="panel-link" href="/change">View all <Icon name="arrow" size={13} /></a></div>
+      {recentRequests.rows.length ? <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>Request</th><th>Requester</th><th>Priority</th><th>Status</th></tr></thead>
+        <tbody>{recentRequests.rows.map((request) => <tr>
+          <td><a class="table-primary" href={`/change/${request.id}`}>{request.title}</a><span class="table-sub">{request.request_number} · {request.repository}</span></td>
+          <td>{request.requester}</td><td class="priority-{request.priority}">{request.priority}</td>
+          <td><StatusBadge status={request.status} /></td>
+        </tr>)}</tbody>
+      </table></div> : <div class="empty-state"><strong>No change requests yet</strong>Create the first request to start a review.</div>}
+    </section>
+    <section class="panel">
+      <div class="panel-heading"><div><h2>Recent activity</h2><p>Latest audit events</p></div><a class="panel-link" href="/audit">Audit log <Icon name="arrow" size={13} /></a></div>
+      {activity.rows.length ? <div class="activity-list">{activity.rows.map((event) => <div class="activity-item">
+        <span class="activity-icon"><Icon name={event.action === 'approved' ? 'check' : 'file'} size={14} /></span>
+        <div class="activity-copy"><p><strong>{event.name ?? 'Former user'}</strong> {actionLabels[event.action] ?? escapeHtml(event.action)}{event.details?.request_number ? ` · ${event.details.request_number}` : ''}</p>
+          <time datetime={event.created_at.toISOString()}>{event.created_at.toLocaleString()}</time></div>
+      </div>)}</div> : <div class="empty-state"><strong>Nothing to show yet</strong>Your team's activity will appear here.</div>}
+    </section>
+  </div>
+  <section class="panel workflow-panel">
+    <div class="panel-heading"><div><h2>Approval workflow</h2><p>Every change follows the same four stages before release</p></div></div>
+    <div class="workflow-steps">
+      {['Lead Code Review', 'QA & Responsive Test', 'Security & API Audit', 'Release Sign-off'].map((stage, index) =>
+        <div class="workflow-step"><span class="step-number">{index + 1}</span><span>{stage}</span></div>
+      )}
+    </div>
+  </section>
+</AdminLayout>

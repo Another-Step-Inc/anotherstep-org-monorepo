@@ -8,9 +8,14 @@
         "./lib/*": "./src/lib/*.js",
         "./layouts/*": "./src/layouts/*.astro",
         "./components/*": "./src/components/*.astro",
+        "./components/admin/*.astro": "./src/components/admin/*.astro",
         "./styles/global.css": {
             "style": "./src/styles/global.css",
             "default": "./src/styles/global.css"
+        },
+        "./styles/admin-portal.css": {
+            "style": "./src/styles/admin-portal.css",
+            "default": "./src/styles/admin-portal.css"
         }
     },
     "peerDependencies": {

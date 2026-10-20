@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "pnpm -r --parallel dev",
     "build": "pnpm -r build",
+    "db:migrate": "pnpm --filter admin-portal db:migrate",
+    "db:seed": "pnpm --filter admin-portal db:seed",
     "test:e2e": "playwright test",
     "test:e2e:main": "playwright test --project=main-site",
     "test:e2e:store": "playwright test --project=store-site"
