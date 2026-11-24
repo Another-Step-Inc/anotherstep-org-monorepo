@@ -1,54 +1,670 @@
 ---
 import StoreLayout from '../layouts/StoreLayout.astro';
-import ProductCard from '../components/ProductCard.astro';
-import Footer from 'src/components/Footer.astro';
-import '../styles/global.css'
+import '../styles/global.css';
 
-const products = {
+interface WooProduct {
+	id: number;
+	name: string;
+	short_description?: string;
+	description?: string;
+	categories?: WooCategory[];
+	permalink: string;
+	on_sale: boolean;
+	prices: {
+		price: string;
+		currency_minor_unit: number;
+		currency_prefix: string;
+		currency_suffix: string;
+	};
+	images: Array<{ src: string; alt: string }>;
+}
 
+interface WooCategory {
+	id: number;
+	name: string;
+	slug: string;
+}
+
+interface StoreProduct {
+	id: number;
+	name: string;
+	description: string;
+	categories: WooCategory[];
+	price: string | null;
+	priceAmount: number | null;
+	image: { src: string; alt: string } | null;
+	permalink: string;
+	onSale: boolean;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === 'object' && value !== null;
+}
+
+function isWooProduct(value: unknown): value is WooProduct {
+	return (
+		isRecord(value) &&
+		typeof value.id === 'number' &&
+		typeof value.name === 'string' &&
+		typeof value.permalink === 'string' &&
+		typeof value.on_sale === 'boolean' &&
+		isRecord(value.prices) &&
+		typeof value.prices.price === 'string' &&
+		typeof value.prices.currency_minor_unit === 'number' &&
+		typeof value.prices.currency_prefix === 'string' &&
+		typeof value.prices.currency_suffix === 'string' &&
+		Array.isArray(value.images) &&
+		value.images.every(
+			(image) =>
+				isRecord(image) &&
+				typeof image.src === 'string' &&
+				typeof image.alt === 'string',
+		) &&
+		(value.short_description === undefined || typeof value.short_description === 'string') &&
+		(value.description === undefined || typeof value.description === 'string') &&
+		(value.categories === undefined ||
+			(Array.isArray(value.categories) && value.categories.every(isWooCategory)))
+	);
+}
+
+function isWooCategory(value: unknown): value is WooCategory {
+	return (
+		isRecord(value) &&
+		typeof value.id === 'number' &&
+		typeof value.name === 'string' &&
+		typeof value.slug === 'string'
+	);
+}
+
+function plainText(description: string | undefined): string {
+	return (
+		description
+			?.replace(/<[^>]*>/g, ' ')
+			.replace(/&#8217;|&#x2019;|&rsquo;/gi, '’')
+			.replace(/\s+/g, ' ')
+			.trim() ?? ''
+	);
+}
+
+function formatPrice(product: WooProduct): string | null {
+	const minorUnits = product.prices.currency_minor_unit;
+	const amountInMinorUnits = Number(product.prices.price);
+
+	if (!Number.isFinite(amountInMinorUnits) || product.prices.price === '') {
+		return null;
+	}
+
+	const amount = new Intl.NumberFormat('en-US', {
+		minimumFractionDigits: minorUnits,
+		maximumFractionDigits: minorUnits,
+	}).format(amountInMinorUnits / 10 ** minorUnits);
+
+	return `${product.prices.currency_prefix}${amount}${product.prices.currency_suffix}`;
+}
+
+function getPriceAmount(product: WooProduct): number | null {
+	const amountInMinorUnits = Number(product.prices.price);
+
+	if (!Number.isFinite(amountInMinorUnits) || product.prices.price === '') {
+		return null;
+	}
+
+	return amountInMinorUnits / 10 ** product.prices.currency_minor_unit;
+}
+
+const wordpressBaseUrl = (
+	import.meta.env.PUBLIC_WORDPRESS_API_URL || 'http://host.docker.internal:8050'
+).replace(/\/+$/, '');
+const storeApiUrl = `${wordpressBaseUrl}/wp-json/wc/store/v1`;
+const productsEndpoint = `${storeApiUrl}/products?per_page=100&orderby=popularity`;
+const categoriesEndpoint = `${storeApiUrl}/products/categories?per_page=100&hide_empty=true`;
+
+let products: StoreProduct[] = [];
+let productsError: string | undefined;
+let categories: WooCategory[] = [];
+let categoriesError: string | undefined;
+
+try {
+	const response = await fetch(productsEndpoint);
+	if (!response.ok) {
+		throw new Error(`WooCommerce returned HTTP ${response.status}`);
+	}
+
+	const payload: unknown = await response.json();
+	if (!Array.isArray(payload) || !payload.every(isWooProduct)) {
+		throw new Error('WooCommerce returned an invalid product list');
+	}
+
+	products = payload.map((product) => ({
+		id: product.id,
+		name: product.name,
+		categories: product.categories ?? [],
+		description:
+			plainText(product.short_description) ||
+			plainText(product.description) ||
+			'View this product for more details.',
+		price: formatPrice(product),
+		priceAmount: getPriceAmount(product),
+		image: product.images[0]
+			? {
+					src: product.images[0].src,
+					alt: product.images[0].alt || product.name,
+				}
+			: null,
+		permalink: product.permalink,
+		onSale: product.on_sale,
+	}));
+} catch (error) {
+	console.error(`Failed to load WooCommerce products from ${productsEndpoint}:`, error);
+	productsError = 'We could not load products right now. Please try again later.';
+}
+
+try {
+	const response = await fetch(categoriesEndpoint);
+	if (!response.ok) {
+		throw new Error(`WooCommerce returned HTTP ${response.status}`);
+	}
+
+	const payload: unknown = await response.json();
+	if (!Array.isArray(payload) || !payload.every(isWooCategory)) {
+		throw new Error('WooCommerce returned an invalid product category list');
+	}
+
+	categories = payload;
+} catch (error) {
+	console.error(`Failed to load WooCommerce categories from ${categoriesEndpoint}:`, error);
+	categoriesError = 'Product categories could not be loaded. Showing all products.';
 }
 ---
-<StoreLayout title='Store'>
-	<section class="max-w-7xl mx-auto px-4 py-8">
-		<div class="bg-[#0E75BC] rounded-[2.5rem] p-12 text-white relative overflow-hidden flex flex-col md:flex-row items-center gap-8">
-		<div class="md:w-1/2 z-10">
-			<h1 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
-			Shop with <span class="text-[#F9EF21]">Purpose</span>
-			</h1>
-			<p class="text-lg text-blue-50 mb-8 max-w-lg">
-			Every item in our store is designed to support the "Without Walls" model, providing community-based independence for the people we serve.
-			</p>
-			<a href="/products" class="inline-block bg-[#EC1F28] text-white px-10 py-4 rounded-2xl font-black text-xl hover:scale-105 transition-transform shadow-lg">
-			Browse the Collection
-			</a>
-		</div>
-		<div class="md:w-1/2 relative z-10">
-			<img src="/store-hero-image.jpg" class="rounded-[2rem] shadow-2xl border-4 border-white/10" alt="Another Step Merchandise" />
-		</div>
-		<div class="absolute -bottom-20 -right-20 w-80 h-80 bg-[#F9EF21] rounded-full opacity-20 blur-3xl"></div>
-		</div>
-	</section>
 
-	<section class="max-w-7xl mx-auto px-4 py-12">
-		<div class="flex items-center justify-between mb-8 border-b-2 border-[#EEEEEE] pb-4">
-			<h2 class="text-3xl font-black text-[#232020] uppercase tracking-tighter">Custom Apparel</h2>
-			<a href="/products" class="text-[#0E75BC] font-bold hover:underline">View All Collection →</a>
-		</div>
-
-		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-			<div class="bg-white rounded-[2rem] border border-[#EEEEEE] overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-shadow">
-			<div class="p-8 bg-[#F9F9F9] flex justify-center items-center aspect-square">
-				<img src="/tshirt-mockup.png" class="w-full h-auto object-contain" />
+<StoreLayout title="Store">
+	<main class="flex-grow bg-white pb-24 md:pb-0">
+		<section class="mx-auto flex max-w-7xl flex-col items-center gap-12 px-8 py-16 md:flex-row">
+			<div class="flex-1 space-y-6">
+				<h1 class="text-5xl font-black leading-tight tracking-tight text-brand-blue md:text-6xl">
+					Gear That Empowers <br class="hidden sm:block" />Every Step.
+				</h1>
+				<p class="max-w-xl text-lg text-brand-text">
+					Support our mission with high-quality essentials designed for independence, comfort, and visibility. Every purchase directly funds our vocational training programs.
+				</p>
+				<div class="flex flex-wrap gap-4">
+					<a
+						href="#collection"
+						class="rounded-full bg-brand-yellow-fixed px-8 py-4 text-lg font-bold text-on-brand-yellow transition-all hover:brightness-95 active:scale-95"
+					>
+						View Best Sellers
+					</a>
+					<a
+						href="#impact"
+						class="rounded-full bg-surface-container-low px-8 py-4 text-lg font-bold text-brand-blue transition-all hover:bg-surface-container-high active:scale-95"
+					>
+						Our Impact
+					</a>
+				</div>
 			</div>
-			<div class="p-6 text-center flex-grow">
-				<h3 class="font-bold text-[#232020] text-lg">T-Shirts Apparel</h3>
-				<p class="text-[#808080] text-sm mt-1">As low as <span class="text-[#EC1F28] font-black">$15.99</span> ea.</p>
+			<div class="relative aspect-square h-[400px] w-full flex-1 overflow-hidden rounded-[2.5rem] shadow-2xl md:aspect-auto">
+				<img
+					class="h-full w-full object-cover"
+					alt="Inclusive merchandise and branded apparel displayed in a bright boutique"
+					src="https://lh3.googleusercontent.com/aida-public/AB6AXuALhYF6eZdDEdNoMeLWefK6Dl49WWsAQH14i2PCkSKejeCMrztlTUgnjfadSXXVVkiJbzpG9D4hWp4L9XDAJ2IVSvnwcYRO9cZ6j253ZMdMhfIXuPbZDbcPvTRWo1MLsJalP_MDmFEk_U8-A5xSqoZEC5SijPyQ-MejCWEdfJwaaKQrW-Wlwo33d1fQRkVsOiiuRWa1QlrMd3VQ3FhFP6L5FeBzWOh4LycT_HOOBy3_ZOy2BXiGScp8Z48fxLDHaDVKcx_v33LQe1M"
+				/>
+				<div class="absolute inset-0 bg-gradient-to-t from-brand-blue/40 to-transparent"></div>
 			</div>
-			<a href="/product/tshirt" class="bg-[#0E75BC] text-white py-4 font-black uppercase tracking-widest text-sm hover:bg-[#232020] transition-colors text-center">
-				Buy Now
-			</a>
-		</div>
+		</section>
 
-		</div>
-	</section>
+		<section id="collection" class="mx-auto max-w-7xl px-8 pb-24">
+			<div class="mb-12 flex items-end justify-between gap-4">
+				<div>
+					<h2 class="mb-2 text-2xl font-black uppercase tracking-widest text-brand-blue">The Collection</h2>
+					<p class="text-brand-text">Quality products for a purposeful lifestyle.</p>
+				</div>
+				{!productsError && products.length > 0 && (
+					<div class="flex gap-2">
+						<div class="relative">
+							<button
+								type="button"
+								aria-label="Filter products"
+								aria-controls="product-filter-menu"
+								aria-expanded="false"
+								data-filter-toggle
+								class="rounded-full bg-surface-container p-3 text-brand-blue transition-colors hover:bg-brand-blue hover:text-white"
+							>
+								<span class="material-symbols-outlined" aria-hidden="true">filter_list</span>
+							</button>
+							<div
+								id="product-filter-menu"
+								class="absolute right-0 top-full z-30 mt-3 hidden w-72 max-w-[calc(100vw-4rem)] rounded-2xl border border-surface-container bg-white p-5 text-on-surface shadow-xl"
+								data-filter-menu
+							>
+								<h3 class="mb-4 text-sm font-bold uppercase tracking-wider text-brand-blue">More filters</h3>
+								<label class="flex cursor-pointer items-center gap-3 rounded-xl bg-surface-container-low px-4 py-3 font-medium">
+									<input
+										type="checkbox"
+										class="h-4 w-4 accent-brand-blue"
+										data-sale-filter
+									/>
+									On sale
+								</label>
+								<button
+									type="button"
+									class="mt-3 w-full rounded-xl px-4 py-2 text-left text-sm font-semibold text-brand-blue transition-colors hover:bg-surface-container-low"
+									data-clear-filters
+								>
+									Clear filters
+								</button>
+							</div>
+						</div>
+						<div class="relative">
+							<button
+								type="button"
+								aria-label="Sort products"
+								aria-controls="product-sort-menu"
+								aria-expanded="false"
+								data-sort-toggle
+								class="rounded-full bg-surface-container p-3 text-brand-blue transition-colors hover:bg-brand-blue hover:text-white"
+							>
+								<span class="material-symbols-outlined" aria-hidden="true">sort</span>
+							</button>
+							<div
+								id="product-sort-menu"
+								class="absolute right-0 top-full z-30 mt-3 hidden w-64 max-w-[calc(100vw-4rem)] rounded-2xl border border-surface-container bg-white p-3 text-on-surface shadow-xl"
+								data-sort-menu
+							>
+								<h3 class="px-3 py-2 text-sm font-bold uppercase tracking-wider text-brand-blue">Sort products</h3>
+								<button
+									type="button"
+									class="w-full rounded-xl bg-brand-blue px-3 py-2.5 text-left text-sm font-semibold text-white"
+									data-sort-option="featured"
+									aria-pressed="true"
+								>
+									Featured
+								</button>
+								<button
+									type="button"
+									class="w-full rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors hover:bg-surface-container-low"
+									data-sort-option="price-ascending"
+									aria-pressed="false"
+								>
+									Price: low to high
+								</button>
+								<button
+									type="button"
+									class="w-full rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors hover:bg-surface-container-low"
+									data-sort-option="price-descending"
+									aria-pressed="false"
+								>
+									Price: high to low
+								</button>
+								<button
+									type="button"
+									class="w-full rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors hover:bg-surface-container-low"
+									data-sort-option="name"
+									aria-pressed="false"
+								>
+									Name: A to Z
+								</button>
+							</div>
+						</div>
+					</div>
+				)}
+			</div>
+
+			{!productsError && products.length > 0 && (
+				<nav
+					id="category-filters"
+					class="mb-8 flex flex-wrap gap-3"
+					aria-label="Filter products by category"
+					data-category-filters
+				>
+					<button
+						type="button"
+						class="rounded-full bg-brand-blue px-6 py-2 font-bold text-white"
+						data-category-filter="*"
+						aria-pressed="true"
+					>
+						All
+					</button>
+					{categories.map((category) => (
+						<button
+							type="button"
+							class="rounded-full border border-brand-blue px-6 py-2 font-bold text-brand-blue transition-colors hover:bg-brand-blue hover:text-white"
+							data-category-filter={category.slug}
+							aria-pressed="false"
+						>
+							{category.name}
+						</button>
+					))}
+				</nav>
+			)}
+			{categoriesError && (
+				<p class="mb-6 text-sm text-brand-text" role="status">{categoriesError}</p>
+			)}
+
+			<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3" data-product-grid>
+				{productsError ? (
+					<p class="col-span-full rounded-2xl bg-surface-container-low p-8 text-center text-brand-text" role="status">
+						{productsError}
+					</p>
+				) : products.length === 0 ? (
+					<p class="col-span-full rounded-2xl bg-surface-container-low p-8 text-center text-brand-text">
+						No products are available right now.
+					</p>
+				) : (
+					products.map((product, productIndex) => (
+					<article
+						class="group flex flex-col overflow-hidden rounded-[2rem] bg-surface-container-low transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl"
+						data-product-id={product.id}
+						data-category-slugs={product.categories.map((category) => category.slug).join(' ')}
+						data-on-sale={product.onSale}
+						data-sort-price={product.priceAmount ?? ''}
+						data-sort-name={product.name}
+						data-featured-order={productIndex}
+					>
+						<div class="relative h-80 overflow-hidden bg-white">
+							{product.image ? (
+								<img
+									class="h-full w-full object-contain transition-transform duration-700 group-hover:scale-110"
+									src={product.image.src}
+									alt={product.image.alt}
+									loading="lazy"
+								/>
+							) : (
+								<div class="flex h-full items-center justify-center p-8 text-center text-brand-text">
+									{product.name}
+								</div>
+							)}
+							{product.onSale && (
+								<span class="absolute left-4 top-4 rounded-full bg-brand-red px-4 py-1 text-xs font-bold uppercase text-white">
+									On Sale
+								</span>
+							)}
+						</div>
+						<div class="flex flex-grow flex-col p-8">
+							{product.categories.length > 0 && (
+								<div class="mb-3 flex flex-wrap gap-2" aria-label="Product categories">
+									{product.categories.map((category) => (
+										<span class="rounded-full bg-surface-container px-3 py-1 text-xs font-semibold text-brand-blue">
+											{category.name}
+										</span>
+									))}
+								</div>
+							)}
+							<h3 class="mb-2 text-xl font-bold text-on-surface">{product.name}</h3>
+							<p class="mb-6 flex-grow text-sm text-brand-text">{product.description}</p>
+							<div class="mt-auto flex items-center justify-between gap-3">
+								<span class="text-2xl font-black text-brand-blue">
+									{product.price ?? 'See product'}
+								</span>
+								<a
+									href={product.permalink}
+									class="flex items-center gap-2 rounded-full bg-brand-blue px-6 py-3 font-bold text-on-brand-blue transition-all hover:bg-brand-blue-container active:scale-95"
+								>
+									<span class="material-symbols-outlined text-sm" aria-hidden="true">add_shopping_cart</span>
+									View Product
+								</a>
+							</div>
+						</div>
+					</article>
+					))
+				)}
+				{!productsError && products.length > 0 && (
+					<p
+						class="col-span-full hidden rounded-2xl bg-surface-container-low p-8 text-center text-brand-text"
+						data-no-category-results
+						role="status"
+					>
+						No products match these filters.
+					</p>
+				)}
+			</div>
+			<p class="sr-only" data-sort-status aria-live="polite"></p>
+		</section>
+
+		<section id="impact" class="bg-surface-container-low py-20">
+			<div class="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-8 text-center md:grid-cols-3">
+				<div class="space-y-4">
+					<div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm">
+						<span class="material-symbols-outlined text-3xl text-brand-blue" aria-hidden="true">volunteer_activism</span>
+					</div>
+					<h3 class="text-xl font-bold text-on-surface">Community Funded</h3>
+					<p class="text-brand-text">100% of proceeds fund local empowerment and vocational training programs.</p>
+				</div>
+				<div class="space-y-4">
+					<div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm">
+						<span class="material-symbols-outlined text-3xl text-brand-blue" aria-hidden="true">local_shipping</span>
+					</div>
+					<h3 class="text-xl font-bold text-on-surface">Reliable Delivery</h3>
+					<p class="text-brand-text">Fast, tracked shipping on every order to ensure your gear arrives safely.</p>
+				</div>
+				<div class="space-y-4">
+					<div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm">
+						<span class="material-symbols-outlined text-3xl text-brand-blue" aria-hidden="true">verified</span>
+					</div>
+					<h3 class="text-xl font-bold text-on-surface">Quality Guaranteed</h3>
+					<p class="text-brand-text">We stand by our products. If you aren't satisfied, we'll make it right.</p>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<nav
+		aria-label="Mobile store navigation"
+		class="fixed bottom-0 left-0 z-50 flex w-full justify-around rounded-t-[2rem] border-t border-slate-100 bg-white/90 px-4 pb-6 pt-3 shadow-[0_-8px_24px_rgba(0,0,0,0.05)] backdrop-blur-xl md:hidden"
+	>
+		<a
+			class="flex flex-col items-center justify-center rounded-2xl bg-brand-blue px-6 py-2 text-white transition-transform duration-200 hover:scale-105 active:scale-90"
+			href="/"
+			aria-current="page"
+		>
+			<span class="material-symbols-outlined" aria-hidden="true">storefront</span>
+			<span class="mt-1 text-[10px] font-semibold uppercase tracking-wider">Shop</span>
+		</a>
+		<a
+			class="flex flex-col items-center justify-center px-4 py-2 text-slate-500 transition-transform duration-200 hover:scale-105 active:scale-90"
+			href="/cart"
+		>
+			<span class="material-symbols-outlined" aria-hidden="true">shopping_bag</span>
+			<span class="mt-1 text-[10px] font-semibold uppercase tracking-wider">Cart</span>
+		</a>
+		<button
+			type="button"
+			class="flex flex-col items-center justify-center px-4 py-2 text-slate-500 transition-transform duration-200 hover:scale-105 active:scale-90"
+		>
+			<span class="material-symbols-outlined" aria-hidden="true">favorite</span>
+			<span class="mt-1 text-[10px] font-semibold uppercase tracking-wider">Saved</span>
+		</button>
+		<button
+			type="button"
+			class="flex flex-col items-center justify-center px-4 py-2 text-slate-500 transition-transform duration-200 hover:scale-105 active:scale-90"
+		>
+			<span class="material-symbols-outlined" aria-hidden="true">person</span>
+			<span class="mt-1 text-[10px] font-semibold uppercase tracking-wider">Profile</span>
+		</button>
+	</nav>
 </StoreLayout>
+
+<script>
+	const filterToggle = document.querySelector<HTMLButtonElement>('[data-filter-toggle]');
+	const filterMenu = document.querySelector<HTMLElement>('[data-filter-menu]');
+	const filterDropdown = filterToggle?.parentElement;
+	const sortToggle = document.querySelector<HTMLButtonElement>('[data-sort-toggle]');
+	const sortMenu = document.querySelector<HTMLElement>('[data-sort-menu]');
+	const sortDropdown = sortToggle?.parentElement;
+	const productGrid = document.querySelector<HTMLElement>('[data-product-grid]');
+	const filterButtons = document.querySelectorAll<HTMLButtonElement>('[data-category-filter]');
+	const saleFilter = document.querySelector<HTMLInputElement>('[data-sale-filter]');
+	const clearFiltersButton = document.querySelector<HTMLButtonElement>('[data-clear-filters]');
+	const sortOptions = document.querySelectorAll<HTMLButtonElement>('[data-sort-option]');
+	const productCards = Array.from(document.querySelectorAll<HTMLElement>('[data-product-id]'));
+	const noResultsMessage = document.querySelector<HTMLElement>('[data-no-category-results]');
+	const sortStatus = document.querySelector<HTMLElement>('[data-sort-status]');
+
+	let activeCategory = '*';
+	let saleOnly = false;
+	let activeSort = 'featured';
+
+	function setMenuVisibility(
+		menu: HTMLElement | null,
+		toggle: HTMLButtonElement | null,
+		isOpen: boolean,
+	): void {
+		if (!menu || !toggle) return;
+		menu.hidden = !isOpen;
+		menu.classList.toggle('hidden', !isOpen);
+		toggle.setAttribute('aria-expanded', String(isOpen));
+	}
+
+	function closeMenus(): void {
+		setMenuVisibility(filterMenu, filterToggle, false);
+		setMenuVisibility(sortMenu, sortToggle, false);
+	}
+
+	filterToggle?.addEventListener('click', () => {
+		const isOpen = filterToggle.getAttribute('aria-expanded') !== 'true';
+		setMenuVisibility(sortMenu, sortToggle, false);
+		setMenuVisibility(filterMenu, filterToggle, isOpen);
+	});
+
+	sortToggle?.addEventListener('click', () => {
+		const isOpen = sortToggle.getAttribute('aria-expanded') !== 'true';
+		setMenuVisibility(filterMenu, filterToggle, false);
+		setMenuVisibility(sortMenu, sortToggle, isOpen);
+	});
+
+	document.addEventListener('click', (event) => {
+		if (!(event.target instanceof Node)) return;
+		if (!filterDropdown?.contains(event.target)) setMenuVisibility(filterMenu, filterToggle, false);
+		if (!sortDropdown?.contains(event.target)) setMenuVisibility(sortMenu, sortToggle, false);
+	});
+
+	document.addEventListener('keydown', (event) => {
+		if (event.key !== 'Escape') return;
+		closeMenus();
+	});
+
+	function updateProductVisibility(): void {
+		let visibleProducts = 0;
+		productCards.forEach((card) => {
+			const productCategories = card.dataset.categorySlugs?.split(' ') ?? [];
+			const matchesCategory =
+				activeCategory === '*' || productCategories.includes(activeCategory);
+			const matchesSaleFilter = !saleOnly || card.dataset.onSale === 'true';
+			const isVisible = matchesCategory && matchesSaleFilter;
+			card.hidden = !isVisible;
+			card.classList.toggle('hidden', !isVisible);
+			if (isVisible) visibleProducts += 1;
+		});
+
+		if (noResultsMessage) {
+			noResultsMessage.hidden = visibleProducts > 0;
+			noResultsMessage.classList.toggle('hidden', visibleProducts > 0);
+		}
+	}
+
+	filterButtons.forEach((button) => {
+		button.addEventListener('click', () => {
+			const selectedCategory = button.dataset.categoryFilter;
+			if (selectedCategory === undefined) return;
+
+			activeCategory = selectedCategory;
+			filterButtons.forEach((filterButton) => {
+				const isSelected = filterButton.dataset.categoryFilter === activeCategory;
+				filterButton.setAttribute('aria-pressed', String(isSelected));
+				filterButton.classList.toggle('bg-brand-blue', isSelected);
+				filterButton.classList.toggle('text-white', isSelected);
+				filterButton.classList.toggle('border', !isSelected);
+				filterButton.classList.toggle('border-brand-blue', !isSelected);
+				filterButton.classList.toggle('text-brand-blue', !isSelected);
+			});
+
+			updateProductVisibility();
+		});
+	});
+
+	saleFilter?.addEventListener('change', () => {
+		saleOnly = saleFilter.checked;
+		updateProductVisibility();
+	});
+
+	clearFiltersButton?.addEventListener('click', () => {
+		activeCategory = '*';
+		saleOnly = false;
+		if (saleFilter) saleFilter.checked = false;
+
+		filterButtons.forEach((button) => {
+			const isSelected = button.dataset.categoryFilter === activeCategory;
+			button.setAttribute('aria-pressed', String(isSelected));
+			button.classList.toggle('bg-brand-blue', isSelected);
+			button.classList.toggle('text-white', isSelected);
+			button.classList.toggle('border', !isSelected);
+			button.classList.toggle('border-brand-blue', !isSelected);
+			button.classList.toggle('text-brand-blue', !isSelected);
+		});
+
+		updateProductVisibility();
+	});
+
+	function sortProducts(sortBy: string): void {
+		if (!productGrid) return;
+
+		const compareFeatured = (first: HTMLElement, second: HTMLElement) =>
+			Number(first.dataset.featuredOrder) - Number(second.dataset.featuredOrder);
+		const sortedCards = [...productCards].sort((first, second) => {
+			if (sortBy === 'featured') return compareFeatured(first, second);
+
+			if (sortBy === 'price-ascending' || sortBy === 'price-descending') {
+				const firstPriceValue = first.dataset.sortPrice ?? '';
+				const secondPriceValue = second.dataset.sortPrice ?? '';
+				const firstPrice = Number(firstPriceValue);
+				const secondPrice = Number(secondPriceValue);
+				const firstHasPrice = firstPriceValue !== '' && Number.isFinite(firstPrice);
+				const secondHasPrice = secondPriceValue !== '' && Number.isFinite(secondPrice);
+
+				if (firstHasPrice !== secondHasPrice) return firstHasPrice ? -1 : 1;
+				if (!firstHasPrice) return compareFeatured(first, second);
+
+				const direction = sortBy === 'price-ascending' ? 1 : -1;
+				return direction * (firstPrice - secondPrice) || compareFeatured(first, second);
+			}
+
+			const nameComparison = (first.dataset.sortName ?? '').localeCompare(
+				second.dataset.sortName ?? '',
+				undefined,
+				{ numeric: true, sensitivity: 'base' },
+			);
+			return nameComparison || compareFeatured(first, second);
+		});
+
+		sortedCards.forEach((card) => {
+			if (noResultsMessage) {
+				productGrid.insertBefore(card, noResultsMessage);
+			} else {
+				productGrid.append(card);
+			}
+		});
+
+		const selectedSort = Array.from(sortOptions).find(
+			(option) => option.dataset.sortOption === sortBy,
+		)?.textContent?.trim();
+		if (sortStatus && selectedSort) sortStatus.textContent = `Products sorted by ${selectedSort}.`;
+	}
+
+	sortOptions.forEach((option) => {
+		option.addEventListener('click', () => {
+			const sortBy = option.dataset.sortOption;
+			if (!sortBy) return;
+
+			activeSort = sortBy;
+			sortOptions.forEach((sortOption) => {
+				const isSelected = sortOption.dataset.sortOption === activeSort;
+				sortOption.setAttribute('aria-pressed', String(isSelected));
+				sortOption.classList.toggle('bg-brand-blue', isSelected);
+				sortOption.classList.toggle('text-white', isSelected);
+				sortOption.classList.toggle('text-on-surface', !isSelected);
+			});
+
+			sortProducts(activeSort);
+			setMenuVisibility(sortMenu, sortToggle, false);
+		});
+	});
+</script>
